@@ -12,9 +12,11 @@
         "postinstall": "npm run cf-typegen"
     },
     "dependencies": {
+        "@solid-primitives/i18n": "^2.2.1",
         "@tanstack/solid-router": "^1.141.8",
         "@tanstack/solid-router-devtools": "^1.141.8",
         "@tanstack/solid-start": "^1.142.5",
+        "@workos-inc/node": "^8.0.0",
         "animejs": "^4.2.2",
         "luxon": "^3.7.2",
         "nanoid": "^5.1.6",
