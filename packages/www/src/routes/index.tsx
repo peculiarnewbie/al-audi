@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/solid-router";
 import { For, Show } from "solid-js";
-import { t, locale, setLocaleWithStorage } from "~/utils/i18n";
+import { t, locale, setLocaleWithStorage } from "~/i18n";
 
 export const Route = createFileRoute("/")({
     component: Index,

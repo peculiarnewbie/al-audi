@@ -1,14 +1,14 @@
-import { createSignal, createMemo } from "solid-js";
+import { createSignal, createMemo, createResource } from "solid-js";
 import * as i18n from "@solid-primitives/i18n";
-import { en } from "./en";
-import { id } from "./id";
+import type * as en from "./en";
+import type * as id from "./id";
 
 export type Locale = "en" | "id";
 
-const dictionaries = {
-    en: en,
-    id: id,
-};
+async function fetchDictionary(locale: Locale): Promise<en.Dict> {
+    const dict: en.Dict = (await import(`./${locale}.ts`)).dict;
+    return i18n.flatten(dict);
+}
 
 function detectLocale(): Locale {
     if (typeof window === "undefined") return "id";
@@ -26,12 +26,11 @@ function detectLocale(): Locale {
     return "id";
 }
 
-export const [locale, setLocale] = createSignal<Locale>(detectLocale());
+export const [locale, setLocale] = createSignal<Locale>("en");
 
-export const dict = createMemo(() => i18n.flatten(dictionaries[locale()]));
+const [dict] = createResource(locale, fetchDictionary);
 
-export const t = (key: string, params?: Record<string, string | number>) =>
-    i18n.translator(() => dict() as any)(key, params);
+export const t = i18n.translator(dict);
 
 export function setLocaleWithStorage(newLocale: Locale) {
     if (typeof window !== "undefined") {

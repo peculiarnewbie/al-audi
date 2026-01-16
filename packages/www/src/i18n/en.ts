@@ -1,4 +1,4 @@
-export const en = {
+export const dict = {
     heroTitle: "AL AUDI ENGLISH HOME",
     heroSubtitle: "A small, patient space for learning English.",
     ctaWhatsApp: "Chat on WhatsApp",
@@ -12,3 +12,5 @@ export const en = {
     footerEmail: "hello@alaudienglishhome.com",
     footerCopyright: "© 2025 AL AUDI ENGLISH HOME",
 };
+
+export type Dict = typeof dict;
