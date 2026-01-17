@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
+import { Route as UserRouteImport } from './routes/user'
 import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as PostsRouteImport } from './routes/posts'
 import { Route as HomeRouteImport } from './routes/home'
@@ -22,19 +23,26 @@ import { Route as RoomIndexRouteImport } from './routes/room/index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
 import { Route as RoomRoomIdIndexRouteImport } from './routes/room/$roomId/index'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
 import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
 import { Route as ApiRoomRoomIdRouteImport } from './routes/api/room/$roomId'
+import { Route as ApiAuthSignOutRouteImport } from './routes/api/auth/sign-out'
+import { Route as ApiAuthSignInRouteImport } from './routes/api/auth/sign-in'
+import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserRoute = UserRouteImport.update({
+  id: '/user',
+  path: '/user',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RedirectRoute = RedirectRouteImport.update({
@@ -96,11 +104,6 @@ const PostsPostIdRoute = PostsPostIdRouteImport.update({
   path: '/$postId',
   getParentRoute: () => PostsRoute,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiUsersRoute = ApiUsersRouteImport.update({
   id: '/api/users',
   path: '/api/users',
@@ -131,6 +134,21 @@ const ApiRoomRoomIdRoute = ApiRoomRoomIdRouteImport.update({
   path: '/api/room/$roomId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSignOutRoute = ApiAuthSignOutRouteImport.update({
+  id: '/api/auth/sign-out',
+  path: '/api/auth/sign-out',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignInRoute = ApiAuthSignInRouteImport.update({
+  id: '/api/auth/sign-in',
+  path: '/api/auth/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
+  id: '/api/auth/callback',
+  path: '/api/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PathlessLayoutNestedLayoutRouteBRoute =
   PathlessLayoutNestedLayoutRouteBRouteImport.update({
     id: '/route-b',
@@ -151,9 +169,9 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
-  '/auth/login': typeof AuthLoginRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
@@ -161,6 +179,9 @@ export interface FileRoutesByFullPath {
   '/users/': typeof UsersIndexRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
+  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
@@ -172,8 +193,8 @@ export interface FileRoutesByTo {
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/redirect': typeof RedirectRoute
+  '/user': typeof UserRoute
   '/api/users': typeof ApiUsersRouteWithChildren
-  '/auth/login': typeof AuthLoginRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts': typeof PostsIndexRoute
@@ -181,6 +202,9 @@ export interface FileRoutesByTo {
   '/users': typeof UsersIndexRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
+  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
@@ -195,10 +219,10 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
-  '/auth/login': typeof AuthLoginRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
@@ -206,6 +230,9 @@ export interface FileRoutesById {
   '/users/': typeof UsersIndexRoute
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
+  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
@@ -220,9 +247,9 @@ export interface FileRouteTypes {
     | '/home'
     | '/posts'
     | '/redirect'
+    | '/user'
     | '/users'
     | '/api/users'
-    | '/auth/login'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts/'
@@ -230,6 +257,9 @@ export interface FileRouteTypes {
     | '/users/'
     | '/route-a'
     | '/route-b'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
+    | '/api/auth/sign-out'
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts/$postId/deep'
@@ -241,8 +271,8 @@ export interface FileRouteTypes {
     | '/deferred'
     | '/home'
     | '/redirect'
+    | '/user'
     | '/api/users'
-    | '/auth/login'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts'
@@ -250,6 +280,9 @@ export interface FileRouteTypes {
     | '/users'
     | '/route-a'
     | '/route-b'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
+    | '/api/auth/sign-out'
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts/$postId/deep'
@@ -263,10 +296,10 @@ export interface FileRouteTypes {
     | '/home'
     | '/posts'
     | '/redirect'
+    | '/user'
     | '/users'
     | '/_pathlessLayout/_nested-layout'
     | '/api/users'
-    | '/auth/login'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts/'
@@ -274,6 +307,9 @@ export interface FileRouteTypes {
     | '/users/'
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
+    | '/api/auth/sign-out'
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts_/$postId/deep'
@@ -288,10 +324,13 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   PostsRoute: typeof PostsRouteWithChildren
   RedirectRoute: typeof RedirectRoute
+  UserRoute: typeof UserRoute
   UsersRoute: typeof UsersRouteWithChildren
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
-  AuthLoginRoute: typeof AuthLoginRoute
   RoomIndexRoute: typeof RoomIndexRoute
+  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
+  ApiAuthSignInRoute: typeof ApiAuthSignInRoute
+  ApiAuthSignOutRoute: typeof ApiAuthSignOutRoute
   ApiRoomRoomIdRoute: typeof ApiRoomRoomIdRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
   RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute
@@ -304,6 +343,13 @@ declare module '@tanstack/solid-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user': {
+      id: '/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/redirect': {
@@ -390,13 +436,6 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof PostsPostIdRouteImport
       parentRoute: typeof PostsRoute
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/users': {
       id: '/api/users'
       path: '/api/users'
@@ -437,6 +476,27 @@ declare module '@tanstack/solid-router' {
       path: '/api/room/$roomId'
       fullPath: '/api/room/$roomId'
       preLoaderRoute: typeof ApiRoomRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/sign-out': {
+      id: '/api/auth/sign-out'
+      path: '/api/auth/sign-out'
+      fullPath: '/api/auth/sign-out'
+      preLoaderRoute: typeof ApiAuthSignOutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/sign-in': {
+      id: '/api/auth/sign-in'
+      path: '/api/auth/sign-in'
+      fullPath: '/api/auth/sign-in'
+      preLoaderRoute: typeof ApiAuthSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback': {
+      id: '/api/auth/callback'
+      path: '/api/auth/callback'
+      fullPath: '/api/auth/callback'
+      preLoaderRoute: typeof ApiAuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_pathlessLayout/_nested-layout/route-b': {
@@ -530,10 +590,13 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   PostsRoute: PostsRouteWithChildren,
   RedirectRoute: RedirectRoute,
+  UserRoute: UserRoute,
   UsersRoute: UsersRouteWithChildren,
   ApiUsersRoute: ApiUsersRouteWithChildren,
-  AuthLoginRoute: AuthLoginRoute,
   RoomIndexRoute: RoomIndexRoute,
+  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
+  ApiAuthSignInRoute: ApiAuthSignInRoute,
+  ApiAuthSignOutRoute: ApiAuthSignOutRoute,
   ApiRoomRoomIdRoute: ApiRoomRoomIdRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
   RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,

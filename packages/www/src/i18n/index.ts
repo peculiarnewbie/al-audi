@@ -5,9 +5,17 @@ import type * as id from "./id";
 
 export type Locale = "en" | "id";
 
-async function fetchDictionary(locale: Locale): Promise<en.Dict> {
-    const dict: en.Dict = (await import(`./${locale}.ts`)).dict;
-    return i18n.flatten(dict);
+const dictionaries = import.meta.glob("./*.ts");
+
+export async function fetchDictionary(locale: Locale): Promise<en.Dict> {
+    const dictionaryImport = dictionaries[`./${locale}.ts`];
+
+    if (!dictionaryImport) {
+        throw new Error(`Missing dictionary for locale: ${locale}`);
+    }
+
+    const dictModule = (await dictionaryImport()) as { dict: en.Dict };
+    return i18n.flatten(dictModule.dict);
 }
 
 function detectLocale(): Locale {
@@ -26,15 +34,12 @@ function detectLocale(): Locale {
     return "id";
 }
 
-export const [locale, setLocale] = createSignal<Locale>("en");
-
-const [dict] = createResource(locale, fetchDictionary);
-
-export const t = i18n.translator(dict);
-
-export function setLocaleWithStorage(newLocale: Locale) {
+export function setLocaleWithStorage(
+    newLocale: Locale,
+    callback: (locale: Locale) => void,
+) {
     if (typeof window !== "undefined") {
         localStorage.setItem("locale", newLocale);
     }
-    setLocale(newLocale);
+    callback(newLocale);
 }

@@ -5,7 +5,9 @@ import {
     Scripts,
     createRootRoute,
 } from "@tanstack/solid-router";
+import { createServerFn } from "@tanstack/solid-start";
 import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
+import { Show } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import type * as Solid from "solid-js";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
@@ -13,7 +15,18 @@ import { NotFound } from "~/components/NotFound";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 
+const getUser = createServerFn({ method: "GET" }).handler(async () => {
+    const { getAuthenticatedUser } = await import("~/utils/workos-auth.server");
+    const { getRequestHeaders } = await import("@tanstack/solid-start/server");
+
+    return getAuthenticatedUser(getRequestHeaders());
+});
+
 export const Route = createRootRoute({
+    loader: async () => {
+        const user = await getUser();
+        return { user };
+    },
     head: () => ({
         meta: [
             {
@@ -63,6 +76,9 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: Solid.JSX.Element }) {
+    const auth = Route.useLoaderData();
+    const user = () => auth()?.user;
+
     return (
         <html>
             <head>
@@ -70,17 +86,45 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
             </head>
             <body>
                 <HeadContent />
-                <div class="p-2 flex gap-2 text-lg">
-                    <Link
-                        to="/"
-                        activeProps={{
-                            class: "font-bold",
-                        }}
-                        activeOptions={{ exact: true }}
-                    >
-                        Home
-                    </Link>{" "}
-                </div>
+                <header class="flex items-center justify-between px-6 py-4">
+                    <div class="flex gap-4 text-lg">
+                        <Link
+                            to="/"
+                            activeProps={{
+                                class: "font-bold",
+                            }}
+                            activeOptions={{ exact: true }}
+                        >
+                            Home
+                        </Link>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm">
+                        <Show
+                            when={user()}
+                            fallback={
+                                <a
+                                    href="/api/auth/sign-in"
+                                    class="text-stone-700 hover:text-stone-900"
+                                >
+                                    Sign in
+                                </a>
+                            }
+                        >
+                            <Link
+                                to="/user"
+                                class="text-stone-700 hover:text-stone-900"
+                            >
+                                Account
+                            </Link>
+                            <a
+                                href="/api/auth/sign-out"
+                                class="text-stone-700 hover:text-stone-900"
+                            >
+                                Sign out
+                            </a>
+                        </Show>
+                    </div>
+                </header>
                 <hr />
                 {children}
                 <TanStackRouterDevtools position="bottom-right" />

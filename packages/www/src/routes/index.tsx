@@ -1,19 +1,23 @@
+import { translator } from "@solid-primitives/i18n";
 import { createFileRoute } from "@tanstack/solid-router";
-import { For, Show } from "solid-js";
-import { t, locale, setLocaleWithStorage } from "~/i18n";
+import { createResource, createSignal, For, Show } from "solid-js";
+import { setLocaleWithStorage, Locale, fetchDictionary } from "~/i18n";
 
 export const Route = createFileRoute("/")({
     component: Index,
 });
 
-function Header() {
+function Header(props: {
+    locale: Locale;
+    setLocale: (locale: Locale) => void;
+}) {
     return (
         <header class="flex justify-end px-6 py-4">
             <div class="flex gap-3 text-stone-600 text-sm">
                 <button
-                    onClick={() => setLocaleWithStorage("en")}
+                    onClick={() => setLocaleWithStorage("en", props.setLocale)}
                     class={
-                        locale() === "en"
+                        props.locale === "en"
                             ? "text-stone-900 font-medium cursor-pointer"
                             : "hover:text-stone-900 cursor-pointer"
                     }
@@ -22,9 +26,9 @@ function Header() {
                 </button>
                 <span class="text-stone-300">|</span>
                 <button
-                    onClick={() => setLocaleWithStorage("id")}
+                    onClick={() => setLocaleWithStorage("id", props.setLocale)}
                     class={
-                        locale() === "id"
+                        props.locale === "id"
                             ? "text-stone-900 font-medium cursor-pointer"
                             : "hover:text-stone-900 cursor-pointer"
                     }
@@ -37,9 +41,15 @@ function Header() {
 }
 
 function Index() {
+    const [locale, setLocale] = createSignal<Locale>("en");
+
+    const [dict] = createResource(locale, fetchDictionary);
+
+    const t = translator(dict);
+
     return (
         <div class="min-h-screen bg-[#FDFBF7]">
-            <Header />
+            <Header locale={locale()} setLocale={setLocale} />
 
             <section class="max-w-4xl mx-auto px-6 py-16 text-center">
                 <h1 class="font-serif text-4xl md:text-5xl text-stone-800 mb-6">
