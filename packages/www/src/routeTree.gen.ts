@@ -22,6 +22,7 @@ import { Route as UsersIndexRouteImport } from './routes/users.index'
 import { Route as RoomIndexRouteImport } from './routes/room/index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
+import { Route as QuizzesNewRouteImport } from './routes/quizzes/new'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
@@ -99,6 +100,11 @@ const UsersUserIdRoute = UsersUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => UsersRoute,
 } as any)
+const QuizzesNewRoute = QuizzesNewRouteImport.update({
+  id: '/quizzes/new',
+  path: '/quizzes/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostsPostIdRoute = PostsPostIdRouteImport.update({
   id: '/$postId',
   path: '/$postId',
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof UsersRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
+  '/quizzes/new': typeof QuizzesNewRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/room': typeof RoomIndexRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/user': typeof UserRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
+  '/quizzes/new': typeof QuizzesNewRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts': typeof PostsIndexRoute
   '/room': typeof RoomIndexRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
+  '/quizzes/new': typeof QuizzesNewRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/room/': typeof RoomIndexRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/api/users'
     | '/posts/$postId'
+    | '/quizzes/new'
     | '/users/$userId'
     | '/posts/'
     | '/room'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/user'
     | '/api/users'
     | '/posts/$postId'
+    | '/quizzes/new'
     | '/users/$userId'
     | '/posts'
     | '/room'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/_pathlessLayout/_nested-layout'
     | '/api/users'
     | '/posts/$postId'
+    | '/quizzes/new'
     | '/users/$userId'
     | '/posts/'
     | '/room/'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   UserRoute: typeof UserRoute
   UsersRoute: typeof UsersRouteWithChildren
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
+  QuizzesNewRoute: typeof QuizzesNewRoute
   RoomIndexRoute: typeof RoomIndexRoute
   ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
   ApiAuthSignInRoute: typeof ApiAuthSignInRoute
@@ -428,6 +441,13 @@ declare module '@tanstack/solid-router' {
       fullPath: '/users/$userId'
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRoute
+    }
+    '/quizzes/new': {
+      id: '/quizzes/new'
+      path: '/quizzes/new'
+      fullPath: '/quizzes/new'
+      preLoaderRoute: typeof QuizzesNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/posts/$postId': {
       id: '/posts/$postId'
@@ -593,6 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   UserRoute: UserRoute,
   UsersRoute: UsersRouteWithChildren,
   ApiUsersRoute: ApiUsersRouteWithChildren,
+  QuizzesNewRoute: QuizzesNewRoute,
   RoomIndexRoute: RoomIndexRoute,
   ApiAuthCallbackRoute: ApiAuthCallbackRoute,
   ApiAuthSignInRoute: ApiAuthSignInRoute,
