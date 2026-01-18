@@ -1,12 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { nanoid } from "nanoid";
-import { createMemo, createSignal, For, Show } from "solid-js";
-import { produce } from "solid-js/store";
+import { createMemo, createSignal, For, Index, Show } from "solid-js";
+import { createStore, produce, unwrap } from "solid-js/store";
 import type { MultipleChoiceQuestion, QuizQuestion, TextQuestion } from "core";
 import { QuizPreview } from "~/components/quiz-preview";
-import { saveQuiz } from "~/server/quiz";
 import type { AuthUser } from "~/utils/workos-auth.server";
+import { saveQuiz } from "~/server/quiz";
 
 const getUser = createServerFn({ method: "GET" }).handler(
     async (): Promise<AuthUser | null> => {
@@ -48,7 +48,7 @@ const createTextQuestion = (): TextQuestion => ({
 
 function QuizCreatePage() {
     const user = Route.useLoaderData();
-    const [questions, setQuestions] = createSignal<QuizQuestion[]>([
+    const [questions, setQuestions] = createStore<QuizQuestion[]>([
         createMultipleChoiceQuestion(),
     ]);
     const [previewMode, setPreviewMode] = createSignal(false);
@@ -59,23 +59,18 @@ function QuizCreatePage() {
     const [savedQuizId, setSavedQuizId] = createSignal<string | null>(null);
 
     const isValid = createMemo(() => {
-        const currentQuestions = questions();
+        const currentQuestions = questions;
 
         if (!currentQuestions.length) {
-            console.log("No questions");
             return false;
         }
 
-        return currentQuestions.every((question, i) => {
+        return currentQuestions.every((question: QuizQuestion) => {
             if (!question.prompt.trim()) {
-                console.log(`Question ${i + 1} is missing a prompt`);
                 return false;
             }
 
             if (question.type === "multiple-choice") {
-                console.log(
-                    `Multiple choice question ${i + 1} is missing options`,
-                );
                 const trimmedOptions = question.options.map((option: string) =>
                     option.trim(),
                 );
@@ -93,20 +88,6 @@ function QuizCreatePage() {
         });
     });
 
-    const updateQuestion = (
-        questionId: string,
-        updater: (question: QuizQuestion) => void,
-    ) => {
-        setQuestions(
-            produce((current) => {
-                const question = current.find((q) => q.id === questionId);
-                if (question) {
-                    updater(question);
-                }
-            }),
-        );
-    };
-
     const removeQuestion = (questionId: string) => {
         setQuestions((current) =>
             current.filter((question) => question.id !== questionId),
@@ -122,17 +103,32 @@ function QuizCreatePage() {
     };
 
     const updatePrompt = (questionId: string, value: string) => {
-        updateQuestion(questionId, (question) => {
-            question.prompt = value;
-        });
+        setQuestions(
+            produce((current) => {
+                const target = current.find(
+                    (question) => question.id === questionId,
+                );
+
+                if (target) {
+                    target.prompt = value;
+                }
+            }),
+        );
     };
 
     const updateTextAnswer = (questionId: string, value: string) => {
-        updateQuestion(questionId, (question) => {
-            if (question.type === "text") {
-                question.answer = value;
-            }
-        });
+        setQuestions(
+            produce((current) => {
+                const target = current.find(
+                    (question): question is TextQuestion =>
+                        question.id === questionId && question.type === "text",
+                );
+
+                if (target) {
+                    target.answer = value;
+                }
+            }),
+        );
     };
 
     const updateMultipleChoiceOption = (
@@ -140,56 +136,88 @@ function QuizCreatePage() {
         optionIndex: number,
         value: string,
     ) => {
-        updateQuestion(questionId, (question) => {
-            if (question.type === "multiple-choice") {
-                question.options[optionIndex] = value;
-            }
-        });
+        setQuestions(
+            produce((current) => {
+                const target = current.find(
+                    (question): question is MultipleChoiceQuestion =>
+                        question.id === questionId &&
+                        question.type === "multiple-choice",
+                );
+
+                if (target) {
+                    target.options[optionIndex] = value;
+                }
+            }),
+        );
     };
 
     const addMultipleChoiceOption = (questionId: string) => {
-        updateQuestion(questionId, (question) => {
-            if (question.type === "multiple-choice") {
-                question.options = [...question.options, ""];
-            }
-        });
+        setQuestions(
+            produce((current) => {
+                const target = current.find(
+                    (question): question is MultipleChoiceQuestion =>
+                        question.id === questionId &&
+                        question.type === "multiple-choice",
+                );
+
+                if (target) {
+                    target.options.push("");
+                }
+            }),
+        );
     };
 
     const removeMultipleChoiceOption = (
         questionId: string,
         optionIndex: number,
     ) => {
-        updateQuestion(questionId, (question) => {
-            if (question.type !== "multiple-choice") {
-                return;
-            }
+        setQuestions(
+            produce((current) => {
+                const target = current.find(
+                    (question): question is MultipleChoiceQuestion =>
+                        question.id === questionId &&
+                        question.type === "multiple-choice",
+                );
 
-            const nextOptions = question.options.filter(
-                (_: string, index: number) => index !== optionIndex,
-            );
-            let nextCorrect = question.correctOptionIndex;
-
-            if (nextCorrect !== null) {
-                if (optionIndex === nextCorrect) {
-                    nextCorrect = null;
-                } else if (optionIndex < nextCorrect) {
-                    nextCorrect -= 1;
+                if (!target) {
+                    return;
                 }
-            }
 
-            question.options = nextOptions.length ? nextOptions : ["", ""];
-            question.correctOptionIndex = nextCorrect;
-        });
+                const nextOptions = target.options.filter(
+                    (_: string, index: number) => index !== optionIndex,
+                );
+                let nextCorrect = target.correctOptionIndex;
+
+                if (nextCorrect !== null) {
+                    if (optionIndex === nextCorrect) {
+                        nextCorrect = null;
+                    } else if (optionIndex < nextCorrect) {
+                        nextCorrect -= 1;
+                    }
+                }
+
+                target.options = nextOptions.length ? nextOptions : ["", ""];
+                target.correctOptionIndex = nextCorrect;
+            }),
+        );
     };
 
     const updateCorrectOption = (questionId: string, value: string) => {
-        updateQuestion(questionId, (question) => {
-            if (question.type === "multiple-choice") {
-                question.correctOptionIndex = value
-                    ? Number.parseInt(value, 10)
-                    : null;
-            }
-        });
+        setQuestions(
+            produce((current) => {
+                const target = current.find(
+                    (question): question is MultipleChoiceQuestion =>
+                        question.id === questionId &&
+                        question.type === "multiple-choice",
+                );
+
+                if (target) {
+                    target.correctOptionIndex = value
+                        ? Number.parseInt(value, 10)
+                        : null;
+                }
+            }),
+        );
     };
 
     const handleSubmit = async (event: SubmitEvent) => {
@@ -198,7 +226,9 @@ function QuizCreatePage() {
         setErrorMessage(null);
         setSavedQuizId(null);
 
-        const result = await saveQuiz({ data: { questions: questions() } });
+        const result = await saveQuiz({
+            data: { questions: unwrap(questions) },
+        });
 
         if (result.success) {
             setStatus("saved");
@@ -232,10 +262,10 @@ function QuizCreatePage() {
             <form class="space-y-6" onSubmit={handleSubmit}>
                 <Show
                     when={!previewMode()}
-                    fallback={<QuizPreview questions={questions()} />}
+                    fallback={<QuizPreview questions={questions} />}
                 >
                     <div class="space-y-6">
-                        <For each={questions()}>
+                        <For each={questions}>
                             {(question, index) => {
                                 const multipleChoiceQuestion = () =>
                                     question.type === "multiple-choice"
@@ -309,35 +339,33 @@ function QuizCreatePage() {
                                                             Options
                                                         </div>
                                                         <div class="space-y-2">
-                                                            <For
+                                                            <Index
                                                                 each={
                                                                     multipleChoice()
                                                                         .options
                                                                 }
                                                             >
                                                                 {(
-                                                                    option: string,
-                                                                    optionIndex: () => number,
+                                                                    option,
+                                                                    optionIndex,
                                                                 ) => (
                                                                     <div class="flex items-center gap-2">
                                                                         <input
                                                                             type="text"
-                                                                            value={
-                                                                                option
-                                                                            }
+                                                                            value={option()}
                                                                             onInput={(
                                                                                 event,
                                                                             ) =>
                                                                                 updateMultipleChoiceOption(
                                                                                     question.id,
-                                                                                    optionIndex(),
+                                                                                    optionIndex,
                                                                                     event
                                                                                         .currentTarget
                                                                                         .value,
                                                                                 )
                                                                             }
                                                                             placeholder={`Option ${
-                                                                                optionIndex() +
+                                                                                optionIndex +
                                                                                 1
                                                                             }`}
                                                                             class="flex-1 px-3 py-2 border border-stone-200 rounded"
@@ -353,7 +381,7 @@ function QuizCreatePage() {
                                                                             onClick={() =>
                                                                                 removeMultipleChoiceOption(
                                                                                     question.id,
-                                                                                    optionIndex(),
+                                                                                    optionIndex,
                                                                                 )
                                                                             }
                                                                             class="px-3 py-2 text-xs uppercase tracking-wide text-stone-500 border border-stone-200 rounded disabled:opacity-50"
@@ -362,8 +390,9 @@ function QuizCreatePage() {
                                                                         </button>
                                                                     </div>
                                                                 )}
-                                                            </For>
+                                                            </Index>
                                                         </div>
+
                                                         <button
                                                             type="button"
                                                             onClick={() =>
