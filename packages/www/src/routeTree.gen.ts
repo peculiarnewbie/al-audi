@@ -8,629 +8,673 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as UsersRouteImport } from './routes/users'
-import { Route as UserRouteImport } from './routes/user'
-import { Route as RedirectRouteImport } from './routes/redirect'
-import { Route as PostsRouteImport } from './routes/posts'
-import { Route as HomeRouteImport } from './routes/home'
-import { Route as DeferredRouteImport } from './routes/deferred'
-import { Route as CustomScriptDotjsRouteImport } from './routes/customScript[.]js'
-import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as UsersIndexRouteImport } from './routes/users.index'
-import { Route as RoomIndexRouteImport } from './routes/room/index'
-import { Route as PostsIndexRouteImport } from './routes/posts.index'
-import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
-import { Route as QuizzesNewRouteImport } from './routes/quizzes/new'
-import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
-import { Route as ApiUsersRouteImport } from './routes/api/users'
-import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
-import { Route as RoomRoomIdIndexRouteImport } from './routes/room/$roomId/index'
-import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
-import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
-import { Route as ApiRoomRoomIdRouteImport } from './routes/api/room/$roomId'
-import { Route as ApiAuthSignOutRouteImport } from './routes/api/auth/sign-out'
-import { Route as ApiAuthSignInRouteImport } from './routes/api/auth/sign-in'
-import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
-import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
-import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as UsersRouteImport } from "./routes/users";
+import { Route as UserRouteImport } from "./routes/user";
+import { Route as RedirectRouteImport } from "./routes/redirect";
+import { Route as PostsRouteImport } from "./routes/posts";
+import { Route as HomeRouteImport } from "./routes/home";
+import { Route as DeferredRouteImport } from "./routes/deferred";
+import { Route as CustomScriptDotjsRouteImport } from "./routes/customScript[.]js";
+import { Route as PathlessLayoutRouteImport } from "./routes/_pathlessLayout";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as UsersIndexRouteImport } from "./routes/users.index";
+import { Route as RoomIndexRouteImport } from "./routes/room/index";
+import { Route as PostsIndexRouteImport } from "./routes/posts.index";
+import { Route as UsersUserIdRouteImport } from "./routes/users.$userId";
+import { Route as QuizzesNewRouteImport } from "./routes/quizzes/new";
+import { Route as PostsPostIdRouteImport } from "./routes/posts.$postId";
+import { Route as ApiUsersRouteImport } from "./routes/api/users";
+import { Route as ApiQuizzesMediaRouteImport } from "./routes/api/quizzes/media";
+import { Route as ApiDriveMediaRouteImport } from "./routes/api/drive/media";
+import { Route as PathlessLayoutNestedLayoutRouteImport } from "./routes/_pathlessLayout/_nested-layout";
+import { Route as RoomRoomIdIndexRouteImport } from "./routes/room/$roomId/index";
+import { Route as PostsPostIdDeepRouteImport } from "./routes/posts_.$postId.deep";
+import { Route as ApiUsersUserIdRouteImport } from "./routes/api/users.$userId";
+import { Route as ApiRoomRoomIdRouteImport } from "./routes/api/room/$roomId";
+import { Route as ApiAuthSignOutRouteImport } from "./routes/api/auth/sign-out";
+import { Route as ApiAuthSignInRouteImport } from "./routes/api/auth/sign-in";
+import { Route as ApiAuthCallbackRouteImport } from "./routes/api/auth/callback";
+import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from "./routes/_pathlessLayout/_nested-layout/route-b";
+import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from "./routes/_pathlessLayout/_nested-layout/route-a";
 
 const UsersRoute = UsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/users",
+    path: "/users",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const UserRoute = UserRouteImport.update({
-  id: '/user',
-  path: '/user',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/user",
+    path: "/user",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const RedirectRoute = RedirectRouteImport.update({
-  id: '/redirect',
-  path: '/redirect',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/redirect",
+    path: "/redirect",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PostsRoute = PostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/posts",
+    path: "/posts",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/home",
+    path: "/home",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const DeferredRoute = DeferredRouteImport.update({
-  id: '/deferred',
-  path: '/deferred',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/deferred",
+    path: "/deferred",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const CustomScriptDotjsRoute = CustomScriptDotjsRouteImport.update({
-  id: '/customScript.js',
-  path: '/customScript.js',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/customScript.js",
+    path: "/customScript.js",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PathlessLayoutRoute = PathlessLayoutRouteImport.update({
-  id: '/_pathlessLayout',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/_pathlessLayout",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/",
+    path: "/",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const UsersIndexRoute = UsersIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => UsersRoute,
-} as any)
+    id: "/",
+    path: "/",
+    getParentRoute: () => UsersRoute,
+} as any);
 const RoomIndexRoute = RoomIndexRouteImport.update({
-  id: '/room/',
-  path: '/room/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/room/",
+    path: "/room/",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PostsIndexRoute = PostsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PostsRoute,
-} as any)
+    id: "/",
+    path: "/",
+    getParentRoute: () => PostsRoute,
+} as any);
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => UsersRoute,
-} as any)
+    id: "/$userId",
+    path: "/$userId",
+    getParentRoute: () => UsersRoute,
+} as any);
 const QuizzesNewRoute = QuizzesNewRouteImport.update({
-  id: '/quizzes/new',
-  path: '/quizzes/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/quizzes/new",
+    path: "/quizzes/new",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PostsPostIdRoute = PostsPostIdRouteImport.update({
-  id: '/$postId',
-  path: '/$postId',
-  getParentRoute: () => PostsRoute,
-} as any)
+    id: "/$postId",
+    path: "/$postId",
+    getParentRoute: () => PostsRoute,
+} as any);
 const ApiUsersRoute = ApiUsersRouteImport.update({
-  id: '/api/users',
-  path: '/api/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/api/users",
+    path: "/api/users",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const ApiQuizzesMediaRoute = ApiQuizzesMediaRouteImport.update({
+    id: "/api/quizzes/media",
+    path: "/api/quizzes/media",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const ApiDriveMediaRoute = ApiDriveMediaRouteImport.update({
+    id: "/api/drive/media",
+    path: "/api/drive/media",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PathlessLayoutNestedLayoutRoute =
-  PathlessLayoutNestedLayoutRouteImport.update({
-    id: '/_nested-layout',
-    getParentRoute: () => PathlessLayoutRoute,
-  } as any)
+    PathlessLayoutNestedLayoutRouteImport.update({
+        id: "/_nested-layout",
+        getParentRoute: () => PathlessLayoutRoute,
+    } as any);
 const RoomRoomIdIndexRoute = RoomRoomIdIndexRouteImport.update({
-  id: '/room/$roomId/',
-  path: '/room/$roomId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/room/$roomId/",
+    path: "/room/$roomId/",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
-  id: '/posts_/$postId/deep',
-  path: '/posts/$postId/deep',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/posts_/$postId/deep",
+    path: "/posts/$postId/deep",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const ApiUsersUserIdRoute = ApiUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => ApiUsersRoute,
-} as any)
+    id: "/$userId",
+    path: "/$userId",
+    getParentRoute: () => ApiUsersRoute,
+} as any);
 const ApiRoomRoomIdRoute = ApiRoomRoomIdRouteImport.update({
-  id: '/api/room/$roomId',
-  path: '/api/room/$roomId',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/api/room/$roomId",
+    path: "/api/room/$roomId",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const ApiAuthSignOutRoute = ApiAuthSignOutRouteImport.update({
-  id: '/api/auth/sign-out',
-  path: '/api/auth/sign-out',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/api/auth/sign-out",
+    path: "/api/auth/sign-out",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const ApiAuthSignInRoute = ApiAuthSignInRouteImport.update({
-  id: '/api/auth/sign-in',
-  path: '/api/auth/sign-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/api/auth/sign-in",
+    path: "/api/auth/sign-in",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
-  id: '/api/auth/callback',
-  path: '/api/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/api/auth/callback",
+    path: "/api/auth/callback",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const PathlessLayoutNestedLayoutRouteBRoute =
-  PathlessLayoutNestedLayoutRouteBRouteImport.update({
-    id: '/route-b',
-    path: '/route-b',
-    getParentRoute: () => PathlessLayoutNestedLayoutRoute,
-  } as any)
+    PathlessLayoutNestedLayoutRouteBRouteImport.update({
+        id: "/route-b",
+        path: "/route-b",
+        getParentRoute: () => PathlessLayoutNestedLayoutRoute,
+    } as any);
 const PathlessLayoutNestedLayoutRouteARoute =
-  PathlessLayoutNestedLayoutRouteARouteImport.update({
-    id: '/route-a',
-    path: '/route-a',
-    getParentRoute: () => PathlessLayoutNestedLayoutRoute,
-  } as any)
+    PathlessLayoutNestedLayoutRouteARouteImport.update({
+        id: "/route-a",
+        path: "/route-a",
+        getParentRoute: () => PathlessLayoutNestedLayoutRoute,
+    } as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/customScript.js': typeof CustomScriptDotjsRoute
-  '/deferred': typeof DeferredRoute
-  '/home': typeof HomeRoute
-  '/posts': typeof PostsRouteWithChildren
-  '/redirect': typeof RedirectRoute
-  '/user': typeof UserRoute
-  '/users': typeof UsersRouteWithChildren
-  '/api/users': typeof ApiUsersRouteWithChildren
-  '/posts/$postId': typeof PostsPostIdRoute
-  '/quizzes/new': typeof QuizzesNewRoute
-  '/users/$userId': typeof UsersUserIdRoute
-  '/posts/': typeof PostsIndexRoute
-  '/room': typeof RoomIndexRoute
-  '/users/': typeof UsersIndexRoute
-  '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
-  '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
-  '/api/auth/callback': typeof ApiAuthCallbackRoute
-  '/api/auth/sign-in': typeof ApiAuthSignInRoute
-  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
-  '/api/room/$roomId': typeof ApiRoomRoomIdRoute
-  '/api/users/$userId': typeof ApiUsersUserIdRoute
-  '/posts/$postId/deep': typeof PostsPostIdDeepRoute
-  '/room/$roomId': typeof RoomRoomIdIndexRoute
+    "/": typeof IndexRoute;
+    "/customScript.js": typeof CustomScriptDotjsRoute;
+    "/deferred": typeof DeferredRoute;
+    "/home": typeof HomeRoute;
+    "/posts": typeof PostsRouteWithChildren;
+    "/redirect": typeof RedirectRoute;
+    "/user": typeof UserRoute;
+    "/users": typeof UsersRouteWithChildren;
+    "/api/users": typeof ApiUsersRouteWithChildren;
+    "/api/quizzes/media": typeof ApiQuizzesMediaRoute;
+    "/api/drive/media": typeof ApiDriveMediaRoute;
+    "/posts/$postId": typeof PostsPostIdRoute;
+
+    "/quizzes/new": typeof QuizzesNewRoute;
+    "/users/$userId": typeof UsersUserIdRoute;
+    "/posts/": typeof PostsIndexRoute;
+    "/room": typeof RoomIndexRoute;
+    "/users/": typeof UsersIndexRoute;
+    "/route-a": typeof PathlessLayoutNestedLayoutRouteARoute;
+    "/route-b": typeof PathlessLayoutNestedLayoutRouteBRoute;
+    "/api/auth/callback": typeof ApiAuthCallbackRoute;
+    "/api/auth/sign-in": typeof ApiAuthSignInRoute;
+    "/api/auth/sign-out": typeof ApiAuthSignOutRoute;
+    "/api/room/$roomId": typeof ApiRoomRoomIdRoute;
+    "/api/users/$userId": typeof ApiUsersUserIdRoute;
+    "/posts/$postId/deep": typeof PostsPostIdDeepRoute;
+    "/room/$roomId": typeof RoomRoomIdIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/customScript.js': typeof CustomScriptDotjsRoute
-  '/deferred': typeof DeferredRoute
-  '/home': typeof HomeRoute
-  '/redirect': typeof RedirectRoute
-  '/user': typeof UserRoute
-  '/api/users': typeof ApiUsersRouteWithChildren
-  '/posts/$postId': typeof PostsPostIdRoute
-  '/quizzes/new': typeof QuizzesNewRoute
-  '/users/$userId': typeof UsersUserIdRoute
-  '/posts': typeof PostsIndexRoute
-  '/room': typeof RoomIndexRoute
-  '/users': typeof UsersIndexRoute
-  '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
-  '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
-  '/api/auth/callback': typeof ApiAuthCallbackRoute
-  '/api/auth/sign-in': typeof ApiAuthSignInRoute
-  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
-  '/api/room/$roomId': typeof ApiRoomRoomIdRoute
-  '/api/users/$userId': typeof ApiUsersUserIdRoute
-  '/posts/$postId/deep': typeof PostsPostIdDeepRoute
-  '/room/$roomId': typeof RoomRoomIdIndexRoute
+    "/": typeof IndexRoute;
+    "/customScript.js": typeof CustomScriptDotjsRoute;
+    "/deferred": typeof DeferredRoute;
+    "/home": typeof HomeRoute;
+    "/redirect": typeof RedirectRoute;
+    "/user": typeof UserRoute;
+    "/api/users": typeof ApiUsersRouteWithChildren;
+    "/api/quizzes/media": typeof ApiQuizzesMediaRoute;
+    "/api/drive/media": typeof ApiDriveMediaRoute;
+    "/posts/$postId": typeof PostsPostIdRoute;
+    "/quizzes/new": typeof QuizzesNewRoute;
+    "/users/$userId": typeof UsersUserIdRoute;
+    "/posts": typeof PostsIndexRoute;
+    "/room": typeof RoomIndexRoute;
+    "/users": typeof UsersIndexRoute;
+    "/route-a": typeof PathlessLayoutNestedLayoutRouteARoute;
+    "/route-b": typeof PathlessLayoutNestedLayoutRouteBRoute;
+    "/api/auth/callback": typeof ApiAuthCallbackRoute;
+    "/api/auth/sign-in": typeof ApiAuthSignInRoute;
+    "/api/auth/sign-out": typeof ApiAuthSignOutRoute;
+    "/api/room/$roomId": typeof ApiRoomRoomIdRoute;
+    "/api/users/$userId": typeof ApiUsersUserIdRoute;
+    "/posts/$postId/deep": typeof PostsPostIdDeepRoute;
+    "/room/$roomId": typeof RoomRoomIdIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
-  '/customScript.js': typeof CustomScriptDotjsRoute
-  '/deferred': typeof DeferredRoute
-  '/home': typeof HomeRoute
-  '/posts': typeof PostsRouteWithChildren
-  '/redirect': typeof RedirectRoute
-  '/user': typeof UserRoute
-  '/users': typeof UsersRouteWithChildren
-  '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
-  '/api/users': typeof ApiUsersRouteWithChildren
-  '/posts/$postId': typeof PostsPostIdRoute
-  '/quizzes/new': typeof QuizzesNewRoute
-  '/users/$userId': typeof UsersUserIdRoute
-  '/posts/': typeof PostsIndexRoute
-  '/room/': typeof RoomIndexRoute
-  '/users/': typeof UsersIndexRoute
-  '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
-  '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
-  '/api/auth/callback': typeof ApiAuthCallbackRoute
-  '/api/auth/sign-in': typeof ApiAuthSignInRoute
-  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
-  '/api/room/$roomId': typeof ApiRoomRoomIdRoute
-  '/api/users/$userId': typeof ApiUsersUserIdRoute
-  '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
-  '/room/$roomId/': typeof RoomRoomIdIndexRoute
+    __root__: typeof rootRouteImport;
+    "/": typeof IndexRoute;
+    "/_pathlessLayout": typeof PathlessLayoutRouteWithChildren;
+    "/customScript.js": typeof CustomScriptDotjsRoute;
+    "/deferred": typeof DeferredRoute;
+    "/home": typeof HomeRoute;
+    "/posts": typeof PostsRouteWithChildren;
+    "/redirect": typeof RedirectRoute;
+    "/user": typeof UserRoute;
+    "/users": typeof UsersRouteWithChildren;
+    "/_pathlessLayout/_nested-layout": typeof PathlessLayoutNestedLayoutRouteWithChildren;
+    "/api/users": typeof ApiUsersRouteWithChildren;
+    "/api/quizzes/media": typeof ApiQuizzesMediaRoute;
+    "/api/drive/media": typeof ApiDriveMediaRoute;
+    "/posts/$postId": typeof PostsPostIdRoute;
+    "/quizzes/new": typeof QuizzesNewRoute;
+    "/users/$userId": typeof UsersUserIdRoute;
+    "/posts/": typeof PostsIndexRoute;
+    "/room/": typeof RoomIndexRoute;
+    "/users/": typeof UsersIndexRoute;
+    "/_pathlessLayout/_nested-layout/route-a": typeof PathlessLayoutNestedLayoutRouteARoute;
+    "/_pathlessLayout/_nested-layout/route-b": typeof PathlessLayoutNestedLayoutRouteBRoute;
+    "/api/auth/callback": typeof ApiAuthCallbackRoute;
+    "/api/auth/sign-in": typeof ApiAuthSignInRoute;
+    "/api/auth/sign-out": typeof ApiAuthSignOutRoute;
+    "/api/room/$roomId": typeof ApiRoomRoomIdRoute;
+    "/api/users/$userId": typeof ApiUsersUserIdRoute;
+    "/posts_/$postId/deep": typeof PostsPostIdDeepRoute;
+    "/room/$roomId/": typeof RoomRoomIdIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/customScript.js'
-    | '/deferred'
-    | '/home'
-    | '/posts'
-    | '/redirect'
-    | '/user'
-    | '/users'
-    | '/api/users'
-    | '/posts/$postId'
-    | '/quizzes/new'
-    | '/users/$userId'
-    | '/posts/'
-    | '/room'
-    | '/users/'
-    | '/route-a'
-    | '/route-b'
-    | '/api/auth/callback'
-    | '/api/auth/sign-in'
-    | '/api/auth/sign-out'
-    | '/api/room/$roomId'
-    | '/api/users/$userId'
-    | '/posts/$postId/deep'
-    | '/room/$roomId'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/customScript.js'
-    | '/deferred'
-    | '/home'
-    | '/redirect'
-    | '/user'
-    | '/api/users'
-    | '/posts/$postId'
-    | '/quizzes/new'
-    | '/users/$userId'
-    | '/posts'
-    | '/room'
-    | '/users'
-    | '/route-a'
-    | '/route-b'
-    | '/api/auth/callback'
-    | '/api/auth/sign-in'
-    | '/api/auth/sign-out'
-    | '/api/room/$roomId'
-    | '/api/users/$userId'
-    | '/posts/$postId/deep'
-    | '/room/$roomId'
-  id:
-    | '__root__'
-    | '/'
-    | '/_pathlessLayout'
-    | '/customScript.js'
-    | '/deferred'
-    | '/home'
-    | '/posts'
-    | '/redirect'
-    | '/user'
-    | '/users'
-    | '/_pathlessLayout/_nested-layout'
-    | '/api/users'
-    | '/posts/$postId'
-    | '/quizzes/new'
-    | '/users/$userId'
-    | '/posts/'
-    | '/room/'
-    | '/users/'
-    | '/_pathlessLayout/_nested-layout/route-a'
-    | '/_pathlessLayout/_nested-layout/route-b'
-    | '/api/auth/callback'
-    | '/api/auth/sign-in'
-    | '/api/auth/sign-out'
-    | '/api/room/$roomId'
-    | '/api/users/$userId'
-    | '/posts_/$postId/deep'
-    | '/room/$roomId/'
-  fileRoutesById: FileRoutesById
+    fileRoutesByFullPath: FileRoutesByFullPath;
+    fullPaths:
+        | "/"
+        | "/customScript.js"
+        | "/deferred"
+        | "/home"
+        | "/posts"
+        | "/redirect"
+        | "/user"
+        | "/users"
+        | "/api/users"
+        | "/api/quizzes/media"
+        | "/api/drive/media"
+        | "/posts/$postId"
+        | "/quizzes/new"
+        | "/users/$userId"
+        | "/posts/"
+        | "/room"
+        | "/users/"
+        | "/route-a"
+        | "/route-b"
+        | "/api/auth/callback"
+        | "/api/auth/sign-in"
+        | "/api/auth/sign-out"
+        | "/api/room/$roomId"
+        | "/api/users/$userId"
+        | "/posts/$postId/deep"
+        | "/room/$roomId";
+    fileRoutesByTo: FileRoutesByTo;
+    to:
+        | "/"
+        | "/customScript.js"
+        | "/deferred"
+        | "/home"
+        | "/redirect"
+        | "/user"
+        | "/api/users"
+        | "/api/quizzes/media"
+        | "/api/drive/media"
+        | "/posts/$postId"
+        | "/quizzes/new"
+        | "/users/$userId"
+        | "/posts"
+        | "/room"
+        | "/users"
+        | "/route-a"
+        | "/route-b"
+        | "/api/auth/callback"
+        | "/api/auth/sign-in"
+        | "/api/auth/sign-out"
+        | "/api/room/$roomId"
+        | "/api/users/$userId"
+        | "/posts/$postId/deep"
+        | "/room/$roomId";
+    id:
+        | "__root__"
+        | "/"
+        | "/_pathlessLayout"
+        | "/customScript.js"
+        | "/deferred"
+        | "/home"
+        | "/posts"
+        | "/redirect"
+        | "/user"
+        | "/users"
+        | "/_pathlessLayout/_nested-layout"
+        | "/api/users"
+        | "/api/quizzes/media"
+        | "/api/drive/media"
+        | "/posts/$postId"
+        | "/quizzes/new"
+        | "/users/$userId"
+        | "/posts/"
+        | "/room/"
+        | "/users/"
+        | "/_pathlessLayout/_nested-layout/route-a"
+        | "/_pathlessLayout/_nested-layout/route-b"
+        | "/api/auth/callback"
+        | "/api/auth/sign-in"
+        | "/api/auth/sign-out"
+        | "/api/room/$roomId"
+        | "/api/users/$userId"
+        | "/posts_/$postId/deep"
+        | "/room/$roomId/";
+    fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
-  CustomScriptDotjsRoute: typeof CustomScriptDotjsRoute
-  DeferredRoute: typeof DeferredRoute
-  HomeRoute: typeof HomeRoute
-  PostsRoute: typeof PostsRouteWithChildren
-  RedirectRoute: typeof RedirectRoute
-  UserRoute: typeof UserRoute
-  UsersRoute: typeof UsersRouteWithChildren
-  ApiUsersRoute: typeof ApiUsersRouteWithChildren
-  QuizzesNewRoute: typeof QuizzesNewRoute
-  RoomIndexRoute: typeof RoomIndexRoute
-  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
-  ApiAuthSignInRoute: typeof ApiAuthSignInRoute
-  ApiAuthSignOutRoute: typeof ApiAuthSignOutRoute
-  ApiRoomRoomIdRoute: typeof ApiRoomRoomIdRoute
-  PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
-  RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute
+    IndexRoute: typeof IndexRoute;
+    PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren;
+    CustomScriptDotjsRoute: typeof CustomScriptDotjsRoute;
+    DeferredRoute: typeof DeferredRoute;
+    HomeRoute: typeof HomeRoute;
+    PostsRoute: typeof PostsRouteWithChildren;
+    RedirectRoute: typeof RedirectRoute;
+    UserRoute: typeof UserRoute;
+    UsersRoute: typeof UsersRouteWithChildren;
+    ApiUsersRoute: typeof ApiUsersRouteWithChildren;
+    ApiQuizzesMediaRoute: typeof ApiQuizzesMediaRoute;
+    ApiDriveMediaRoute: typeof ApiDriveMediaRoute;
+    QuizzesNewRoute: typeof QuizzesNewRoute;
+    RoomIndexRoute: typeof RoomIndexRoute;
+    ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute;
+    ApiAuthSignInRoute: typeof ApiAuthSignInRoute;
+    ApiAuthSignOutRoute: typeof ApiAuthSignOutRoute;
+    ApiRoomRoomIdRoute: typeof ApiRoomRoomIdRoute;
+    PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute;
+    RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute;
 }
 
-declare module '@tanstack/solid-router' {
-  interface FileRoutesByPath {
-    '/users': {
-      id: '/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof UsersRouteImport
-      parentRoute: typeof rootRouteImport
+declare module "@tanstack/solid-router" {
+    interface FileRoutesByPath {
+        "/users": {
+            id: "/users";
+            path: "/users";
+            fullPath: "/users";
+            preLoaderRoute: typeof UsersRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/user": {
+            id: "/user";
+            path: "/user";
+            fullPath: "/user";
+            preLoaderRoute: typeof UserRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/redirect": {
+            id: "/redirect";
+            path: "/redirect";
+            fullPath: "/redirect";
+            preLoaderRoute: typeof RedirectRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/posts": {
+            id: "/posts";
+            path: "/posts";
+            fullPath: "/posts";
+            preLoaderRoute: typeof PostsRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/home": {
+            id: "/home";
+            path: "/home";
+            fullPath: "/home";
+            preLoaderRoute: typeof HomeRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/deferred": {
+            id: "/deferred";
+            path: "/deferred";
+            fullPath: "/deferred";
+            preLoaderRoute: typeof DeferredRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/customScript.js": {
+            id: "/customScript.js";
+            path: "/customScript.js";
+            fullPath: "/customScript.js";
+            preLoaderRoute: typeof CustomScriptDotjsRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/_pathlessLayout": {
+            id: "/_pathlessLayout";
+            path: "";
+            fullPath: "";
+            preLoaderRoute: typeof PathlessLayoutRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/": {
+            id: "/";
+            path: "/";
+            fullPath: "/";
+            preLoaderRoute: typeof IndexRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/users/": {
+            id: "/users/";
+            path: "/";
+            fullPath: "/users/";
+            preLoaderRoute: typeof UsersIndexRouteImport;
+            parentRoute: typeof UsersRoute;
+        };
+        "/room/": {
+            id: "/room/";
+            path: "/room";
+            fullPath: "/room";
+            preLoaderRoute: typeof RoomIndexRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/posts/": {
+            id: "/posts/";
+            path: "/";
+            fullPath: "/posts/";
+            preLoaderRoute: typeof PostsIndexRouteImport;
+            parentRoute: typeof PostsRoute;
+        };
+        "/users/$userId": {
+            id: "/users/$userId";
+            path: "/$userId";
+            fullPath: "/users/$userId";
+            preLoaderRoute: typeof UsersUserIdRouteImport;
+            parentRoute: typeof UsersRoute;
+        };
+        "/quizzes/new": {
+            id: "/quizzes/new";
+            path: "/quizzes/new";
+            fullPath: "/quizzes/new";
+            preLoaderRoute: typeof QuizzesNewRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/posts/$postId": {
+            id: "/posts/$postId";
+            path: "/$postId";
+            fullPath: "/posts/$postId";
+            preLoaderRoute: typeof PostsPostIdRouteImport;
+            parentRoute: typeof PostsRoute;
+        };
+        "/api/users": {
+            id: "/api/users";
+            path: "/api/users";
+            fullPath: "/api/users";
+            preLoaderRoute: typeof ApiUsersRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/api/quizzes/media": {
+            id: "/api/quizzes/media";
+            path: "/api/quizzes/media";
+            fullPath: "/api/quizzes/media";
+            preLoaderRoute: typeof ApiQuizzesMediaRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/api/drive/media": {
+            id: "/api/drive/media";
+            path: "/api/drive/media";
+            fullPath: "/api/drive/media";
+            preLoaderRoute: typeof ApiDriveMediaRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/_pathlessLayout/_nested-layout": {
+            id: "/_pathlessLayout/_nested-layout";
+            path: "";
+            fullPath: "";
+            preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteImport;
+            parentRoute: typeof PathlessLayoutRoute;
+        };
+        "/room/$roomId/": {
+            id: "/room/$roomId/";
+            path: "/room/$roomId";
+            fullPath: "/room/$roomId";
+            preLoaderRoute: typeof RoomRoomIdIndexRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/posts_/$postId/deep": {
+            id: "/posts_/$postId/deep";
+            path: "/posts/$postId/deep";
+            fullPath: "/posts/$postId/deep";
+            preLoaderRoute: typeof PostsPostIdDeepRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/api/users/$userId": {
+            id: "/api/users/$userId";
+            path: "/$userId";
+            fullPath: "/api/users/$userId";
+            preLoaderRoute: typeof ApiUsersUserIdRouteImport;
+            parentRoute: typeof ApiUsersRoute;
+        };
+        "/api/room/$roomId": {
+            id: "/api/room/$roomId";
+            path: "/api/room/$roomId";
+            fullPath: "/api/room/$roomId";
+            preLoaderRoute: typeof ApiRoomRoomIdRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/api/auth/sign-out": {
+            id: "/api/auth/sign-out";
+            path: "/api/auth/sign-out";
+            fullPath: "/api/auth/sign-out";
+            preLoaderRoute: typeof ApiAuthSignOutRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/api/auth/sign-in": {
+            id: "/api/auth/sign-in";
+            path: "/api/auth/sign-in";
+            fullPath: "/api/auth/sign-in";
+            preLoaderRoute: typeof ApiAuthSignInRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/api/auth/callback": {
+            id: "/api/auth/callback";
+            path: "/api/auth/callback";
+            fullPath: "/api/auth/callback";
+            preLoaderRoute: typeof ApiAuthCallbackRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/_pathlessLayout/_nested-layout/route-b": {
+            id: "/_pathlessLayout/_nested-layout/route-b";
+            path: "/route-b";
+            fullPath: "/route-b";
+            preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteBRouteImport;
+            parentRoute: typeof PathlessLayoutNestedLayoutRoute;
+        };
+        "/_pathlessLayout/_nested-layout/route-a": {
+            id: "/_pathlessLayout/_nested-layout/route-a";
+            path: "/route-a";
+            fullPath: "/route-a";
+            preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteARouteImport;
+            parentRoute: typeof PathlessLayoutNestedLayoutRoute;
+        };
     }
-    '/user': {
-      id: '/user'
-      path: '/user'
-      fullPath: '/user'
-      preLoaderRoute: typeof UserRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/redirect': {
-      id: '/redirect'
-      path: '/redirect'
-      fullPath: '/redirect'
-      preLoaderRoute: typeof RedirectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/posts': {
-      id: '/posts'
-      path: '/posts'
-      fullPath: '/posts'
-      preLoaderRoute: typeof PostsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deferred': {
-      id: '/deferred'
-      path: '/deferred'
-      fullPath: '/deferred'
-      preLoaderRoute: typeof DeferredRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customScript.js': {
-      id: '/customScript.js'
-      path: '/customScript.js'
-      fullPath: '/customScript.js'
-      preLoaderRoute: typeof CustomScriptDotjsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_pathlessLayout': {
-      id: '/_pathlessLayout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof PathlessLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/users/': {
-      id: '/users/'
-      path: '/'
-      fullPath: '/users/'
-      preLoaderRoute: typeof UsersIndexRouteImport
-      parentRoute: typeof UsersRoute
-    }
-    '/room/': {
-      id: '/room/'
-      path: '/room'
-      fullPath: '/room'
-      preLoaderRoute: typeof RoomIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/posts/': {
-      id: '/posts/'
-      path: '/'
-      fullPath: '/posts/'
-      preLoaderRoute: typeof PostsIndexRouteImport
-      parentRoute: typeof PostsRoute
-    }
-    '/users/$userId': {
-      id: '/users/$userId'
-      path: '/$userId'
-      fullPath: '/users/$userId'
-      preLoaderRoute: typeof UsersUserIdRouteImport
-      parentRoute: typeof UsersRoute
-    }
-    '/quizzes/new': {
-      id: '/quizzes/new'
-      path: '/quizzes/new'
-      fullPath: '/quizzes/new'
-      preLoaderRoute: typeof QuizzesNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/posts/$postId': {
-      id: '/posts/$postId'
-      path: '/$postId'
-      fullPath: '/posts/$postId'
-      preLoaderRoute: typeof PostsPostIdRouteImport
-      parentRoute: typeof PostsRoute
-    }
-    '/api/users': {
-      id: '/api/users'
-      path: '/api/users'
-      fullPath: '/api/users'
-      preLoaderRoute: typeof ApiUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_pathlessLayout/_nested-layout': {
-      id: '/_pathlessLayout/_nested-layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteImport
-      parentRoute: typeof PathlessLayoutRoute
-    }
-    '/room/$roomId/': {
-      id: '/room/$roomId/'
-      path: '/room/$roomId'
-      fullPath: '/room/$roomId'
-      preLoaderRoute: typeof RoomRoomIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/posts_/$postId/deep': {
-      id: '/posts_/$postId/deep'
-      path: '/posts/$postId/deep'
-      fullPath: '/posts/$postId/deep'
-      preLoaderRoute: typeof PostsPostIdDeepRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/users/$userId': {
-      id: '/api/users/$userId'
-      path: '/$userId'
-      fullPath: '/api/users/$userId'
-      preLoaderRoute: typeof ApiUsersUserIdRouteImport
-      parentRoute: typeof ApiUsersRoute
-    }
-    '/api/room/$roomId': {
-      id: '/api/room/$roomId'
-      path: '/api/room/$roomId'
-      fullPath: '/api/room/$roomId'
-      preLoaderRoute: typeof ApiRoomRoomIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/sign-out': {
-      id: '/api/auth/sign-out'
-      path: '/api/auth/sign-out'
-      fullPath: '/api/auth/sign-out'
-      preLoaderRoute: typeof ApiAuthSignOutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/sign-in': {
-      id: '/api/auth/sign-in'
-      path: '/api/auth/sign-in'
-      fullPath: '/api/auth/sign-in'
-      preLoaderRoute: typeof ApiAuthSignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/callback': {
-      id: '/api/auth/callback'
-      path: '/api/auth/callback'
-      fullPath: '/api/auth/callback'
-      preLoaderRoute: typeof ApiAuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_pathlessLayout/_nested-layout/route-b': {
-      id: '/_pathlessLayout/_nested-layout/route-b'
-      path: '/route-b'
-      fullPath: '/route-b'
-      preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteBRouteImport
-      parentRoute: typeof PathlessLayoutNestedLayoutRoute
-    }
-    '/_pathlessLayout/_nested-layout/route-a': {
-      id: '/_pathlessLayout/_nested-layout/route-a'
-      path: '/route-a'
-      fullPath: '/route-a'
-      preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteARouteImport
-      parentRoute: typeof PathlessLayoutNestedLayoutRoute
-    }
-  }
 }
 
 interface PathlessLayoutNestedLayoutRouteChildren {
-  PathlessLayoutNestedLayoutRouteARoute: typeof PathlessLayoutNestedLayoutRouteARoute
-  PathlessLayoutNestedLayoutRouteBRoute: typeof PathlessLayoutNestedLayoutRouteBRoute
+    PathlessLayoutNestedLayoutRouteARoute: typeof PathlessLayoutNestedLayoutRouteARoute;
+    PathlessLayoutNestedLayoutRouteBRoute: typeof PathlessLayoutNestedLayoutRouteBRoute;
 }
 
 const PathlessLayoutNestedLayoutRouteChildren: PathlessLayoutNestedLayoutRouteChildren =
-  {
-    PathlessLayoutNestedLayoutRouteARoute:
-      PathlessLayoutNestedLayoutRouteARoute,
-    PathlessLayoutNestedLayoutRouteBRoute:
-      PathlessLayoutNestedLayoutRouteBRoute,
-  }
+    {
+        PathlessLayoutNestedLayoutRouteARoute:
+            PathlessLayoutNestedLayoutRouteARoute,
+        PathlessLayoutNestedLayoutRouteBRoute:
+            PathlessLayoutNestedLayoutRouteBRoute,
+    };
 
 const PathlessLayoutNestedLayoutRouteWithChildren =
-  PathlessLayoutNestedLayoutRoute._addFileChildren(
-    PathlessLayoutNestedLayoutRouteChildren,
-  )
+    PathlessLayoutNestedLayoutRoute._addFileChildren(
+        PathlessLayoutNestedLayoutRouteChildren,
+    );
 
 interface PathlessLayoutRouteChildren {
-  PathlessLayoutNestedLayoutRoute: typeof PathlessLayoutNestedLayoutRouteWithChildren
+    PathlessLayoutNestedLayoutRoute: typeof PathlessLayoutNestedLayoutRouteWithChildren;
 }
 
 const PathlessLayoutRouteChildren: PathlessLayoutRouteChildren = {
-  PathlessLayoutNestedLayoutRoute: PathlessLayoutNestedLayoutRouteWithChildren,
-}
+    PathlessLayoutNestedLayoutRoute:
+        PathlessLayoutNestedLayoutRouteWithChildren,
+};
 
 const PathlessLayoutRouteWithChildren = PathlessLayoutRoute._addFileChildren(
-  PathlessLayoutRouteChildren,
-)
+    PathlessLayoutRouteChildren,
+);
 
 interface PostsRouteChildren {
-  PostsPostIdRoute: typeof PostsPostIdRoute
-  PostsIndexRoute: typeof PostsIndexRoute
+    PostsPostIdRoute: typeof PostsPostIdRoute;
+    PostsIndexRoute: typeof PostsIndexRoute;
 }
 
 const PostsRouteChildren: PostsRouteChildren = {
-  PostsPostIdRoute: PostsPostIdRoute,
-  PostsIndexRoute: PostsIndexRoute,
-}
+    PostsPostIdRoute: PostsPostIdRoute,
+    PostsIndexRoute: PostsIndexRoute,
+};
 
-const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren)
+const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren);
 
 interface UsersRouteChildren {
-  UsersUserIdRoute: typeof UsersUserIdRoute
-  UsersIndexRoute: typeof UsersIndexRoute
+    UsersUserIdRoute: typeof UsersUserIdRoute;
+    UsersIndexRoute: typeof UsersIndexRoute;
 }
 
 const UsersRouteChildren: UsersRouteChildren = {
-  UsersUserIdRoute: UsersUserIdRoute,
-  UsersIndexRoute: UsersIndexRoute,
-}
+    UsersUserIdRoute: UsersUserIdRoute,
+    UsersIndexRoute: UsersIndexRoute,
+};
 
-const UsersRouteWithChildren = UsersRoute._addFileChildren(UsersRouteChildren)
+const UsersRouteWithChildren = UsersRoute._addFileChildren(UsersRouteChildren);
 
 interface ApiUsersRouteChildren {
-  ApiUsersUserIdRoute: typeof ApiUsersUserIdRoute
+    ApiUsersUserIdRoute: typeof ApiUsersUserIdRoute;
 }
 
 const ApiUsersRouteChildren: ApiUsersRouteChildren = {
-  ApiUsersUserIdRoute: ApiUsersUserIdRoute,
-}
+    ApiUsersUserIdRoute: ApiUsersUserIdRoute,
+};
 
 const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
-  ApiUsersRouteChildren,
-)
+    ApiUsersRouteChildren,
+);
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
-  CustomScriptDotjsRoute: CustomScriptDotjsRoute,
-  DeferredRoute: DeferredRoute,
-  HomeRoute: HomeRoute,
-  PostsRoute: PostsRouteWithChildren,
-  RedirectRoute: RedirectRoute,
-  UserRoute: UserRoute,
-  UsersRoute: UsersRouteWithChildren,
-  ApiUsersRoute: ApiUsersRouteWithChildren,
-  QuizzesNewRoute: QuizzesNewRoute,
-  RoomIndexRoute: RoomIndexRoute,
-  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
-  ApiAuthSignInRoute: ApiAuthSignInRoute,
-  ApiAuthSignOutRoute: ApiAuthSignOutRoute,
-  ApiRoomRoomIdRoute: ApiRoomRoomIdRoute,
-  PostsPostIdDeepRoute: PostsPostIdDeepRoute,
-  RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,
-}
+    IndexRoute: IndexRoute,
+    PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
+    CustomScriptDotjsRoute: CustomScriptDotjsRoute,
+    DeferredRoute: DeferredRoute,
+    HomeRoute: HomeRoute,
+    PostsRoute: PostsRouteWithChildren,
+    RedirectRoute: RedirectRoute,
+    UserRoute: UserRoute,
+    UsersRoute: UsersRouteWithChildren,
+    ApiUsersRoute: ApiUsersRouteWithChildren,
+    ApiQuizzesMediaRoute: ApiQuizzesMediaRoute,
+    ApiDriveMediaRoute: ApiDriveMediaRoute,
+    QuizzesNewRoute: QuizzesNewRoute,
+    RoomIndexRoute: RoomIndexRoute,
+    ApiAuthCallbackRoute: ApiAuthCallbackRoute,
+    ApiAuthSignInRoute: ApiAuthSignInRoute,
+    ApiAuthSignOutRoute: ApiAuthSignOutRoute,
+    ApiRoomRoomIdRoute: ApiRoomRoomIdRoute,
+    PostsPostIdDeepRoute: PostsPostIdDeepRoute,
+    RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,
+};
 export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+    ._addFileChildren(rootRouteChildren)
+    ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/solid-start'
-declare module '@tanstack/solid-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/solid-start";
+declare module "@tanstack/solid-start" {
+    interface Register {
+        ssr: true;
+        router: Awaited<ReturnType<typeof getRouter>>;
+    }
 }
