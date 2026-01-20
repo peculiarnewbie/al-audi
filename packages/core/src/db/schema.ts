@@ -7,6 +7,66 @@ export const quizzes = sqliteTable("quizzes", {
     r2Key: text("r2_key").notNull(),
 });
 
+export const teachers = sqliteTable("teachers", {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const students = sqliteTable("students", {
+    id: text("id").primaryKey(),
+    teacherId: text("teacher_id").notNull(),
+    name: text("name").notNull(),
+    email: text("email"),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const classes = sqliteTable("classes", {
+    id: text("id").primaryKey(),
+    teacherId: text("teacher_id").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const classStudents = sqliteTable("class_students", {
+    id: text("id").primaryKey(),
+    classId: text("class_id").notNull(),
+    studentId: text("student_id").notNull(),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const quizQuestions = sqliteTable("quiz_questions", {
+    id: text("id").primaryKey(),
+    quizId: text("quiz_id").notNull(),
+    questionType: text("question_type").notNull(),
+    prompt: text("prompt").notNull(),
+    answerText: text("answer_text"),
+    correctOption: integer("correct_option"),
+    position: integer("position").notNull(),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const quizQuestionOptions = sqliteTable("quiz_question_options", {
+    id: text("id").primaryKey(),
+    questionId: text("question_id").notNull(),
+    optionText: text("option_text").notNull(),
+    optionIndex: integer("option_index").notNull(),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const quizAssignments = sqliteTable("quiz_assignments", {
+    id: text("id").primaryKey(),
+    quizId: text("quiz_id").notNull(),
+    teacherId: text("teacher_id").notNull(),
+    classId: text("class_id"),
+    studentId: text("student_id"),
+    status: text("status").notNull(),
+    dueAt: integer("due_at"),
+    createdAt: integer("created_at").notNull(),
+});
+
 export const quizCategories = sqliteTable("quiz_categories", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),

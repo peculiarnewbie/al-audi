@@ -25,13 +25,14 @@
 
 1. **Foundations & storage**
     - Create D1 schema: teachers, students, classes, quizzes, categories, questions, options, assignments, attempts, responses.
+    - Done: added teachers, students, classes, class rosters, quiz questions/options, and assignments tables (migration `0003_school_core_tables.sql`).
     - Done: added quiz categories, question assets, attempts, and responses tables (migration `0001_quiz_results_and_categories.sql`).
     - Done: added `/api/quizzes/media` image upload endpoint using `BUCKET` with `quiz-media/` prefix and `quiz_question_assets` metadata.
     - Create R2 buckets: `quiz-media` (question images), `drive-media` (homework PDFs/audio).
     - Done: added `/api/drive/media` upload endpoint + `drive_assets` metadata table for drive uploads.
 
 2. **Quiz authoring upgrades**
-    - Attach image per question (R2 key stored in D1).
+    - Done: attach image per question uploads to R2 and stores metadata in D1.
     - Add category taxonomy (level, topic, skill).
     - Migrate draft JSON builder to structured D1 rows while retaining JSON drafts.
 

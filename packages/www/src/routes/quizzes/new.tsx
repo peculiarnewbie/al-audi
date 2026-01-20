@@ -46,17 +46,34 @@ const createTextQuestion = (): TextQuestion => ({
     answer: "",
 });
 
+type QuestionImageState = {
+    status: "idle" | "uploading" | "uploaded" | "error";
+    previewUrl?: string;
+    r2Key?: string;
+    fileName?: string;
+    errorMessage?: string;
+};
+
 function QuizCreatePage() {
     const user = Route.useLoaderData();
     const [questions, setQuestions] = createStore<QuizQuestion[]>([
         createMultipleChoiceQuestion(),
     ]);
+    const [questionImages, setQuestionImages] = createStore<
+        Record<string, QuestionImageState>
+    >({});
     const [previewMode, setPreviewMode] = createSignal(false);
     const [status, setStatus] = createSignal<
         "idle" | "saving" | "saved" | "error"
     >("idle");
     const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
     const [savedQuizId, setSavedQuizId] = createSignal<string | null>(null);
+    const [quizId, setQuizId] = createSignal<string | null>(null);
+    const [categoryInputs, setCategoryInputs] = createStore({
+        level: "",
+        topic: "",
+        skill: "",
+    });
 
     const isValid = createMemo(() => {
         const currentQuestions = questions;
@@ -88,7 +105,121 @@ function QuizCreatePage() {
         });
     });
 
+    const categorySummary = createMemo(() => ({
+        level: categoryInputs.level.trim(),
+        topic: categoryInputs.topic.trim(),
+        skill: categoryInputs.skill.trim(),
+    }));
+
+    const buildCategoryPayload = () => {
+        const summary = categorySummary();
+        const payload = {
+            level: summary.level || undefined,
+            topic: summary.topic || undefined,
+            skill: summary.skill || undefined,
+        };
+
+        return Object.values(payload).some(Boolean) ? payload : undefined;
+    };
+
+    const getQuizId = () => {
+        const current = quizId();
+
+        if (current) {
+            return current;
+        }
+
+        const nextId = nanoid(10);
+        setQuizId(nextId);
+        return nextId;
+    };
+
+    const clearQuestionImage = (questionId: string) => {
+        const currentImage = questionImages[questionId];
+
+        if (currentImage?.previewUrl) {
+            URL.revokeObjectURL(currentImage.previewUrl);
+        }
+
+        setQuestionImages(
+            produce((current) => {
+                delete current[questionId];
+            }),
+        );
+    };
+
+    const uploadQuestionImage = async (
+        questionId: string,
+        file: File,
+    ): Promise<void> => {
+        const currentPreview = questionImages[questionId]?.previewUrl;
+
+        if (currentPreview) {
+            URL.revokeObjectURL(currentPreview);
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        setQuestionImages(questionId, {
+            status: "uploading",
+            previewUrl,
+            fileName: file.name,
+        });
+
+        try {
+            const formData = new FormData();
+            formData.append("quizId", getQuizId());
+            formData.append("questionId", questionId);
+            formData.append("file", file);
+
+            const response = await fetch("/api/quizzes/media", {
+                method: "POST",
+                body: formData,
+            });
+
+            const payload = (await response.json()) as {
+                r2Key?: string;
+                error?: string;
+            };
+
+            if (!response.ok) {
+                setQuestionImages(questionId, (current) => ({
+                    ...current,
+                    status: "error",
+                    errorMessage: payload.error ?? "Upload failed.",
+                }));
+                return;
+            }
+
+            setQuestionImages(questionId, (current) => ({
+                ...current,
+                status: "uploaded",
+                r2Key: payload.r2Key,
+                errorMessage: undefined,
+            }));
+        } catch (error) {
+            console.error("Failed to upload question image", error);
+            setQuestionImages(questionId, (current) => ({
+                ...current,
+                status: "error",
+                errorMessage: "Upload failed.",
+            }));
+        }
+    };
+
+    const handleImageSelection = async (questionId: string, event: Event) => {
+        const input = event.currentTarget as HTMLInputElement;
+        const file = input.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        input.value = "";
+        await uploadQuestionImage(questionId, file);
+    };
+
     const removeQuestion = (questionId: string) => {
+        clearQuestionImage(questionId);
         setQuestions((current) =>
             current.filter((question) => question.id !== questionId),
         );
@@ -227,7 +358,11 @@ function QuizCreatePage() {
         setSavedQuizId(null);
 
         const result = await saveQuiz({
-            data: { questions: unwrap(questions) },
+            data: {
+                quizId: getQuizId(),
+                questions: unwrap(questions),
+                categories: buildCategoryPayload(),
+            },
         });
 
         if (result.success) {
@@ -262,7 +397,111 @@ function QuizCreatePage() {
             <form class="space-y-6" onSubmit={handleSubmit}>
                 <Show
                     when={!previewMode()}
-                    fallback={<QuizPreview questions={questions} />}
+                    fallback={
+                        <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-3">
+                            <div class="text-xs uppercase tracking-wide text-stone-500">
+                                Quiz categories
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-sm">
+                                <Show
+                                    when={
+                                        categorySummary().level ||
+                                        categorySummary().topic ||
+                                        categorySummary().skill
+                                    }
+                                    fallback={
+                                        <span class="text-sm text-stone-500">
+                                            No categories yet.
+                                        </span>
+                                    }
+                                >
+                                    <Show when={categorySummary().level}>
+                                        <span class="px-2 py-1 rounded-full bg-stone-100 text-stone-600">
+                                            Level: {categorySummary().level}
+                                        </span>
+                                    </Show>
+                                    <Show when={categorySummary().topic}>
+                                        <span class="px-2 py-1 rounded-full bg-stone-100 text-stone-600">
+                                            Topic: {categorySummary().topic}
+                                        </span>
+                                    </Show>
+                                    <Show when={categorySummary().skill}>
+                                        <span class="px-2 py-1 rounded-full bg-stone-100 text-stone-600">
+                                            Skill: {categorySummary().skill}
+                                        </span>
+                                    </Show>
+                                </Show>
+                            </div>
+                        </div>
+                    }
+                >
+                    <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-4">
+                        <div class="text-xs uppercase tracking-wide text-stone-500">
+                            Quiz categories
+                        </div>
+                        <div class="grid gap-4 sm:grid-cols-3">
+                            <label class="space-y-2">
+                                <span class="text-xs uppercase tracking-wide text-stone-500">
+                                    Level
+                                </span>
+                                <input
+                                    type="text"
+                                    value={categoryInputs.level}
+                                    onInput={(event) =>
+                                        setCategoryInputs(
+                                            "level",
+                                            event.currentTarget.value,
+                                        )
+                                    }
+                                    placeholder="Beginner"
+                                    class="w-full px-3 py-2 border border-stone-200 rounded"
+                                />
+                            </label>
+                            <label class="space-y-2">
+                                <span class="text-xs uppercase tracking-wide text-stone-500">
+                                    Topic
+                                </span>
+                                <input
+                                    type="text"
+                                    value={categoryInputs.topic}
+                                    onInput={(event) =>
+                                        setCategoryInputs(
+                                            "topic",
+                                            event.currentTarget.value,
+                                        )
+                                    }
+                                    placeholder="Grammar"
+                                    class="w-full px-3 py-2 border border-stone-200 rounded"
+                                />
+                            </label>
+                            <label class="space-y-2">
+                                <span class="text-xs uppercase tracking-wide text-stone-500">
+                                    Skill
+                                </span>
+                                <input
+                                    type="text"
+                                    value={categoryInputs.skill}
+                                    onInput={(event) =>
+                                        setCategoryInputs(
+                                            "skill",
+                                            event.currentTarget.value,
+                                        )
+                                    }
+                                    placeholder="Listening"
+                                    class="w-full px-3 py-2 border border-stone-200 rounded"
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </Show>
+                <Show
+                    when={!previewMode()}
+                    fallback={
+                        <QuizPreview
+                            questions={questions}
+                            imageByQuestionId={questionImages}
+                        />
+                    }
                 >
                     <div class="space-y-6">
                         <For each={questions}>
@@ -271,6 +510,8 @@ function QuizCreatePage() {
                                     question.type === "multiple-choice"
                                         ? (question as MultipleChoiceQuestion)
                                         : null;
+                                const imageState = () =>
+                                    questionImages[question.id];
 
                                 return (
                                     <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-4">
@@ -302,6 +543,78 @@ function QuizCreatePage() {
                                                 placeholder="Question prompt"
                                                 class="w-full px-3 py-2 border border-stone-200 rounded"
                                             />
+                                            <div class="space-y-2">
+                                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                                    Question image
+                                                </div>
+                                                <div class="flex flex-wrap items-center gap-3">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        disabled={
+                                                            imageState()
+                                                                ?.status ===
+                                                            "uploading"
+                                                        }
+                                                        onChange={(event) =>
+                                                            handleImageSelection(
+                                                                question.id,
+                                                                event,
+                                                            )
+                                                        }
+                                                        class="text-sm text-stone-600 file:mr-3 file:rounded file:border file:border-stone-200 file:bg-white file:px-3 file:py-1.5 file:text-sm file:text-stone-600"
+                                                    />
+                                                    <Show
+                                                        when={
+                                                            imageState()
+                                                                ?.status ===
+                                                            "uploading"
+                                                        }
+                                                    >
+                                                        <span class="text-xs text-stone-500">
+                                                            Uploading...
+                                                        </span>
+                                                    </Show>
+                                                    <Show
+                                                        when={
+                                                            imageState()
+                                                                ?.status ===
+                                                            "uploaded"
+                                                        }
+                                                    >
+                                                        <span class="text-xs text-emerald-600">
+                                                            Image uploaded
+                                                        </span>
+                                                    </Show>
+                                                    <Show
+                                                        when={
+                                                            imageState()
+                                                                ?.status ===
+                                                            "error"
+                                                        }
+                                                    >
+                                                        <span class="text-xs text-rose-600">
+                                                            {imageState()
+                                                                ?.errorMessage ??
+                                                                "Upload failed."}
+                                                        </span>
+                                                    </Show>
+                                                </div>
+                                                <Show
+                                                    when={
+                                                        imageState()?.previewUrl
+                                                    }
+                                                >
+                                                    <img
+                                                        src={
+                                                            imageState()
+                                                                ?.previewUrl
+                                                        }
+                                                        alt="Question illustration"
+                                                        class="w-full max-h-64 rounded-lg border border-stone-200 object-contain"
+                                                    />
+                                                </Show>
+                                            </div>
                                             <Show
                                                 when={multipleChoiceQuestion()}
                                                 fallback={

@@ -1,9 +1,14 @@
 import { For, Show } from "solid-js";
 import type { MultipleChoiceQuestion, QuizQuestion } from "core";
 
+type QuizPreviewProps = {
+    questions: QuizQuestion[];
+    imageByQuestionId?: Record<string, { previewUrl?: string }>;
+};
+
 const optionLabel = (index: number) => String.fromCharCode(65 + index);
 
-export function QuizPreview(props: { questions: QuizQuestion[] }) {
+export function QuizPreview(props: QuizPreviewProps) {
     return (
         <div class="space-y-6">
             <For each={props.questions}>
@@ -12,6 +17,8 @@ export function QuizPreview(props: { questions: QuizQuestion[] }) {
                         question.type === "multiple-choice"
                             ? (question as MultipleChoiceQuestion)
                             : null;
+                    const previewUrl = () =>
+                        props.imageByQuestionId?.[question.id]?.previewUrl;
 
                     return (
                         <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-3">
@@ -21,6 +28,13 @@ export function QuizPreview(props: { questions: QuizQuestion[] }) {
                             <div class="text-lg text-stone-800">
                                 {question.prompt || "Untitled question"}
                             </div>
+                            <Show when={previewUrl()}>
+                                <img
+                                    src={previewUrl()}
+                                    alt="Question illustration"
+                                    class="w-full max-h-56 rounded-lg border border-stone-200 object-contain"
+                                />
+                            </Show>
                             <Show
                                 when={multipleChoiceQuestion()}
                                 fallback={

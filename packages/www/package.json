@@ -19,6 +19,7 @@
         "@workos-inc/node": "^8.0.0",
         "animejs": "^4.2.2",
         "core": "workspace:*",
+        "drizzle-orm": "^0.45.1",
         "luxon": "^3.7.2",
         "nanoid": "^5.1.6",
         "remeda": "^2.32.2",
