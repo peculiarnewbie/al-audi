@@ -2,227 +2,104 @@
 
 This document provides guidelines for agentic coding agents operating in this repository.
 
-## Project Overview
+## Product Overview
 
-This is a TanStack Solid Start application with Cloudflare Workers deployment. It uses TypeScript, Tailwind CSS, and Vite.
+This is the English Learning add-on app for an in-person school. It focuses on teacher-managed workflows, async homework, and real-time live quizzes. The stack is Cloudflare-first (Workers, D1, R2, Durable Objects) with a TanStack Solid Start frontend and WorkOS authentication.
 
-## Build Commands
+## Repository Layout (Monorepo)
+
+- `packages/core`: Shared data layer and types.
+    - Drizzle D1 schema lives in `packages/core/src/db/schema.ts`.
+    - SQL migrations live in `packages/core/src/migrations`.
+    - Exported helper: `createDb` from `core` for D1 access.
+- `packages/www`: Main application (TanStack Solid Start + Cloudflare Worker).
+    - Routes: `packages/www/src/routes` (UI + API routes).
+    - Server helpers: `packages/www/src/server`.
+    - Durable Objects + Worker entry: `packages/www/src/worker`.
+    - Game logic: `packages/www/src/game`.
+    - UI components: `packages/www/src/components`.
+    - Utilities: `packages/www/src/utils`.
+    - Styles: `packages/www/src/styles`.
+
+## Commands
+
+Install dependencies from the repo root (workspace-aware package manager of choice).
 
 ```bash
-# Install dependencies
-bun i
-
-# Start development server
-bun dev
-
-# Build for production (runs TypeScript check)
-bun build
-
-# Preview production build
-bun preview
-
-# Deploy to Cloudflare
-bun run deploy
-
-# Generate Cloudflare types
-bun run cf-typegen
+npm install
 ```
 
-**Important**: `bun build` runs `vite build && tsc --noEmit` to validate TypeScript.
+Run app scripts from `packages/www`:
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run deploy
+npm run cf-typegen
+```
+
+- `npm run cf-typegen` regenerates `packages/www/worker-configuration.d.ts`.
+- `npm run build` runs `vite build && tsc --noEmit`.
 
 ## Testing
 
+Tests use Bun’s runner (see `packages/www/src/game/game.test.ts`).
+
 ```bash
-# Run all tests
 bun test
-
-# Run specific test file
 bun test src/game/game.test.ts
-
-# Run tests with coverage
-bun test --coverage
 ```
 
-- Uses Bun's native test runner (no external dependencies)
-- Test files use `.test.ts` or `.test.tsx` extension
-- Bun test API is Vitest-compatible (`describe`, `it`, `expect`, `vi`)
-- No `@types/*` needed for test globals
+## Cloudflare Bindings & Storage
 
-## TypeScript Configuration
+Bindings are defined in `packages/www/wrangler.jsonc`:
 
-- **Strict mode enabled** in `tsconfig.json`
-- **Path alias**: Use `~/*` to import from `./src/*` (e.g., `~/components/Button`)
-- **Target**: ES2022
-- **Module**: ESNext with Bundler resolution
-- **JSX**: preserve with solid-js import source
+- `DB`: D1 database for quiz + school data.
+- `BUCKET`: R2 storage (quiz and drive media).
+- `WS`: Durable Object namespace for live quiz rooms (`GameRoom`).
 
-## Code Style Guidelines
+Use `import { env } from "cloudflare:workers"` in server/worker code to access bindings.
 
-### Imports
+Media storage conventions:
 
-```tsx
-// External packages
-import { createRouter } from "@tanstack/solid-router";
+- Quiz assets are stored under `quiz-media/` in R2.
+- Drive assets are stored under `drive-media/` in R2.
 
-// Path aliases (use ~/*)
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
-import appCss from "~/styles/app.css?url";
+## Authentication
 
-// Type imports
-import type { ErrorComponentProps } from "@tanstack/solid-router";
-```
+- Auth uses WorkOS (see `packages/www/src/utils/workos-auth.server.ts`).
+- Protect server handlers with `getAuthenticatedUser`.
+- Required env vars are listed in `packages/www/.env.example`.
 
-- Use named imports from `@tanstack/solid-router` for routes, components, and utilities
-- Import CSS with `?url` suffix for Vite
-- Place type imports after regular imports
+## Roadmap Alignment (plan.md)
 
-### File Naming
+Current milestones include quiz authoring, assignments, reporting, live sessions, sharing/QR, and internal drive (already implemented). The next planned milestone is admin access control:
 
-- **Routes**: Use `route.tsx` pattern inside `src/routes/` directories
-- **Components**: kebab-case (e.g., `default-catch-boundary.tsx`)
-- **Utilities**: kebab-case (e.g., `logging-middleware.tsx`)
-- **Configuration**: kebab-case (e.g., `vite.config.ts`)
+- Add a superadmin dashboard to assign teacher accounts.
+- Migrate `teachers` + `students` tables into a unified `users` table.
+- Introduce roles (`none`, `student`, `teacher`, `admin`) and update all code paths.
 
-### Creating New Routes
+When modifying the data model, update both the Drizzle schema and add a new SQL migration in `packages/core/src/migrations`.
 
-When creating new routes, keep the dev server running (`bun dev`). TanStack Router will automatically detect new route files and add the necessary boilerplate to `routeTree.gen.ts`.
+## Frontend & Routing Conventions
 
-### Component Patterns
+- Routes use TanStack file-based routing and must export a named `Route`.
+- API routes live under `packages/www/src/routes/api` and use `server.handlers`.
+- Use Solid patterns (`createSignal`, `createMemo`, `Show`, `For`) instead of React equivalents.
+- Tailwind is the primary styling approach (`class`, not `className`).
 
-```tsx
-import { createFileRoute } from "@tanstack/solid-router";
+## TypeScript & Imports
 
-export const Route = createFileRoute("/posts/")({
-    component: PostsIndexComponent,
-});
+- Strict mode is enabled. Use explicit types for public APIs.
+- Path aliases:
+    - `~/` maps to `packages/www/src`.
+    - `core` maps to `packages/core/src`.
+- Prefer `import type` for type-only imports.
 
-function PostsIndexComponent() {
-    return <div>Content</div>;
-}
-```
+## General Rules
 
-- Use `createFileRoute` for file-based routing in `src/routes/`
-- Export `Route` as named export
-- Component functions are named PascalCase
-
-### SolidJS vs React Patterns
-
-**This is SolidJS, NOT React.** Avoid React patterns:
-
-| React Pattern             | SolidJS Equivalent                                   |
-| ------------------------- | ---------------------------------------------------- |
-| `condition ? <A/> : <B/>` | `<Show when={condition} fallback={<B/>}><A/></Show>` |
-| `{arr.map(x => <Item/>)}` | `<For each={arr}>{x => <Item/>}</For>`               |
-| `useEffect(() => {...})`  | `createEffect(() => {...})`                          |
-| `useState(initial)`       | `createSignal(initial)`                              |
-| `useMemo(() => compute)`  | `createMemo(() => compute)`                          |
-
-- Signals are functions: `count()` not `count`
-- Effects run automatically when dependencies change
-- No dependency array needed in effects
-- Components render once; effects rerun on dependency changes
-
-### Error Handling
-
-```tsx
-// Use DefaultCatchBoundary for route-level errors
-export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
-    const router = useRouter();
-    console.error("Error:", error);
-    return <ErrorComponent error={error} />;
-}
-```
-
-- Use `DefaultCatchBoundary` for catching route errors
-- Log errors with `console.error` for debugging
-- Return `ErrorComponent` with the error prop
-
-### Middleware
-
-```tsx
-import { createMiddleware } from "@tanstack/solid-start";
-
-const preLogMiddleware = createMiddleware({ type: "function" })
-    .client(async (ctx) => {
-        return ctx.next({
-            context: {
-                /* data */
-            },
-        });
-    })
-    .server(async (ctx) => {
-        return ctx.next({
-            sendContext: {
-                /* data */
-            },
-        });
-    });
-```
-
-- Use `createMiddleware` from `@tanstack/solid-start`
-- Chain `.client()` and `.server()` for client/server-specific logic
-- Use `context` and `sendContext` to pass data between middleware stages
-
-### Tailwind CSS
-
-- Use utility classes for styling
-- Class names use kebab-case (e.g., `class="flex gap-2 items-center"`)
-- No custom CSS files unless necessary (use Tailwind primarily)
-
-### TypeScript Types
-
-- Enable strict TypeScript checking
-- Use explicit types for props and function parameters
-- Import types with `import type` when possible
-- Use Zod for runtime validation (zod is installed)
-
-### Naming Conventions
-
-| Pattern          | Convention           | Example                      |
-| ---------------- | -------------------- | ---------------------------- |
-| Components       | PascalCase           | `DefaultCatchBoundary`       |
-| Functions        | camelCase            | `getRouter()`                |
-| Constants        | SCREAMING_SNAKE_CASE | `MAX_RETRIES`                |
-| Types/Interfaces | PascalCase           | `ErrorComponentProps`        |
-| Files (all)      | kebab-case           | `default-catch-boundary.tsx` |
-
-### IDs and Keys
-
-- Use `nanoid` from `nanoid` package for generating short, URL-friendly IDs
-- Client-side: `import { nanoid } from 'nanoid'; const id = nanoid(10);`
-- Server-side (Durable Objects): Can use `crypto.randomUUID()` or store nanoid from client
-
-### Directory Structure
-
-```
-src/
-├── components/     # Reusable UI components
-├── routes/         # File-based routes (TanStack Router)
-├── utils/          # Utility functions and hooks
-├── styles/         # Global styles
-├── game/           # Game logic
-├── worker/         # WebSocket/worker code
-└── router.tsx      # Router configuration
-```
-
-### Cloudflare Workers
-
-- Access bindings via `import { env } from 'cloudflare:workers'` in server code
-- Server functions can use Cloudflare bindings directly
-- Run `bun run cf-typegen` after adding new bindings
-
-### Git Workflow
-
-- Do not commit changes unless explicitly requested
-- Never use `git push --force` or hard resets
-- Avoid `git commit --amend` after pushing
-- Create meaningful commit messages focused on "why" not just "what"
-
-### General Rules
-
-- Do not add comments unless explicitly requested
-- Avoid emojis in code and commits
-- Use TypeScript over plain JavaScript
-- Prefer functional components and hooks
-- Handle errors gracefully with proper boundary components
-- Follow existing patterns in the codebase
+- Do not add comments unless explicitly requested.
+- Avoid emojis in code and commits.
+- Prefer minimal, focused changes aligned with the plan.
+- Do not commit changes unless explicitly requested.

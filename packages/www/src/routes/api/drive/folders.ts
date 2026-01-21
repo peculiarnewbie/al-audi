@@ -10,7 +10,7 @@ import {
     createDb,
     driveFolderPermissions,
     driveFolders,
-    students,
+    users,
 } from "core";
 import { getAuthenticatedUser } from "~/utils/workos-auth.server";
 
@@ -197,12 +197,13 @@ export const Route = createFileRoute("/api/drive/folders")({
 
                 if (studentIds.length) {
                     const studentRows = await db
-                        .select({ id: students.id })
-                        .from(students)
+                        .select({ id: users.id })
+                        .from(users)
                         .where(
                             and(
-                                eq(students.teacherId, user.id),
-                                inArray(students.id, studentIds),
+                                eq(users.role, "student"),
+                                eq(users.teacherId, user.id),
+                                inArray(users.id, studentIds),
                             ),
                         );
                     const validStudentIds = new Set(

@@ -55,6 +55,12 @@
     - Done: folder/category structure stored in D1.
     - Done: permissions by class/student.
 
+7. **Admin access control**
+    - Add superadmin dashboard to assign teacher accounts.
+    - Done: migrate `teachers`/`students` tables into a general `users` table (migration `0007_users_table.sql`).
+    - Done: enforce `users.role` enum values (none, student, teacher, admin) (migration `0008_users_role_enum.sql`).
+    - Done: create a `users` row on every sign-up/login.
+
 ## Deliverables
 
 - API routes for quiz CRUD, media upload, assignments, and results.

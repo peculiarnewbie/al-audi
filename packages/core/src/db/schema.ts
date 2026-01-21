@@ -7,16 +7,12 @@ export const quizzes = sqliteTable("quizzes", {
     r2Key: text("r2_key").notNull(),
 });
 
-export const teachers = sqliteTable("teachers", {
+export const users = sqliteTable("users", {
     id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    email: text("email").notNull(),
-    createdAt: integer("created_at").notNull(),
-});
-
-export const students = sqliteTable("students", {
-    id: text("id").primaryKey(),
-    teacherId: text("teacher_id").notNull(),
+    role: text("role", {
+        enum: ["none", "student", "teacher", "admin"],
+    }).notNull(),
+    teacherId: text("teacher_id"),
     name: text("name").notNull(),
     email: text("email"),
     createdAt: integer("created_at").notNull(),

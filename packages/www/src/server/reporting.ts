@@ -1,14 +1,14 @@
 import { createServerFn } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import {
     classStudents,
     classes,
     createDb,
     quizAssignments,
     quizAttempts,
-    students,
+    users,
 } from "core";
 import { getAuthenticatedUser } from "~/utils/workos-auth.server";
 
@@ -98,8 +98,13 @@ export const getTeacherReport = createServerFn({ method: "GET" }).handler(
                 db.select().from(classes).where(eq(classes.teacherId, user.id)),
                 db
                     .select()
-                    .from(students)
-                    .where(eq(students.teacherId, user.id)),
+                    .from(users)
+                    .where(
+                        and(
+                            eq(users.teacherId, user.id),
+                            eq(users.role, "student"),
+                        ),
+                    ),
                 db
                     .select()
                     .from(quizAssignments)
