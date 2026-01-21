@@ -1,11 +1,17 @@
 import { DurableObject } from "cloudflare:workers";
-import { MessageType, server } from "~/game";
+import { nanoid } from "nanoid";
+import { createDb, liveQuizResults } from "core";
+import { server } from "~/game";
+import type { LiveSessionSummary } from "~/game";
 
 export class GameRoom extends DurableObject {
+    env: Env;
+    roomId?: string;
     sessions: Map<WebSocket, { [key: string]: string }>;
 
     constructor(ctx: DurableObjectState, env: Env) {
         super(ctx, env);
+        this.env = env;
         this.sessions = new Map();
 
         this.ctx.getWebSockets().forEach((ws) => {
@@ -21,6 +27,12 @@ export class GameRoom extends DurableObject {
     }
 
     async fetch(request: Request): Promise<Response> {
+        if (!this.roomId) {
+            const { pathname } = new URL(request.url);
+            const segments = pathname.split("/").filter(Boolean);
+            this.roomId = segments[segments.length - 1];
+        }
+
         const webSocketPair = new WebSocketPair();
         const [client, serverWs] = Object.values(webSocketPair);
 
@@ -47,6 +59,18 @@ export class GameRoom extends DurableObject {
             }),
         );
 
+        const currentQuestion = await serverInstance.getCurrentQuestion();
+
+        if (currentQuestion) {
+            const { correctAnswer, ...publicQuestion } = currentQuestion;
+            send(
+                JSON.stringify({
+                    type: "question",
+                    data: { question: publicQuestion },
+                }),
+            );
+        }
+
         return new Response(null, {
             status: 101,
             webSocket: client,
@@ -60,7 +84,39 @@ export class GameRoom extends DurableObject {
             });
         };
 
-        await server(this.ctx).processMessage(message, broadcast);
+        const result = await server(this.ctx).processMessage(
+            message,
+            broadcast,
+        );
+
+        if (result && "type" in result && result.type === "persist") {
+            await this.persistSessionResults(result.summary);
+        }
+    }
+
+    async persistSessionResults(summary: LiveSessionSummary) {
+        if (!this.roomId || !summary.results.length) {
+            return;
+        }
+
+        const roomId = this.roomId;
+        const db = createDb(this.env.DB);
+        const createdAt = Date.now();
+        const rows = summary.results.map((result) => ({
+            id: nanoid(10),
+            sessionId: summary.sessionId,
+            roomId,
+            playerId: result.playerId,
+            playerName: result.playerName,
+            score: result.score,
+            maxScore: result.maxScore,
+            answersJson: JSON.stringify(result.answers),
+            startedAt: summary.startedAt,
+            endedAt: summary.endedAt,
+            createdAt,
+        }));
+
+        await db.insert(liveQuizResults).values(rows);
     }
 
     async webSocketClose(

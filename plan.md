@@ -28,32 +28,32 @@
     - Done: added teachers, students, classes, class rosters, quiz questions/options, and assignments tables (migration `0003_school_core_tables.sql`).
     - Done: added quiz categories, question assets, attempts, and responses tables (migration `0001_quiz_results_and_categories.sql`).
     - Done: added `/api/quizzes/media` image upload endpoint using `BUCKET` with `quiz-media/` prefix and `quiz_question_assets` metadata.
-    - Create R2 buckets: `quiz-media` (question images), `drive-media` (homework PDFs/audio).
+    - configure R2 bindings for quiz + drive media (code uses `BUCKET` with `quiz-media/` and `drive-media/` prefixes).
     - Done: added `/api/drive/media` upload endpoint + `drive_assets` metadata table for drive uploads.
 
 2. **Quiz authoring upgrades**
     - Done: attach image per question uploads to R2 and stores metadata in D1.
-    - Add category taxonomy (level, topic, skill).
-    - Migrate draft JSON builder to structured D1 rows while retaining JSON drafts.
+    - Done: category taxonomy (level, topic, skill) stored in `quiz_categories` + `quiz_category_links`.
+    - Done: store questions/options in D1 (previously only JSON drafts in R2).
 
 3. **Assignments & results**
-    - Assign quizzes to classes/students with due dates.
-    - Store per-question answers, score, timing, and attempt history.
-    - Teacher reporting dashboard (class + student views).
+    - Done: assignment workflows for quizzes to classes/students (server actions for create/list/update assignments).
+    - Done: capture answers, scoring, and timing via attempt submission + scoring (persists `quiz_attempts`/`quiz_responses`).
+    - Done: teacher reporting dashboard (class + student views).
 
 4. **Live quiz sessions**
-    - Durable Object per live session room.
-    - WebSocket join, live question broadcast, realtime scoring.
-    - Persist final session results to D1.
+    - Done: basic `GameRoom` Durable Object + `/api/room/$roomId` WebSocket route (join/leave/start/answer).
+    - Done: live question broadcast + realtime scoring for sample sessions.
+    - Done: persist final session results to D1 (`live_quiz_results`).
 
 5. **Sharing & QR**
-    - Shareable quiz links with optional access token.
-    - Generate QR image in Worker and cache in R2.
+    - Done: shareable quiz links with optional access token.
+    - Done: generate QR image in Worker and cache in R2.
 
 6. **Internal drive**
-    - Teacher uploads PDFs/audio/images to R2.
-    - Folder/category structure stored in D1.
-    - Permissions by class/student.
+    - Done: teacher uploads PDFs/audio/images via `/api/drive/media` + `drive_assets`.
+    - Done: folder/category structure stored in D1.
+    - Done: permissions by class/student.
 
 ## Deliverables
 

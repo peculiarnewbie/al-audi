@@ -2,9 +2,10 @@ import { createFileRoute } from "@tanstack/solid-router";
 import { json } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
+import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { createDb, driveAssets } from "core";
+import { createDb, driveAssets, driveFolders } from "core";
 import { getAuthenticatedUser } from "~/utils/workos-auth.server";
 
 const uploadSchema = z.object({
@@ -73,6 +74,28 @@ export const Route = createFileRoute("/api/drive/media")({
                     );
                 }
 
+                const db = createDb(env.DB);
+
+                if (folderId) {
+                    const [folder] = await db
+                        .select({ id: driveFolders.id })
+                        .from(driveFolders)
+                        .where(
+                            and(
+                                eq(driveFolders.id, folderId),
+                                eq(driveFolders.teacherId, user.id),
+                            ),
+                        )
+                        .limit(1);
+
+                    if (!folder) {
+                        return json(
+                            { error: "Folder not found." },
+                            { status: 404 },
+                        );
+                    }
+                }
+
                 const contentType = file.type || "application/octet-stream";
 
                 if (!isAllowedContentType(contentType)) {
@@ -95,7 +118,6 @@ export const Route = createFileRoute("/api/drive/media")({
                     },
                 });
 
-                const db = createDb(env.DB);
                 await db.insert(driveAssets).values({
                     id: assetId,
                     teacherId: user.id,

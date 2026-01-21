@@ -67,6 +67,14 @@ export const quizAssignments = sqliteTable("quiz_assignments", {
     createdAt: integer("created_at").notNull(),
 });
 
+export const quizShareLinks = sqliteTable("quiz_share_links", {
+    id: text("id").primaryKey(),
+    quizId: text("quiz_id").notNull(),
+    creatorId: text("creator_id").notNull(),
+    accessToken: text("access_token"),
+    createdAt: integer("created_at").notNull(),
+});
+
 export const quizCategories = sqliteTable("quiz_categories", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
@@ -103,6 +111,22 @@ export const driveAssets = sqliteTable("drive_assets", {
     createdAt: integer("created_at").notNull(),
 });
 
+export const driveFolders = sqliteTable("drive_folders", {
+    id: text("id").primaryKey(),
+    teacherId: text("teacher_id").notNull(),
+    parentId: text("parent_id"),
+    name: text("name").notNull(),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const driveFolderPermissions = sqliteTable("drive_folder_permissions", {
+    id: text("id").primaryKey(),
+    folderId: text("folder_id").notNull(),
+    classId: text("class_id"),
+    studentId: text("student_id"),
+    createdAt: integer("created_at").notNull(),
+});
+
 export const quizAttempts = sqliteTable("quiz_attempts", {
     id: text("id").primaryKey(),
     quizId: text("quiz_id").notNull(),
@@ -126,5 +150,19 @@ export const quizResponses = sqliteTable("quiz_responses", {
     answerText: text("answer_text"),
     selectedOption: integer("selected_option"),
     isCorrect: integer("is_correct"),
+    createdAt: integer("created_at").notNull(),
+});
+
+export const liveQuizResults = sqliteTable("live_quiz_results", {
+    id: text("id").primaryKey(),
+    sessionId: text("session_id").notNull(),
+    roomId: text("room_id").notNull(),
+    playerId: text("player_id").notNull(),
+    playerName: text("player_name").notNull(),
+    score: integer("score").notNull(),
+    maxScore: integer("max_score").notNull(),
+    answersJson: text("answers_json").notNull(),
+    startedAt: integer("started_at").notNull(),
+    endedAt: integer("ended_at").notNull(),
     createdAt: integer("created_at").notNull(),
 });

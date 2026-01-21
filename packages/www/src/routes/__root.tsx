@@ -97,6 +97,14 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
                         >
                             Home
                         </Link>
+                        <Link
+                            to="/reports"
+                            activeProps={{
+                                class: "font-bold",
+                            }}
+                        >
+                            Reports
+                        </Link>
                     </div>
                     <div class="flex items-center gap-4 text-sm">
                         <Show

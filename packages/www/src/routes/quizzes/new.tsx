@@ -5,8 +5,8 @@ import { createMemo, createSignal, For, Index, Show } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
 import type { MultipleChoiceQuestion, QuizQuestion, TextQuestion } from "core";
 import { QuizPreview } from "~/components/quiz-preview";
+import { createQuizShareLink, saveQuiz } from "~/server/quiz";
 import type { AuthUser } from "~/utils/workos-auth.server";
-import { saveQuiz } from "~/server/quiz";
 
 const getUser = createServerFn({ method: "GET" }).handler(
     async (): Promise<AuthUser | null> => {
@@ -69,6 +69,15 @@ function QuizCreatePage() {
     const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
     const [savedQuizId, setSavedQuizId] = createSignal<string | null>(null);
     const [quizId, setQuizId] = createSignal<string | null>(null);
+    const [shareStatus, setShareStatus] = createSignal<
+        "idle" | "creating" | "ready" | "error"
+    >("idle");
+    const [shareError, setShareError] = createSignal<string | null>(null);
+    const [shareLink, setShareLink] = createSignal<{
+        shareId: string;
+        accessToken: string | null;
+    } | null>(null);
+    const [shareRequiresToken, setShareRequiresToken] = createSignal(false);
     const [categoryInputs, setCategoryInputs] = createStore({
         level: "",
         topic: "",
@@ -110,6 +119,44 @@ function QuizCreatePage() {
         topic: categoryInputs.topic.trim(),
         skill: categoryInputs.skill.trim(),
     }));
+
+    const sharePath = createMemo(() => {
+        const link = shareLink();
+
+        if (!link) {
+            return null;
+        }
+
+        const token = link.accessToken ? `?token=${link.accessToken}` : "";
+        return `/share/${link.shareId}${token}`;
+    });
+
+    const shareUrl = createMemo(() => {
+        const path = sharePath();
+
+        if (!path) {
+            return null;
+        }
+
+        if (typeof window === "undefined") {
+            return path;
+        }
+
+        return new URL(path, window.location.origin).toString();
+    });
+
+    const qrCodePath = createMemo(() => {
+        const link = shareLink();
+
+        if (!link) {
+            return null;
+        }
+
+        const token = link.accessToken
+            ? `?token=${encodeURIComponent(link.accessToken)}`
+            : "";
+        return `/api/share/${link.shareId}/qr${token}`;
+    });
 
     const buildCategoryPayload = () => {
         const summary = categorySummary();
@@ -356,6 +403,9 @@ function QuizCreatePage() {
         setStatus("saving");
         setErrorMessage(null);
         setSavedQuizId(null);
+        setShareLink(null);
+        setShareStatus("idle");
+        setShareError(null);
 
         const result = await saveQuiz({
             data: {
@@ -371,6 +421,35 @@ function QuizCreatePage() {
         } else {
             setStatus("error");
             setErrorMessage(result.error);
+        }
+    };
+
+    const handleCreateShareLink = async () => {
+        const currentQuizId = savedQuizId();
+
+        if (!currentQuizId) {
+            return;
+        }
+
+        setShareStatus("creating");
+        setShareError(null);
+
+        const result = await createQuizShareLink({
+            data: {
+                quizId: currentQuizId,
+                requireToken: shareRequiresToken(),
+            },
+        });
+
+        if (result.success) {
+            setShareLink({
+                shareId: result.shareId,
+                accessToken: result.accessToken,
+            });
+            setShareStatus("ready");
+        } else {
+            setShareStatus("error");
+            setShareError(result.error);
         }
     };
 
@@ -810,6 +889,83 @@ function QuizCreatePage() {
                         </span>
                     </Show>
                 </div>
+
+                <Show when={savedQuizId()}>
+                    <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-3">
+                        <div class="text-xs uppercase tracking-wide text-stone-500">
+                            Share link
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <label class="flex items-center gap-2 text-sm text-stone-600">
+                                <input
+                                    type="checkbox"
+                                    checked={shareRequiresToken()}
+                                    onChange={(event) =>
+                                        setShareRequiresToken(
+                                            event.currentTarget.checked,
+                                        )
+                                    }
+                                />
+                                Require access token
+                            </label>
+                            <button
+                                type="button"
+                                onClick={handleCreateShareLink}
+                                disabled={shareStatus() === "creating"}
+                                class="px-4 py-2 border border-stone-300 rounded text-stone-700"
+                            >
+                                {shareStatus() === "creating"
+                                    ? "Generating"
+                                    : "Generate link"}
+                            </button>
+                            <Show
+                                when={shareStatus() === "ready" && shareUrl()}
+                            >
+                                <span class="text-xs text-emerald-600">
+                                    Share link ready
+                                </span>
+                            </Show>
+                        </div>
+                        <Show when={shareUrl()}>
+                            <div class="space-y-2">
+                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                    Share URL
+                                </div>
+                                <input
+                                    type="text"
+                                    value={shareUrl() ?? ""}
+                                    readOnly
+                                    class="w-full px-3 py-2 border border-stone-200 rounded text-sm"
+                                />
+                                <Show when={shareLink()?.accessToken}>
+                                    <div class="text-xs uppercase tracking-wide text-stone-500">
+                                        Access token
+                                    </div>
+                                    <div class="text-sm text-stone-700">
+                                        {shareLink()?.accessToken}
+                                    </div>
+                                </Show>
+                            </div>
+                        </Show>
+                        <Show when={qrCodePath()}>
+                            <div class="space-y-2">
+                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                    QR code
+                                </div>
+                                <img
+                                    src={qrCodePath() ?? ""}
+                                    alt="Shared quiz QR code"
+                                    class="h-40 w-40 rounded border border-stone-200 bg-white p-2"
+                                />
+                            </div>
+                        </Show>
+                        <Show when={shareStatus() === "error" && shareError()}>
+                            <div class="text-sm text-rose-600">
+                                {shareError()}
+                            </div>
+                        </Show>
+                    </div>
+                </Show>
             </form>
         </div>
     );

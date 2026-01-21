@@ -1,10 +1,23 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { createSignal, onMount, Switch, Match } from "solid-js";
+import { createSignal, onMount, Switch, Match, For, Show } from "solid-js";
 import { nanoid } from "nanoid";
 import { RoomLobby } from "~/components/room-lobby";
 import { SampleQuizRoom } from "~/components/sample-quiz-room";
-import { MessageType, Player, serverMessageSchema } from "~/game";
+import { serverMessageSchema } from "~/game";
+import type {
+    LivePlayerResult,
+    LiveQuestion,
+    MessageType,
+    Player,
+} from "~/game";
 import z from "zod";
+
+const sampleQuestion: LiveQuestion = {
+    id: "sample-question",
+    prompt: "Which option means 'hello'?",
+    options: ["Hello", "Goodbye", "Thanks"],
+    correctAnswer: "Hello",
+};
 
 export const Route = createFileRoute("/room/$roomId/")({
     component: RouteComponent,
@@ -21,6 +34,9 @@ function RouteComponent() {
     const [gameState, setGameState] = createSignal<
         "lobby" | "playing" | "ended"
     >("lobby");
+    const [finalResults, setFinalResults] = createSignal<
+        LivePlayerResult[] | null
+    >(null);
 
     const refreshPlayerId = () => {
         const match = document.cookie.match(/playerId=([^;]+)/);
@@ -49,7 +65,7 @@ function RouteComponent() {
 
     const join = (name: string) => send("join", name);
     const leave = () => send("leave");
-    const startGame = () => send("start");
+    const startGame = () => send("start", name(), { question: sampleQuestion });
 
     const isJoined = () => players().some((p) => p.id === playerId());
 
@@ -98,7 +114,12 @@ function RouteComponent() {
             }
             if (parsed.type === "game_started") {
                 console.log("play");
+                setFinalResults(null);
                 setGameState("playing");
+            }
+            if (parsed.type === "game_ended") {
+                setFinalResults(parsed.data.results as LivePlayerResult[]);
+                setGameState("ended");
             }
         };
     });
@@ -127,7 +148,28 @@ function RouteComponent() {
                 />
             </Match>
             <Match when={gameState() === "ended"}>
-                <div>Game ended</div>
+                <div class="p-8 space-y-4">
+                    <h2 class="text-2xl font-semibold">Session results</h2>
+                    <Show
+                        when={finalResults() && finalResults()!.length}
+                        fallback={
+                            <div class="text-sm text-gray-500">Game ended.</div>
+                        }
+                    >
+                        <ul class="space-y-2">
+                            <For each={finalResults() ?? []}>
+                                {(result) => (
+                                    <li class="flex items-center justify-between border-b border-gray-700 pb-2">
+                                        <span>{result.playerName}</span>
+                                        <span>
+                                            {result.score} / {result.maxScore}
+                                        </span>
+                                    </li>
+                                )}
+                            </For>
+                        </ul>
+                    </Show>
+                </div>
             </Match>
         </Switch>
     );

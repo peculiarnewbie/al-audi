@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as UserRouteImport } from './routes/user'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as PostsRouteImport } from './routes/posts'
 import { Route as HomeRouteImport } from './routes/home'
@@ -22,6 +23,7 @@ import { Route as UsersIndexRouteImport } from './routes/users.index'
 import { Route as RoomIndexRouteImport } from './routes/room/index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
+import { Route as ShareShareIdRouteImport } from './routes/share/$shareId'
 import { Route as QuizzesNewRouteImport } from './routes/quizzes/new'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
@@ -32,11 +34,13 @@ import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
 import { Route as ApiRoomRoomIdRouteImport } from './routes/api/room/$roomId'
 import { Route as ApiQuizzesMediaRouteImport } from './routes/api/quizzes/media'
 import { Route as ApiDriveMediaRouteImport } from './routes/api/drive/media'
+import { Route as ApiDriveFoldersRouteImport } from './routes/api/drive/folders'
 import { Route as ApiAuthSignOutRouteImport } from './routes/api/auth/sign-out'
 import { Route as ApiAuthSignInRouteImport } from './routes/api/auth/sign-in'
 import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
+import { Route as ApiShareShareIdQrRouteImport } from './routes/api/share/$shareId/qr'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
@@ -46,6 +50,11 @@ const UsersRoute = UsersRouteImport.update({
 const UserRoute = UserRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RedirectRoute = RedirectRouteImport.update({
@@ -102,6 +111,11 @@ const UsersUserIdRoute = UsersUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => UsersRoute,
 } as any)
+const ShareShareIdRoute = ShareShareIdRouteImport.update({
+  id: '/share/$shareId',
+  path: '/share/$shareId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuizzesNewRoute = QuizzesNewRouteImport.update({
   id: '/quizzes/new',
   path: '/quizzes/new',
@@ -152,6 +166,11 @@ const ApiDriveMediaRoute = ApiDriveMediaRouteImport.update({
   path: '/api/drive/media',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDriveFoldersRoute = ApiDriveFoldersRouteImport.update({
+  id: '/api/drive/folders',
+  path: '/api/drive/folders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSignOutRoute = ApiAuthSignOutRouteImport.update({
   id: '/api/auth/sign-out',
   path: '/api/auth/sign-out',
@@ -179,6 +198,11 @@ const PathlessLayoutNestedLayoutRouteARoute =
     path: '/route-a',
     getParentRoute: () => PathlessLayoutNestedLayoutRoute,
   } as any)
+const ApiShareShareIdQrRoute = ApiShareShareIdQrRouteImport.update({
+  id: '/api/share/$shareId/qr',
+  path: '/api/share/$shareId/qr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -187,11 +211,13 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/reports': typeof ReportsRoute
   '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
+  '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/room': typeof RoomIndexRoute
@@ -201,12 +227,14 @@ export interface FileRoutesByFullPath {
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/api/auth/sign-out': typeof ApiAuthSignOutRoute
+  '/api/drive/folders': typeof ApiDriveFoldersRoute
   '/api/drive/media': typeof ApiDriveMediaRoute
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -214,10 +242,12 @@ export interface FileRoutesByTo {
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/redirect': typeof RedirectRoute
+  '/reports': typeof ReportsRoute
   '/user': typeof UserRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
+  '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts': typeof PostsIndexRoute
   '/room': typeof RoomIndexRoute
@@ -227,12 +257,14 @@ export interface FileRoutesByTo {
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/api/auth/sign-out': typeof ApiAuthSignOutRoute
+  '/api/drive/folders': typeof ApiDriveFoldersRoute
   '/api/drive/media': typeof ApiDriveMediaRoute
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -243,12 +275,14 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/reports': typeof ReportsRoute
   '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
+  '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/room/': typeof RoomIndexRoute
@@ -258,12 +292,14 @@ export interface FileRoutesById {
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/api/auth/sign-out': typeof ApiAuthSignOutRoute
+  '/api/drive/folders': typeof ApiDriveFoldersRoute
   '/api/drive/media': typeof ApiDriveMediaRoute
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
   '/room/$roomId/': typeof RoomRoomIdIndexRoute
+  '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -274,11 +310,13 @@ export interface FileRouteTypes {
     | '/home'
     | '/posts'
     | '/redirect'
+    | '/reports'
     | '/user'
     | '/users'
     | '/api/users'
     | '/posts/$postId'
     | '/quizzes/new'
+    | '/share/$shareId'
     | '/users/$userId'
     | '/posts/'
     | '/room'
@@ -288,12 +326,14 @@ export interface FileRouteTypes {
     | '/api/auth/callback'
     | '/api/auth/sign-in'
     | '/api/auth/sign-out'
+    | '/api/drive/folders'
     | '/api/drive/media'
     | '/api/quizzes/media'
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts/$postId/deep'
     | '/room/$roomId'
+    | '/api/share/$shareId/qr'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -301,10 +341,12 @@ export interface FileRouteTypes {
     | '/deferred'
     | '/home'
     | '/redirect'
+    | '/reports'
     | '/user'
     | '/api/users'
     | '/posts/$postId'
     | '/quizzes/new'
+    | '/share/$shareId'
     | '/users/$userId'
     | '/posts'
     | '/room'
@@ -314,12 +356,14 @@ export interface FileRouteTypes {
     | '/api/auth/callback'
     | '/api/auth/sign-in'
     | '/api/auth/sign-out'
+    | '/api/drive/folders'
     | '/api/drive/media'
     | '/api/quizzes/media'
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts/$postId/deep'
     | '/room/$roomId'
+    | '/api/share/$shareId/qr'
   id:
     | '__root__'
     | '/'
@@ -329,12 +373,14 @@ export interface FileRouteTypes {
     | '/home'
     | '/posts'
     | '/redirect'
+    | '/reports'
     | '/user'
     | '/users'
     | '/_pathlessLayout/_nested-layout'
     | '/api/users'
     | '/posts/$postId'
     | '/quizzes/new'
+    | '/share/$shareId'
     | '/users/$userId'
     | '/posts/'
     | '/room/'
@@ -344,12 +390,14 @@ export interface FileRouteTypes {
     | '/api/auth/callback'
     | '/api/auth/sign-in'
     | '/api/auth/sign-out'
+    | '/api/drive/folders'
     | '/api/drive/media'
     | '/api/quizzes/media'
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts_/$postId/deep'
     | '/room/$roomId/'
+    | '/api/share/$shareId/qr'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -360,19 +408,23 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   PostsRoute: typeof PostsRouteWithChildren
   RedirectRoute: typeof RedirectRoute
+  ReportsRoute: typeof ReportsRoute
   UserRoute: typeof UserRoute
   UsersRoute: typeof UsersRouteWithChildren
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
   QuizzesNewRoute: typeof QuizzesNewRoute
+  ShareShareIdRoute: typeof ShareShareIdRoute
   RoomIndexRoute: typeof RoomIndexRoute
   ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
   ApiAuthSignInRoute: typeof ApiAuthSignInRoute
   ApiAuthSignOutRoute: typeof ApiAuthSignOutRoute
+  ApiDriveFoldersRoute: typeof ApiDriveFoldersRoute
   ApiDriveMediaRoute: typeof ApiDriveMediaRoute
   ApiQuizzesMediaRoute: typeof ApiQuizzesMediaRoute
   ApiRoomRoomIdRoute: typeof ApiRoomRoomIdRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
   RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute
+  ApiShareShareIdQrRoute: typeof ApiShareShareIdQrRoute
 }
 
 declare module '@tanstack/solid-router' {
@@ -389,6 +441,13 @@ declare module '@tanstack/solid-router' {
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof UserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/redirect': {
@@ -468,6 +527,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRoute
     }
+    '/share/$shareId': {
+      id: '/share/$shareId'
+      path: '/share/$shareId'
+      fullPath: '/share/$shareId'
+      preLoaderRoute: typeof ShareShareIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quizzes/new': {
       id: '/quizzes/new'
       path: '/quizzes/new'
@@ -538,6 +604,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ApiDriveMediaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/drive/folders': {
+      id: '/api/drive/folders'
+      path: '/api/drive/folders'
+      fullPath: '/api/drive/folders'
+      preLoaderRoute: typeof ApiDriveFoldersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/sign-out': {
       id: '/api/auth/sign-out'
       path: '/api/auth/sign-out'
@@ -572,6 +645,13 @@ declare module '@tanstack/solid-router' {
       fullPath: '/route-a'
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteARouteImport
       parentRoute: typeof PathlessLayoutNestedLayoutRoute
+    }
+    '/api/share/$shareId/qr': {
+      id: '/api/share/$shareId/qr'
+      path: '/api/share/$shareId/qr'
+      fullPath: '/api/share/$shareId/qr'
+      preLoaderRoute: typeof ApiShareShareIdQrRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -650,19 +730,23 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   PostsRoute: PostsRouteWithChildren,
   RedirectRoute: RedirectRoute,
+  ReportsRoute: ReportsRoute,
   UserRoute: UserRoute,
   UsersRoute: UsersRouteWithChildren,
   ApiUsersRoute: ApiUsersRouteWithChildren,
   QuizzesNewRoute: QuizzesNewRoute,
+  ShareShareIdRoute: ShareShareIdRoute,
   RoomIndexRoute: RoomIndexRoute,
   ApiAuthCallbackRoute: ApiAuthCallbackRoute,
   ApiAuthSignInRoute: ApiAuthSignInRoute,
   ApiAuthSignOutRoute: ApiAuthSignOutRoute,
+  ApiDriveFoldersRoute: ApiDriveFoldersRoute,
   ApiDriveMediaRoute: ApiDriveMediaRoute,
   ApiQuizzesMediaRoute: ApiQuizzesMediaRoute,
   ApiRoomRoomIdRoute: ApiRoomRoomIdRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
   RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,
+  ApiShareShareIdQrRoute: ApiShareShareIdQrRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
