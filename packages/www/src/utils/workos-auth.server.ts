@@ -1,5 +1,7 @@
 import { WorkOS } from "@workos-inc/node";
 import { env } from "cloudflare:workers";
+import { eq } from "drizzle-orm";
+import { createDb, users } from "core";
 
 export type AuthUser = {
     id: string;
@@ -7,6 +9,8 @@ export type AuthUser = {
     firstName?: string | null;
     lastName?: string | null;
 };
+
+export type DbUser = typeof users.$inferSelect;
 
 export const WORKOS_COOKIE_NAME = "wos-session";
 
@@ -56,6 +60,35 @@ export async function getAuthenticatedUser(
         console.error("WorkOS session validation failed", error);
         return null;
     }
+}
+
+export async function getAuthenticatedDbUser(
+    headers: Headers,
+): Promise<DbUser | null> {
+    const user = await getAuthenticatedUser(headers);
+
+    if (!user) {
+        return null;
+    }
+
+    const db = createDb(env.DB);
+    const [dbUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
+
+    return dbUser ?? null;
+}
+
+export async function getAdminUser(headers: Headers): Promise<DbUser | null> {
+    const dbUser = await getAuthenticatedDbUser(headers);
+
+    if (!dbUser || dbUser.role !== "admin") {
+        return null;
+    }
+
+    return dbUser;
 }
 
 export async function getLogoutUrl(sessionData: string) {

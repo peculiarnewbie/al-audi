@@ -26,17 +26,17 @@ This is the English Learning add-on app for an in-person school. It focuses on t
 Install dependencies from the repo root (workspace-aware package manager of choice).
 
 ```bash
-npm install
+bun install
 ```
 
 Run app scripts from `packages/www`:
 
 ```bash
-npm run dev
-npm run build
-npm run preview
-npm run deploy
-npm run cf-typegen
+bun run dev
+bun run build
+bun run preview
+bun run deploy
+bun run cf-typegen
 ```
 
 - `npm run cf-typegen` regenerates `packages/www/worker-configuration.d.ts`.

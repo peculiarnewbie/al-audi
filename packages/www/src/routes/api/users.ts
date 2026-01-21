@@ -1,64 +1,55 @@
-import { createFileRoute } from '@tanstack/solid-router'
-import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { createMiddleware, json } from '@tanstack/solid-start'
-import type { User } from '~/utils/users'
+import { createFileRoute } from "@tanstack/solid-router";
+import { json } from "@tanstack/solid-start";
+import { getRequestHeaders } from "@tanstack/solid-start/server";
+import { getAdminUsers } from "~/server/admin";
+import type { UserRole } from "~/server/admin";
 
-const userLoggerMiddleware = createMiddleware().server(async ({ next }) => {
-  console.info('In: /users')
-  console.info('Request Headers:', getRequestHeaders())
-  const result = await next()
-  result.response.headers.set('x-users', 'true')
-  console.info('Out: /users')
-  return result
-})
+export const Route = createFileRoute("/api/users")({
+    server: {
+        handlers: {
+            GET: async ({ request }) => {
+                const url = new URL(request.url);
+                const search = url.searchParams.get("q")?.trim();
+                const roleParam = url.searchParams.get("role")?.trim();
+                const roleOptions: UserRole[] = [
+                    "none",
+                    "student",
+                    "teacher",
+                    "admin",
+                ];
+                const role = roleOptions.includes(roleParam as UserRole)
+                    ? (roleParam as UserRole)
+                    : undefined;
 
-const testParentMiddleware = createMiddleware().server(async ({ next }) => {
-  console.info('In: testParentMiddleware')
-  const result = await next()
-  result.response.headers.set('x-test-parent', 'true')
-  console.info('Out: testParentMiddleware')
-  return result
-})
+                if (roleParam && !role) {
+                    return json(
+                        { error: "Invalid role filter." },
+                        { status: 400 },
+                    );
+                }
 
-const testMiddleware = createMiddleware()
-  .middleware([testParentMiddleware])
-  .server(async ({ next }) => {
-    console.info('In: testMiddleware')
-    const result = await next()
-    result.response.headers.set('x-test', 'true')
+                const result = await getAdminUsers(
+                    getRequestHeaders(),
+                    search || undefined,
+                    role,
+                );
 
-    // if (Math.random() > 0.5) {
-    //   throw new Response(null, {
-    //     status: 302,
-    //     headers: { Location: 'https://www.google.com' },
-    //   })
-    // }
+                if (result.status === "unauthenticated") {
+                    return json(
+                        { error: "You must be signed in." },
+                        { status: 401 },
+                    );
+                }
 
-    console.info('Out: testMiddleware')
-    return result
-  })
+                if (result.status === "forbidden") {
+                    return json(
+                        { error: "Admin access required." },
+                        { status: 403 },
+                    );
+                }
 
-export const Route = createFileRoute('/api/users')({
-  server: {
-    middleware: [testMiddleware, userLoggerMiddleware],
-    handlers: {
-      GET: async ({ request, context }) => {
-        console.info('GET /api/users @', request.url)
-        console.info('Fetching users... @', request.url)
-        const res = await fetch('https://jsonplaceholder.typicode.com/users')
-        if (!res.ok) {
-          throw new Error('Failed to fetch users')
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        const data = (await res.json()) as Array<User>
-
-        const list = data.slice(0, 10)
-
-        return json(
-          list.map((u) => ({ id: u.id, name: u.name, email: u.email })),
-        )
-      },
+                return json(result.users);
+            },
+        },
     },
-  },
-})
+});
