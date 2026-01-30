@@ -1,22 +1,23 @@
 import { createFileRoute } from "@tanstack/solid-router";
+import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { NotFound } from "src/components/NotFound";
 import { UserErrorComponent } from "src/components/UserError";
+import { getAdminUser } from "~/server/admin";
 import type { User } from "../utils/users";
 
 export const Route = createFileRoute("/users/$userId")({
     loader: async ({ params: { userId } }) => {
-        try {
-            const res = await fetch("/api/users/" + userId);
-            if (!res.ok) {
-                throw new Error("Unexpected status code");
-            }
+        const result = await getAdminUser(getRequestHeaders(), userId);
 
-            const data = await res.json();
+        if (result.status === "not_found") {
+            throw new Error("User not found");
+        }
 
-            return data as User;
-        } catch {
+        if (result.status !== "ok") {
             throw new Error("Failed to fetch user");
         }
+
+        return result.user as User;
     },
     errorComponent: UserErrorComponent,
     component: UserComponent,
