@@ -105,6 +105,7 @@ export function buildSessionCookie(sessionData: string, isSecure: boolean) {
         httpOnly: true,
         sameSite: "Lax",
         secure: isSecure,
+        maxAge: 60 * 60 * 24 * 7,
     });
 }
 

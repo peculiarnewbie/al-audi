@@ -1,23 +1,38 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { getRequestHeaders } from "@tanstack/solid-start/server";
+import { createServerFn } from "@tanstack/solid-start";
 import { NotFound } from "src/components/NotFound";
 import { UserErrorComponent } from "src/components/UserError";
-import { getAdminUser } from "~/server/admin";
 import type { User } from "../utils/users";
 
-export const Route = createFileRoute("/users/$userId")({
-    loader: async ({ params: { userId } }) => {
-        const result = await getAdminUser(getRequestHeaders(), userId);
+const getUser = createServerFn({ method: "GET" })
+    .inputValidator((data: { userId: string }) => data)
+    .handler(async ({ data }) => {
+        const { getRequestHeaders } =
+            await import("@tanstack/solid-start/server");
+        const { getAdminUser } = await import("~/server/admin");
+
+        const result = await getAdminUser(getRequestHeaders(), data.userId);
 
         if (result.status === "not_found") {
-            throw new Error("User not found");
+            return null;
         }
 
         if (result.status !== "ok") {
             throw new Error("Failed to fetch user");
         }
 
-        return result.user as User;
+        return result.user;
+    });
+
+export const Route = createFileRoute("/users/$userId")({
+    loader: async ({ params: { userId } }) => {
+        const user = await getUser({ data: { userId } });
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        return user as User;
     },
     errorComponent: UserErrorComponent,
     component: UserComponent,

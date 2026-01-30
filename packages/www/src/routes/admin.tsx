@@ -14,7 +14,79 @@ const getAdminDashboardStats = createServerFn({ method: "GET" }).handler(
     },
 );
 
+type UserQuery = {
+    search?: string;
+    role?: UserRole;
+};
+
+const fetchAdminUsers = createServerFn({ method: "GET" })
+    .inputValidator((data: UserQuery) => data)
+    .handler(async ({ data }) => {
+        const { getRequestHeaders } =
+            await import("@tanstack/solid-start/server");
+        const { getAdminUsers } = await import("~/server/admin");
+
+        return getAdminUsers(getRequestHeaders(), data.search, data.role);
+    });
+
+const updateAdminRole = createServerFn({ method: "POST" })
+    .inputValidator((data: { userId: string; role: UserRole }) => data)
+    .handler(async ({ data }) => {
+        const { getRequestHeaders } =
+            await import("@tanstack/solid-start/server");
+        const { updateAdminUserRole } = await import("~/server/admin");
+
+        return updateAdminUserRole(getRequestHeaders(), data.userId, data.role);
+    });
+
+const updateAdminTeacherAssignment = createServerFn({ method: "POST" })
+    .inputValidator(
+        (data: { studentId: string; teacherId: string | null }) => data,
+    )
+    .handler(async ({ data }) => {
+        const { getRequestHeaders } =
+            await import("@tanstack/solid-start/server");
+        const { updateAdminStudentTeacher } = await import("~/server/admin");
+
+        return updateAdminStudentTeacher(
+            getRequestHeaders(),
+            data.studentId,
+            data.teacherId,
+        );
+    });
+
+const getAdminErrorMessage = (
+    status: "unauthenticated" | "forbidden" | "not_found" | "ok",
+    fallback: string,
+    notFoundMessage = "User not found.",
+) => {
+    if (status === "unauthenticated") {
+        return "You must be signed in.";
+    }
+
+    if (status === "forbidden") {
+        return "Admin access required.";
+    }
+
+    if (status === "not_found") {
+        return notFoundMessage;
+    }
+
+    return fallback;
+};
+
 const roleOptions: UserRole[] = ["none", "student", "teacher", "admin"];
+
+const normalizeRole = (role?: string | null): UserRole => {
+    if (!role) {
+        return "none";
+    }
+
+    const normalized = role.toLowerCase();
+    return roleOptions.includes(normalized as UserRole)
+        ? (normalized as UserRole)
+        : "none";
+};
 
 export const Route = createFileRoute("/admin")({
     loader: async () => {
@@ -104,38 +176,25 @@ function AdminDashboard() {
             }
 
             setUserError(null);
-            const params = new URLSearchParams();
+            const result = await fetchAdminUsers({
+                data: {
+                    search: search || undefined,
+                },
+            });
 
-            if (search) {
-                params.set("q", search);
-            }
-
-            const response = await fetch(
-                `/api/users${params.toString() ? `?${params.toString()}` : ""}`,
-            );
-
-            if (!response.ok) {
-                const payload = (await response.json().catch(() => null)) as {
-                    error?: string;
-                } | null;
-                setUserError(payload?.error ?? "Unable to load users.");
+            if (result.status !== "ok") {
+                setUserError(
+                    getAdminErrorMessage(
+                        result.status,
+                        "Unable to load users.",
+                    ),
+                );
                 return [];
             }
 
-            return (await response.json()) as User[];
+            return result.users as User[];
         },
     );
-
-    const buildUserUrl = (role: UserRole, search?: string) => {
-        const params = new URLSearchParams();
-        params.set("role", role);
-
-        if (search) {
-            params.set("q", search);
-        }
-
-        return `/api/users?${params.toString()}`;
-    };
 
     const [
         assignmentData,
@@ -148,27 +207,40 @@ function AdminDashboard() {
             }
 
             setAssignmentError(null);
-            const [teacherResponse, studentResponse] = await Promise.all([
-                fetch(buildUserUrl("teacher")),
-                fetch(buildUserUrl("student", search)),
+            const [teacherResult, studentResult] = await Promise.all([
+                fetchAdminUsers({
+                    data: {
+                        role: "teacher",
+                    },
+                }),
+                fetchAdminUsers({
+                    data: {
+                        role: "student",
+                        search: search || undefined,
+                    },
+                }),
             ]);
 
-            if (!teacherResponse.ok || !studentResponse.ok) {
-                const failedResponse = teacherResponse.ok
-                    ? studentResponse
-                    : teacherResponse;
-                const payload = (await failedResponse
-                    .json()
-                    .catch(() => null)) as { error?: string } | null;
+            if (
+                teacherResult.status !== "ok" ||
+                studentResult.status !== "ok"
+            ) {
+                const failedResult =
+                    teacherResult.status !== "ok"
+                        ? teacherResult
+                        : studentResult;
                 setAssignmentError(
-                    payload?.error ?? "Unable to load teacher assignments.",
+                    getAdminErrorMessage(
+                        failedResult.status,
+                        "Unable to load teacher assignments.",
+                    ),
                 );
                 return { teachers: [], students: [] };
             }
 
             return {
-                teachers: (await teacherResponse.json()) as User[],
-                students: (await studentResponse.json()) as User[],
+                teachers: teacherResult.users as User[],
+                students: studentResult.users as User[],
             };
         },
     );
@@ -198,23 +270,24 @@ function AdminDashboard() {
         setUserError(null);
 
         try {
-            const response = await fetch(`/api/users/${userId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
+            const result = await updateAdminRole({
+                data: {
+                    userId,
+                    role,
                 },
-                body: JSON.stringify({ role }),
             });
 
-            if (!response.ok) {
-                const payload = (await response.json().catch(() => null)) as {
-                    error?: string;
-                } | null;
-                setUserError(payload?.error ?? "Unable to update role.");
+            if (result.status !== "ok") {
+                setUserError(
+                    getAdminErrorMessage(
+                        result.status,
+                        "Unable to update role.",
+                    ),
+                );
                 return;
             }
 
-            const updated = (await response.json()) as User;
+            const updated = result.user as User;
             const current = users();
 
             if (current) {
@@ -239,25 +312,25 @@ function AdminDashboard() {
         setAssignmentError(null);
 
         try {
-            const response = await fetch(`/api/users/${studentId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
+            const result = await updateAdminTeacherAssignment({
+                data: {
+                    studentId,
+                    teacherId,
                 },
-                body: JSON.stringify({ teacherId }),
             });
 
-            if (!response.ok) {
-                const payload = (await response.json().catch(() => null)) as {
-                    error?: string;
-                } | null;
+            if (result.status !== "ok") {
                 setAssignmentError(
-                    payload?.error ?? "Unable to update teacher.",
+                    getAdminErrorMessage(
+                        result.status,
+                        "Unable to update teacher.",
+                        "Student or teacher not found.",
+                    ),
                 );
                 return;
             }
 
-            const updated = (await response.json()) as User;
+            const updated = result.user as User;
             const current = assignmentData();
 
             if (current) {
@@ -419,7 +492,6 @@ function AdminDashboard() {
                                                 <div class="flex items-center gap-3">
                                                     <select
                                                         class="rounded-lg border border-stone-300 px-3 py-2 text-sm"
-                                                        value={user.role}
                                                         disabled={
                                                             updatingUserId() ===
                                                             user.id
@@ -431,7 +503,9 @@ function AdminDashboard() {
                                                                     .value as UserRole;
                                                             if (
                                                                 nextRole !==
-                                                                user.role
+                                                                normalizeRole(
+                                                                    user.role,
+                                                                )
                                                             ) {
                                                                 void updateUserRole(
                                                                     user.id,
@@ -444,6 +518,12 @@ function AdminDashboard() {
                                                             {(role) => (
                                                                 <option
                                                                     value={role}
+                                                                    selected={
+                                                                        role ===
+                                                                        normalizeRole(
+                                                                            user.role,
+                                                                        )
+                                                                    }
                                                                 >
                                                                     {role}
                                                                 </option>
