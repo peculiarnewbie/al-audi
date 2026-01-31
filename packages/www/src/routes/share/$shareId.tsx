@@ -172,11 +172,11 @@ function SharedQuizPage() {
     };
 
     return (
-        <div class="max-w-4xl mx-auto px-6 py-12 space-y-6">
+        <div class="mx-auto max-w-5xl px-6 py-12 space-y-6">
             <Show
                 when={quiz()}
                 fallback={
-                    <div class="rounded-xl border border-stone-200 bg-white p-6 shadow-sm space-y-4">
+                    <div class="glass-panel p-6 space-y-4">
                         <div class="text-sm text-rose-600">
                             {errorResult()?.error ?? "Share link unavailable."}
                         </div>
@@ -192,11 +192,11 @@ function SharedQuizPage() {
                                         setTokenInput(event.currentTarget.value)
                                     }
                                     placeholder="Enter access token"
-                                    class="flex-1 min-w-[220px] px-3 py-2 border border-stone-200 rounded"
+                                    class="flex-1 min-w-[220px] rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-slate-700"
                                 />
                                 <button
                                     type="submit"
-                                    class="px-4 py-2 bg-stone-800 text-white rounded"
+                                    class="rounded-full bg-[color:var(--dashboard-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)]"
                                 >
                                     Unlock quiz
                                 </button>
@@ -211,24 +211,24 @@ function SharedQuizPage() {
                     return (
                         <div class="space-y-6">
                             <header class="space-y-2">
-                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                                     Shared quiz
                                 </div>
-                                <h1 class="text-2xl font-semibold text-stone-800">
+                                <h1 class="font-display text-3xl font-semibold text-[color:var(--dashboard-ink)]">
                                     Homework quiz
                                 </h1>
-                                <p class="text-sm text-stone-600">
+                                <p class="text-sm text-slate-600">
                                     Complete each question and submit when
                                     you&apos;re ready.
                                 </p>
                             </header>
 
                             <Show when={!viewer()}>
-                                <div class="rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+                                <div class="rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-sm text-slate-600">
                                     Sign in to submit answers.{" "}
                                     <a
                                         href="/api/auth/sign-in"
-                                        class="text-stone-800 underline"
+                                        class="text-slate-900 underline"
                                     >
                                         Sign in
                                     </a>
@@ -246,11 +246,11 @@ function SharedQuizPage() {
                                             responses[question.id];
 
                                         return (
-                                            <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-4">
-                                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                            <div class="glass-card p-4 space-y-4">
+                                                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                                                     Question {index() + 1}
                                                 </div>
-                                                <div class="text-lg text-stone-800">
+                                                <div class="text-lg text-[color:var(--dashboard-ink)]">
                                                     {question.prompt}
                                                 </div>
                                                 <Show
@@ -276,7 +276,7 @@ function SharedQuizPage() {
                                                             }
                                                             placeholder="Type your answer"
                                                             disabled={isLocked()}
-                                                            class="w-full px-3 py-2 border border-stone-200 rounded"
+                                                            class="w-full rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-slate-700"
                                                         />
                                                     }
                                                 >
@@ -292,7 +292,7 @@ function SharedQuizPage() {
                                                                     option,
                                                                     optionIndex,
                                                                 ) => (
-                                                                    <label class="flex items-center gap-3 text-sm text-stone-700">
+                                                                    <label class="flex items-center gap-3 text-sm text-slate-700">
                                                                         <input
                                                                             type="radio"
                                                                             name={`question-${question.id}`}
@@ -337,7 +337,7 @@ function SharedQuizPage() {
                                             isLocked() ||
                                             !viewer()
                                         }
-                                        class="px-6 py-2 bg-stone-800 text-white rounded disabled:opacity-50"
+                                        class="rounded-full bg-[color:var(--dashboard-accent)] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)] disabled:opacity-60"
                                     >
                                         {status() === "submitting"
                                             ? "Submitting"
@@ -354,7 +354,7 @@ function SharedQuizPage() {
                             </form>
 
                             <Show when={score()}>
-                                <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                                <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
                                     Score {score()!.score} / {score()!.maxScore}
                                 </div>
                             </Show>

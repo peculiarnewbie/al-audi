@@ -454,19 +454,19 @@ function QuizCreatePage() {
     };
 
     return (
-        <div class="max-w-4xl mx-auto px-6 py-12 space-y-8">
+        <div class="mx-auto max-w-5xl px-6 py-12 space-y-8">
             <header class="space-y-2">
-                <div class="text-xs uppercase tracking-wide text-stone-500">
+                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                     Signed in as {user().email}
                 </div>
                 <div class="flex flex-wrap items-center justify-between gap-4">
-                    <h1 class="text-2xl font-semibold text-stone-800">
+                    <h1 class="font-display text-3xl font-semibold text-[color:var(--dashboard-ink)]">
                         Create a Quiz
                     </h1>
                     <button
                         type="button"
                         onClick={() => setPreviewMode((current) => !current)}
-                        class="px-4 py-2 border border-stone-300 rounded text-stone-700 hover:text-stone-900"
+                        class="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm transition hover:bg-white"
                     >
                         {previewMode() ? "Back to editor" : "Preview"}
                     </button>
@@ -477,7 +477,7 @@ function QuizCreatePage() {
                 <Show
                     when={!previewMode()}
                     fallback={
-                        <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-3">
+                        <div class="glass-panel p-4 space-y-3">
                             <div class="text-xs uppercase tracking-wide text-stone-500">
                                 Quiz categories
                             </div>
@@ -514,7 +514,7 @@ function QuizCreatePage() {
                         </div>
                     }
                 >
-                    <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-4">
+                    <div class="glass-panel p-4 space-y-4">
                         <div class="text-xs uppercase tracking-wide text-stone-500">
                             Quiz categories
                         </div>
@@ -593,7 +593,7 @@ function QuizCreatePage() {
                                     questionImages[question.id];
 
                                 return (
-                                    <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-4">
+                                    <div class="glass-card p-4 space-y-4">
                                         <div class="flex items-center justify-between">
                                             <div class="text-sm font-medium text-stone-700">
                                                 Question {index() + 1}
@@ -874,7 +874,7 @@ function QuizCreatePage() {
                     <button
                         type="submit"
                         disabled={!isValid() || status() === "saving"}
-                        class="px-6 py-2 bg-stone-800 text-white rounded disabled:opacity-50"
+                        class="rounded-full bg-[color:var(--dashboard-accent)] px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)] disabled:opacity-50"
                     >
                         {status() === "saving" ? "Saving" : "Save quiz"}
                     </button>
@@ -891,7 +891,7 @@ function QuizCreatePage() {
                 </div>
 
                 <Show when={savedQuizId()}>
-                    <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm space-y-3">
+                    <div class="glass-panel p-4 space-y-3">
                         <div class="text-xs uppercase tracking-wide text-stone-500">
                             Share link
                         </div>

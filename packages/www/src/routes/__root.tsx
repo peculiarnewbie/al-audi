@@ -44,6 +44,10 @@ export const Route = createRootRoute({
         links: [
             { rel: "stylesheet", href: appCss },
             {
+                rel: "stylesheet",
+                href: "https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap",
+            },
+            {
                 rel: "apple-touch-icon",
                 sizes: "180x180",
                 href: "/apple-touch-icon.png",
@@ -86,55 +90,83 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
             </head>
             <body>
                 <HeadContent />
-                <header class="flex items-center justify-between px-6 py-4">
-                    <div class="flex gap-4 text-lg">
-                        <Link
-                            to="/"
-                            activeProps={{
-                                class: "font-bold",
-                            }}
-                            activeOptions={{ exact: true }}
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            to="/reports"
-                            activeProps={{
-                                class: "font-bold",
-                            }}
-                        >
-                            Reports
-                        </Link>
-                    </div>
-                    <div class="flex items-center gap-4 text-sm">
-                        <Show
-                            when={user()}
-                            fallback={
-                                <a
-                                    href="/api/auth/sign-in"
-                                    class="text-stone-700 hover:text-stone-900"
-                                >
-                                    Sign in
-                                </a>
-                            }
-                        >
+                <div
+                    class="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,_#f7f3eb_0%,_#eef6f3_55%,_#f7f8fb_100%)] text-slate-900"
+                    style={{
+                        "--dashboard-accent": "#0f766e",
+                        "--dashboard-accent-strong": "#115e59",
+                        "--dashboard-accent-soft": "#ccfbf1",
+                        "--dashboard-ink": "#1f2937",
+                        "--dashboard-wash": "#f8fafc",
+                        "font-family": "'Space Grotesk', system-ui, sans-serif",
+                    }}
+                >
+                    <div class="pointer-events-none absolute -top-40 left-[-10%] h-72 w-72 rounded-full bg-[color:var(--dashboard-accent-soft)] opacity-80 blur-3xl" />
+                    <div class="pointer-events-none absolute bottom-[-25%] right-[-10%] h-80 w-80 rounded-full bg-amber-200/60 blur-3xl" />
+
+                    <header class="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 pt-6">
+                        <div class="flex items-center gap-3 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">
                             <Link
-                                to="/user"
-                                class="text-stone-700 hover:text-stone-900"
+                                to="/"
+                                activeProps={{
+                                    class: "text-slate-900",
+                                }}
+                                activeOptions={{ exact: true }}
+                                class="transition hover:text-slate-900"
                             >
-                                Account
+                                Home
                             </Link>
-                            <a
-                                href="/api/auth/sign-out"
-                                class="text-stone-700 hover:text-stone-900"
+                            <span class="text-slate-300">•</span>
+                            <Link
+                                to="/dashboard"
+                                activeProps={{
+                                    class: "text-slate-900",
+                                }}
+                                class="transition hover:text-slate-900"
                             >
-                                Sign out
-                            </a>
-                        </Show>
-                    </div>
-                </header>
-                <hr />
-                {children}
+                                Dashboard
+                            </Link>
+                            <span class="text-slate-300">•</span>
+                            <Link
+                                to="/reports"
+                                activeProps={{
+                                    class: "text-slate-900",
+                                }}
+                                class="transition hover:text-slate-900"
+                            >
+                                Reports
+                            </Link>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                            <Show
+                                when={user()}
+                                fallback={
+                                    <a
+                                        href="/api/auth/sign-in"
+                                        class="rounded-full border border-white/70 bg-white/80 px-4 py-2 shadow-sm transition hover:bg-white"
+                                    >
+                                        Sign in
+                                    </a>
+                                }
+                            >
+                                <Link
+                                    to="/user"
+                                    class="rounded-full border border-white/70 bg-white/80 px-4 py-2 shadow-sm transition hover:bg-white"
+                                >
+                                    Account
+                                </Link>
+                                <a
+                                    href="/api/auth/sign-out"
+                                    class="rounded-full border border-white/70 bg-white/80 px-4 py-2 shadow-sm transition hover:bg-white"
+                                >
+                                    Sign out
+                                </a>
+                            </Show>
+                        </div>
+                    </header>
+
+                    <main class="relative z-10">{children}</main>
+                </div>
                 <TanStackRouterDevtools position="bottom-right" />
                 <Scripts />
             </body>

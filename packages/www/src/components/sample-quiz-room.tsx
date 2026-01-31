@@ -15,7 +15,7 @@ const AnswerButton: Component<{
     <button
         onClick={() => props.onSubmit(props.answer)}
         disabled={props.playerAnswer !== null}
-        class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
+        class="rounded-full bg-[color:var(--dashboard-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)] disabled:opacity-60"
     >
         {props.label}
     </button>
@@ -114,72 +114,81 @@ export const SampleQuizRoom: Component<{
     };
 
     return (
-        <div class="p-8 space-y-6">
-            <Show
-                when={question()}
-                fallback={
-                    <div class="text-sm text-gray-500">
-                        Waiting for the host to start the quiz...
-                    </div>
-                }
-            >
-                {(currentQuestion) => (
-                    <div class="space-y-4">
-                        <h1 class="text-2xl font-bold">
-                            {currentQuestion().prompt}
-                        </h1>
-                        <div class="flex flex-wrap gap-2">
-                            <For each={currentQuestion().options}>
-                                {(option) => (
-                                    <AnswerButton
-                                        answer={option}
-                                        label={option}
-                                        playerAnswer={playerAnswer()}
-                                        onSubmit={submitAnswer}
-                                    />
+        <div class="mx-auto max-w-3xl px-6 py-12">
+            <div class="glass-panel p-6 space-y-6">
+                <Show
+                    when={question()}
+                    fallback={
+                        <div class="text-sm text-slate-500">
+                            Waiting for the host to start the quiz...
+                        </div>
+                    }
+                >
+                    {(currentQuestion) => (
+                        <div class="space-y-4">
+                            <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                                Live question
+                            </div>
+                            <h1 class="font-display text-2xl font-semibold text-[color:var(--dashboard-ink)]">
+                                {currentQuestion().prompt}
+                            </h1>
+                            <div class="flex flex-wrap gap-2">
+                                <For each={currentQuestion().options}>
+                                    {(option) => (
+                                        <AnswerButton
+                                            answer={option}
+                                            label={option}
+                                            playerAnswer={playerAnswer()}
+                                            onSubmit={submitAnswer}
+                                        />
+                                    )}
+                                </For>
+                            </div>
+                        </div>
+                    )}
+                </Show>
+                <Show when={props.isHost}>
+                    <button
+                        onClick={endSession}
+                        class="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-rose-600 transition hover:bg-rose-100"
+                    >
+                        End session
+                    </button>
+                </Show>
+                <Show when={scores().length > 0}>
+                    <div class="border-t border-white/70 pt-4">
+                        <h2 class="font-semibold text-[color:var(--dashboard-ink)] mb-2">
+                            Scores
+                        </h2>
+                        <ul class="space-y-1 text-sm text-slate-600">
+                            <For each={scores()}>
+                                {(player) => (
+                                    <li class="flex items-center justify-between">
+                                        <span>{player.name}</span>
+                                        <span>{player.score ?? 0}</span>
+                                    </li>
                                 )}
                             </For>
-                        </div>
+                        </ul>
                     </div>
-                )}
-            </Show>
-            <Show when={props.isHost}>
-                <button
-                    onClick={endSession}
-                    class="px-4 py-2 bg-rose-600 rounded hover:bg-rose-700"
-                >
-                    End session
-                </button>
-            </Show>
-            <Show when={scores().length > 0}>
-                <div class="border-t border-gray-700 pt-4">
-                    <h2 class="font-semibold mb-2">Scores</h2>
-                    <ul class="space-y-1">
-                        <For each={scores()}>
-                            {(player) => (
-                                <li class="flex items-center justify-between">
-                                    <span>{player.name}</span>
-                                    <span>{player.score ?? 0}</span>
-                                </li>
-                            )}
-                        </For>
-                    </ul>
-                </div>
-            </Show>
-            <Show when={props.isHost && playerAnswers().length > 0}>
-                <div class="border-t border-gray-700 pt-4">
-                    <h2 class="font-semibold mb-2">Answers</h2>
-                    <ul class="space-y-1">
-                        <For each={playerAnswers()}>
-                            {(pa) => (
-                                <li>
-                                    {pa.player.name}: {pa.answer}
-                                </li>
-                            )}
-                        </For>
-                    </ul>
-                </div>
-            </Show>
+                </Show>
+                <Show when={props.isHost && playerAnswers().length > 0}>
+                    <div class="border-t border-white/70 pt-4">
+                        <h2 class="font-semibold text-[color:var(--dashboard-ink)] mb-2">
+                            Answers
+                        </h2>
+                        <ul class="space-y-1 text-sm text-slate-600">
+                            <For each={playerAnswers()}>
+                                {(pa) => (
+                                    <li>
+                                        {pa.player.name}: {pa.answer}
+                                    </li>
+                                )}
+                            </For>
+                        </ul>
+                    </div>
+                </Show>
+            </div>
         </div>
     );
 };

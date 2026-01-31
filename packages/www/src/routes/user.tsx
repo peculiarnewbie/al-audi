@@ -32,24 +32,26 @@ function UserPage() {
         [user().firstName, user().lastName].filter(Boolean).join(" ");
 
     return (
-        <div class="max-w-2xl mx-auto px-6 py-12">
-            <h1 class="text-2xl font-semibold text-stone-800 mb-6">
+        <div class="mx-auto max-w-3xl px-6 py-12">
+            <h1 class="font-display text-3xl font-semibold text-[color:var(--dashboard-ink)] mb-6">
                 Your Profile
             </h1>
-            <div class="rounded-xl border border-stone-200 bg-white p-6 shadow-sm space-y-4">
+            <div class="glass-panel p-6 space-y-4">
                 <div>
-                    <div class="text-xs uppercase tracking-wide text-stone-500">
+                    <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                         Name
                     </div>
-                    <div class="text-lg text-stone-800">
+                    <div class="text-lg text-[color:var(--dashboard-ink)]">
                         {fullName() || "WorkOS User"}
                     </div>
                 </div>
                 <div>
-                    <div class="text-xs uppercase tracking-wide text-stone-500">
+                    <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                         Email
                     </div>
-                    <div class="text-lg text-stone-800">{user().email}</div>
+                    <div class="text-lg text-[color:var(--dashboard-ink)]">
+                        {user().email}
+                    </div>
                 </div>
             </div>
         </div>

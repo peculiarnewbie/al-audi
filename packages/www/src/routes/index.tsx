@@ -12,25 +12,25 @@ function Header(props: {
     setLocale: (locale: Locale) => void;
 }) {
     return (
-        <header class="flex justify-end px-6 py-4">
-            <div class="flex gap-3 text-stone-600 text-sm">
+        <header class="mx-auto flex max-w-6xl justify-end px-6 pt-6">
+            <div class="flex items-center gap-3 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 shadow-sm">
                 <button
                     onClick={() => setLocaleWithStorage("en", props.setLocale)}
                     class={
                         props.locale === "en"
-                            ? "text-stone-900 font-medium cursor-pointer"
-                            : "hover:text-stone-900 cursor-pointer"
+                            ? "text-slate-900"
+                            : "hover:text-slate-900"
                     }
                 >
                     EN
                 </button>
-                <span class="text-stone-300">|</span>
+                <span class="text-slate-300">•</span>
                 <button
                     onClick={() => setLocaleWithStorage("id", props.setLocale)}
                     class={
                         props.locale === "id"
-                            ? "text-stone-900 font-medium cursor-pointer"
-                            : "hover:text-stone-900 cursor-pointer"
+                            ? "text-slate-900"
+                            : "hover:text-slate-900"
                     }
                 >
                     ID
@@ -48,85 +48,89 @@ function Index() {
     const t = translator(dict);
 
     return (
-        <div class="min-h-screen bg-[#FDFBF7]">
+        <div class="min-h-screen">
             <Header locale={locale()} setLocale={setLocale} />
 
-            <section class="max-w-4xl mx-auto px-6 py-16 text-center">
-                <h1 class="font-serif text-4xl md:text-5xl text-stone-800 mb-6">
+            <section class="mx-auto max-w-4xl px-6 py-16 text-center">
+                <h1 class="font-display text-4xl text-[color:var(--dashboard-ink)] md:text-5xl mb-6">
                     {t("heroTitle")}
                 </h1>
-                <p class="text-stone-600 mb-10 text-lg">{t("heroSubtitle")}</p>
+                <p class="text-slate-600 mb-10 text-lg">{t("heroSubtitle")}</p>
                 <a
                     href="http://wa.me/6282160421987"
                     target="_blank"
-                    class="inline-block bg-stone-800 text-white px-8 py-4 rounded-lg font-medium text-lg hover:bg-stone-700 transition-colors"
+                    class="inline-block rounded-full bg-[color:var(--dashboard-accent)] px-8 py-4 text-lg font-semibold text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)]"
                 >
                     {t("ctaWhatsApp")}
                 </a>
                 <a
                     href="#location"
-                    class="inline-block text-stone-600 px-6 py-4 font-medium text-lg hover:text-stone-900 transition-colors"
+                    class="inline-block px-6 py-4 text-lg font-medium text-slate-600 transition hover:text-slate-900"
                 >
                     {t("ctaVisit")}
                 </a>
             </section>
 
-            <section class="max-w-5xl mx-auto px-6 py-12">
-                <h2 class="font-serif text-2xl text-stone-800 mb-8 text-center">
+            <section class="mx-auto max-w-5xl px-6 py-12">
+                <h2 class="font-display text-2xl text-[color:var(--dashboard-ink)] mb-8 text-center">
                     {t("galleryTitle")}
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <Show when={true}>
-                        <For each={[1, 2, 3, 4, 5, 6]}>
-                            {() => (
-                                <div class="aspect-square bg-stone-200 rounded-lg flex items-center justify-center text-stone-400">
-                                    Photo
-                                </div>
-                            )}
-                        </For>
-                    </Show>
+                <div class="glass-panel p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Show when={true}>
+                            <For each={[1, 2, 3, 4, 5, 6]}>
+                                {() => (
+                                    <div class="aspect-square rounded-2xl border border-white/70 bg-white/70 text-slate-400 flex items-center justify-center">
+                                        Photo
+                                    </div>
+                                )}
+                            </For>
+                        </Show>
+                    </div>
                 </div>
-                <div class="flex justify-center gap-8 text-stone-600 text-sm">
+                <div class="mt-8 flex justify-center gap-8 text-sm text-slate-600">
                     <a
                         href="https://instagram.com"
                         target="_blank"
-                        class="hover:text-stone-900"
+                        class="hover:text-slate-900"
                     >
                         {t("socialInstagram")}
                     </a>
                     <a
                         href="http://wa.me/6282160421987"
                         target="_blank"
-                        class="hover:text-stone-900"
+                        class="hover:text-slate-900"
                     >
                         {t("socialWhatsApp")}
                     </a>
                     <a
                         href="https://youtube.com"
                         target="_blank"
-                        class="hover:text-stone-900"
+                        class="hover:text-slate-900"
                     >
                         {t("socialYouTube")}
                     </a>
                 </div>
             </section>
 
-            <section id="location" class="max-w-4xl mx-auto px-6 py-16">
-                <h2 class="font-serif text-2xl text-stone-800 mb-4 text-center">
+            <section id="location" class="mx-auto max-w-4xl px-6 py-16">
+                <h2 class="font-display text-2xl text-[color:var(--dashboard-ink)] mb-4 text-center">
                     {t("locationTitle")}
                 </h2>
-                <p class="text-stone-600 text-center mb-8">
+                <p class="text-slate-600 text-center mb-8">
                     {t("locationAddress")}
                 </p>
-                <div class="aspect-[4/3] bg-stone-200 rounded-lg flex items-center justify-center text-stone-400 mb-8">
-                    Google Maps Embed
+                <div class="glass-panel p-6">
+                    <div class="aspect-[4/3] rounded-2xl border border-white/70 bg-white/70 flex items-center justify-center text-slate-400">
+                        Google Maps Embed
+                    </div>
                 </div>
             </section>
 
-            <footer class="bg-stone-800 text-stone-300 py-12 mt-12">
-                <div class="max-w-4xl mx-auto px-6 text-center">
+            <footer class="mx-auto max-w-5xl px-6 pb-16">
+                <div class="glass-panel p-10 text-center">
                     <p class="mb-2">{t("footerEmail")}</p>
-                    <p class="text-stone-500 text-sm">{t("footerCopyright")}</p>
+                    <p class="text-slate-500 text-sm">{t("footerCopyright")}</p>
                 </div>
             </footer>
         </div>

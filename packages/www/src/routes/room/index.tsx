@@ -32,29 +32,28 @@ function RouteComponent() {
     };
 
     return (
-        <div class="min-h-screen flex flex-col items-center justify-center p-4">
-            <h1 class="text-4xl font-bold mb-8">Quiz Party</h1>
-            <form
-                onSubmit={joinRoom}
-                class="flex flex-col gap-4 w-full max-w-sm"
-            >
+        <div class="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-6 py-16">
+            <h1 class="font-display text-4xl font-semibold text-[color:var(--dashboard-ink)] mb-8">
+                Quiz Party
+            </h1>
+            <form onSubmit={joinRoom} class="glass-panel w-full space-y-4 p-6">
                 <input
                     type="text"
                     placeholder="Enter room name"
                     value={roomId()}
                     onInput={(e) => setRoomId(e.currentTarget.value)}
-                    class="px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                    class="w-full rounded-2xl border border-white/70 bg-white/70 px-4 py-3 text-base text-slate-700 focus:outline-none focus:ring-2 focus:ring-[color:var(--dashboard-accent)]"
                 />
                 <button
                     type="submit"
                     disabled={!roomId()}
-                    class="px-4 py-3 text-lg bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                    class="rounded-full bg-[color:var(--dashboard-accent)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     Join Room
                 </button>
             </form>
-            <div class="mt-8 text-gray-500">
-                <Link to="/home" class="hover:underline">
+            <div class="mt-8 text-sm text-slate-500">
+                <Link to="/home" class="hover:text-slate-800">
                     Demo Home
                 </Link>
             </div>

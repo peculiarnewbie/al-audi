@@ -16,6 +16,7 @@ import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as PostsRouteImport } from './routes/posts'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as DeferredRouteImport } from './routes/deferred'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomScriptDotjsRouteImport } from './routes/customScript[.]js'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
@@ -77,6 +78,11 @@ const HomeRoute = HomeRouteImport.update({
 const DeferredRoute = DeferredRouteImport.update({
   id: '/deferred',
   path: '/deferred',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CustomScriptDotjsRoute = CustomScriptDotjsRouteImport.update({
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/customScript.js': typeof CustomScriptDotjsRoute
+  '/dashboard': typeof DashboardRoute
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/customScript.js': typeof CustomScriptDotjsRoute
+  '/dashboard': typeof DashboardRoute
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/redirect': typeof RedirectRoute
@@ -288,6 +296,7 @@ export interface FileRoutesById {
   '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
   '/admin': typeof AdminRoute
   '/customScript.js': typeof CustomScriptDotjsRoute
+  '/dashboard': typeof DashboardRoute
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/customScript.js'
+    | '/dashboard'
     | '/deferred'
     | '/home'
     | '/posts'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/customScript.js'
+    | '/dashboard'
     | '/deferred'
     | '/home'
     | '/redirect'
@@ -392,6 +403,7 @@ export interface FileRouteTypes {
     | '/_pathlessLayout'
     | '/admin'
     | '/customScript.js'
+    | '/dashboard'
     | '/deferred'
     | '/home'
     | '/posts'
@@ -429,6 +441,7 @@ export interface RootRouteChildren {
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
   AdminRoute: typeof AdminRoute
   CustomScriptDotjsRoute: typeof CustomScriptDotjsRoute
+  DashboardRoute: typeof DashboardRoute
   DeferredRoute: typeof DeferredRoute
   HomeRoute: typeof HomeRoute
   PostsRoute: typeof PostsRouteWithChildren
@@ -502,6 +515,13 @@ declare module '@tanstack/solid-router' {
       path: '/deferred'
       fullPath: '/deferred'
       preLoaderRoute: typeof DeferredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/customScript.js': {
@@ -767,6 +787,7 @@ const rootRouteChildren: RootRouteChildren = {
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
   AdminRoute: AdminRoute,
   CustomScriptDotjsRoute: CustomScriptDotjsRoute,
+  DashboardRoute: DashboardRoute,
   DeferredRoute: DeferredRoute,
   HomeRoute: HomeRoute,
   PostsRoute: PostsRouteWithChildren,

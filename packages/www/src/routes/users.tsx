@@ -26,36 +26,44 @@ function UsersComponent() {
     const users = Route.useLoaderData();
 
     return (
-        <div class="p-2 flex gap-2">
-            <ul class="list-disc pl-4">
-                {[
-                    ...users(),
-                    {
-                        id: "i-do-not-exist",
-                        name: "Non-existent User",
-                        email: null,
-                        role: "none",
-                        createdAt: Date.now(),
-                    },
-                ].map((user) => {
-                    return (
-                        <li class="whitespace-nowrap">
-                            <Link
-                                to="/users/$userId"
-                                params={{
-                                    userId: String(user.id),
-                                }}
-                                class="block py-1 text-blue-800 hover:text-blue-600"
-                                activeProps={{ class: "text-black font-bold" }}
-                            >
-                                <div>{user.name}</div>
-                            </Link>
-                        </li>
-                    );
-                })}
-            </ul>
-            <hr />
-            <Outlet />
+        <div class="mx-auto max-w-5xl px-6 py-12 grid gap-6 lg:grid-cols-[240px_1fr]">
+            <div class="glass-panel p-4">
+                <div class="text-xs uppercase tracking-[0.3em] text-slate-500 mb-3">
+                    Users
+                </div>
+                <ul class="space-y-1">
+                    {[
+                        ...users(),
+                        {
+                            id: "i-do-not-exist",
+                            name: "Non-existent User",
+                            email: null,
+                            role: "none",
+                            createdAt: Date.now(),
+                        },
+                    ].map((user) => {
+                        return (
+                            <li class="whitespace-nowrap">
+                                <Link
+                                    to="/users/$userId"
+                                    params={{
+                                        userId: String(user.id),
+                                    }}
+                                    class="block rounded-xl px-3 py-2 text-sm text-slate-600 transition hover:bg-white/70 hover:text-slate-900"
+                                    activeProps={{
+                                        class: "bg-white/90 text-slate-900 font-semibold",
+                                    }}
+                                >
+                                    <div>{user.name}</div>
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+            <div class="glass-panel p-6 min-h-[200px]">
+                <Outlet />
+            </div>
         </div>
     );
 }

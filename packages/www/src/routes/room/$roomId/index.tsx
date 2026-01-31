@@ -148,27 +148,34 @@ function RouteComponent() {
                 />
             </Match>
             <Match when={gameState() === "ended"}>
-                <div class="p-8 space-y-4">
-                    <h2 class="text-2xl font-semibold">Session results</h2>
-                    <Show
-                        when={finalResults() && finalResults()!.length}
-                        fallback={
-                            <div class="text-sm text-gray-500">Game ended.</div>
-                        }
-                    >
-                        <ul class="space-y-2">
-                            <For each={finalResults() ?? []}>
-                                {(result) => (
-                                    <li class="flex items-center justify-between border-b border-gray-700 pb-2">
-                                        <span>{result.playerName}</span>
-                                        <span>
-                                            {result.score} / {result.maxScore}
-                                        </span>
-                                    </li>
-                                )}
-                            </For>
-                        </ul>
-                    </Show>
+                <div class="mx-auto max-w-3xl px-6 py-12">
+                    <div class="glass-panel p-6 space-y-4">
+                        <h2 class="font-display text-2xl font-semibold text-[color:var(--dashboard-ink)]">
+                            Session results
+                        </h2>
+                        <Show
+                            when={finalResults() && finalResults()!.length}
+                            fallback={
+                                <div class="text-sm text-slate-500">
+                                    Game ended.
+                                </div>
+                            }
+                        >
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <For each={finalResults() ?? []}>
+                                    {(result) => (
+                                        <li class="flex items-center justify-between border-b border-white/70 pb-2">
+                                            <span>{result.playerName}</span>
+                                            <span>
+                                                {result.score} /{" "}
+                                                {result.maxScore}
+                                            </span>
+                                        </li>
+                                    )}
+                                </For>
+                            </ul>
+                        </Show>
+                    </div>
                 </div>
             </Match>
         </Switch>

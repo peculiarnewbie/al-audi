@@ -132,11 +132,11 @@ type TeacherAssignmentData = {
 
 function StatCard(props: StatCardProps) {
     return (
-        <div class="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <div class="text-xs uppercase tracking-wide text-stone-500">
+        <div class="glass-card p-6">
+            <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                 {props.label}
             </div>
-            <div class="mt-2 text-3xl font-semibold text-stone-800">
+            <div class="mt-2 text-3xl font-semibold text-[color:var(--dashboard-ink)]">
                 {props.value}
             </div>
         </div>
@@ -359,19 +359,19 @@ function AdminDashboard() {
     const hasUsers = () => (users() ?? []).length > 0;
 
     return (
-        <div class="max-w-5xl mx-auto px-6 py-12 space-y-8">
+        <div class="mx-auto max-w-6xl px-6 py-12 space-y-8">
             <header class="space-y-2">
-                <div class="text-xs uppercase tracking-wide text-stone-500">
+                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                     Admin access
                 </div>
-                <h1 class="text-2xl font-semibold text-stone-800">
+                <h1 class="font-display text-3xl font-semibold text-[color:var(--dashboard-ink)]">
                     Admin dashboard
                 </h1>
-                <p class="text-stone-600">
+                <p class="text-slate-600">
                     Monitor overall usage for the school program.
                 </p>
                 <Show when={stats()}>
-                    <div class="text-xs uppercase tracking-wide text-stone-400">
+                    <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
                         Updated {formatDate(stats()!.generatedAt)}
                     </div>
                 </Show>
@@ -380,11 +380,11 @@ function AdminDashboard() {
             <Show
                 when={stats()}
                 fallback={
-                    <div class="rounded-xl border border-stone-200 bg-white p-6 shadow-sm space-y-2">
-                        <div class="text-sm text-stone-700">
+                    <div class="glass-panel p-6 space-y-2">
+                        <div class="text-sm text-slate-700">
                             Admin access required.
                         </div>
-                        <div class="text-xs text-stone-500">
+                        <div class="text-xs text-slate-500">
                             Ask a superadmin to grant access.
                         </div>
                     </div>
@@ -402,17 +402,17 @@ function AdminDashboard() {
                         </For>
                     </div>
 
-                    <div class="rounded-xl border border-stone-200 bg-white p-6 shadow-sm space-y-4">
+                    <div class="glass-panel p-6 space-y-4">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div>
-                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                                     User management
                                 </div>
-                                <div class="text-sm text-stone-600">
+                                <div class="text-sm text-slate-600">
                                     Search users and update access roles.
                                 </div>
                             </div>
-                            <div class="text-xs uppercase tracking-wide text-stone-400">
+                            <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
                                 {formatNumber((users() ?? []).length)} users
                             </div>
                         </div>
@@ -422,7 +422,7 @@ function AdminDashboard() {
                             onSubmit={handleSearch}
                         >
                             <input
-                                class="w-full sm:w-64 rounded-lg border border-stone-300 px-3 py-2 text-sm"
+                                class="w-full sm:w-64 rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-slate-700"
                                 type="text"
                                 placeholder="Search by name, email, or ID"
                                 value={searchInput()}
@@ -431,13 +431,13 @@ function AdminDashboard() {
                                 }
                             />
                             <button
-                                class="rounded-lg bg-stone-800 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+                                class="rounded-full bg-[color:var(--dashboard-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)]"
                                 type="submit"
                             >
                                 Search
                             </button>
                             <button
-                                class="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-700 hover:text-stone-900"
+                                class="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm transition hover:bg-white"
                                 type="button"
                                 onClick={clearSearch}
                             >
@@ -454,7 +454,7 @@ function AdminDashboard() {
                         <Show
                             when={!users.loading}
                             fallback={
-                                <div class="text-sm text-stone-500">
+                                <div class="text-sm text-slate-500">
                                     Loading users...
                                 </div>
                             }
@@ -462,27 +462,27 @@ function AdminDashboard() {
                             <Show
                                 when={hasUsers()}
                                 fallback={
-                                    <div class="text-sm text-stone-500">
+                                    <div class="text-sm text-slate-500">
                                         No users found.
                                     </div>
                                 }
                             >
-                                <div class="divide-y divide-stone-200">
+                                <div class="divide-y divide-white/70">
                                     <For each={users() ?? []}>
                                         {(user) => (
                                             <div class="flex flex-wrap items-center justify-between gap-4 py-4">
                                                 <div class="space-y-1">
-                                                    <div class="text-sm font-medium text-stone-800">
+                                                    <div class="text-sm font-medium text-[color:var(--dashboard-ink)]">
                                                         {user.name}
                                                     </div>
-                                                    <div class="text-xs text-stone-500">
+                                                    <div class="text-xs text-slate-500">
                                                         {user.email ??
                                                             "No email on file"}
                                                     </div>
-                                                    <div class="text-xs text-stone-400">
+                                                    <div class="text-xs text-slate-400">
                                                         ID {user.id}
                                                     </div>
-                                                    <div class="text-xs text-stone-400">
+                                                    <div class="text-xs text-slate-400">
                                                         Joined{" "}
                                                         {formatDate(
                                                             user.createdAt,
@@ -536,7 +536,7 @@ function AdminDashboard() {
                                                             user.id
                                                         }
                                                     >
-                                                        <span class="text-xs text-stone-400">
+                                                        <span class="text-xs text-slate-400">
                                                             Saving...
                                                         </span>
                                                     </Show>
@@ -549,17 +549,17 @@ function AdminDashboard() {
                         </Show>
                     </div>
 
-                    <div class="rounded-xl border border-stone-200 bg-white p-6 shadow-sm space-y-4">
+                    <div class="glass-panel p-6 space-y-4">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div>
-                                <div class="text-xs uppercase tracking-wide text-stone-500">
+                                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                                     Teacher assignments
                                 </div>
-                                <div class="text-sm text-stone-600">
+                                <div class="text-sm text-slate-600">
                                     Link students to their assigned teacher.
                                 </div>
                             </div>
-                            <div class="text-xs uppercase tracking-wide text-stone-400">
+                            <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
                                 {formatNumber(assignmentStudents().length)}{" "}
                                 students
                             </div>
@@ -570,7 +570,7 @@ function AdminDashboard() {
                             onSubmit={handleAssignmentSearch}
                         >
                             <input
-                                class="w-full sm:w-64 rounded-lg border border-stone-300 px-3 py-2 text-sm"
+                                class="w-full sm:w-64 rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-slate-700"
                                 type="text"
                                 placeholder="Search students by name, email, or ID"
                                 value={assignmentSearchInput()}
@@ -581,13 +581,13 @@ function AdminDashboard() {
                                 }
                             />
                             <button
-                                class="rounded-lg bg-stone-800 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
+                                class="rounded-full bg-[color:var(--dashboard-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)]"
                                 type="submit"
                             >
                                 Search
                             </button>
                             <button
-                                class="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-700 hover:text-stone-900"
+                                class="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm transition hover:bg-white"
                                 type="button"
                                 onClick={clearAssignmentSearch}
                             >
@@ -604,7 +604,7 @@ function AdminDashboard() {
                         <Show
                             when={!assignmentData.loading}
                             fallback={
-                                <div class="text-sm text-stone-500">
+                                <div class="text-sm text-slate-500">
                                     Loading teacher assignments...
                                 </div>
                             }
@@ -612,24 +612,24 @@ function AdminDashboard() {
                             <Show
                                 when={hasAssignmentStudents()}
                                 fallback={
-                                    <div class="text-sm text-stone-500">
+                                    <div class="text-sm text-slate-500">
                                         No students found.
                                     </div>
                                 }
                             >
-                                <div class="divide-y divide-stone-200">
+                                <div class="divide-y divide-white/70">
                                     <For each={assignmentStudents()}>
                                         {(student) => (
                                             <div class="flex flex-wrap items-center justify-between gap-4 py-4">
                                                 <div class="space-y-1">
-                                                    <div class="text-sm font-medium text-stone-800">
+                                                    <div class="text-sm font-medium text-[color:var(--dashboard-ink)]">
                                                         {student.name}
                                                     </div>
-                                                    <div class="text-xs text-stone-500">
+                                                    <div class="text-xs text-slate-500">
                                                         {student.email ??
                                                             "No email on file"}
                                                     </div>
-                                                    <div class="text-xs text-stone-400">
+                                                    <div class="text-xs text-slate-400">
                                                         ID {student.id}
                                                     </div>
                                                 </div>
@@ -688,7 +688,7 @@ function AdminDashboard() {
                                                             student.id
                                                         }
                                                     >
-                                                        <span class="text-xs text-stone-400">
+                                                        <span class="text-xs text-slate-400">
                                                             Saving...
                                                         </span>
                                                     </Show>
