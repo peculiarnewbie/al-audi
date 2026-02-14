@@ -12,7 +12,10 @@ import {
     driveFolders,
     users,
 } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
+import {
+    getAuthenticatedUser,
+    getAuthenticatedDbUser,
+} from "~/utils/workos-auth.server";
 
 const createFolderSchema = z.object({
     name: z.string().trim().min(1),
@@ -117,11 +120,20 @@ export const Route = createFileRoute("/api/drive/folders")({
             },
             POST: async ({ request }) => {
                 const user = await getAuthenticatedUser(getRequestHeaders());
+                const dbUser =
+                    await getAuthenticatedDbUser(getRequestHeaders());
 
-                if (!user) {
+                if (!user || !dbUser) {
                     return json(
                         { error: "You must be signed in." },
                         { status: 401 },
+                    );
+                }
+
+                if (dbUser.role !== "teacher" && dbUser.role !== "admin") {
+                    return json(
+                        { error: "Only teachers can create folders." },
+                        { status: 403 },
                     );
                 }
 

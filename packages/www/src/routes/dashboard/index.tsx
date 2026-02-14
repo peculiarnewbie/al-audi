@@ -3,7 +3,7 @@ import { For, Show, createSignal } from "solid-js";
 import { getDashboardData } from "~/server/dashboard";
 import type { DashboardClassroom, DashboardResource } from "~/server/dashboard";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/dashboard/")({
     loader: async () => {
         const data = await getDashboardData();
 
@@ -250,6 +250,14 @@ function DashboardPage() {
                         >
                             Live rooms
                         </Link>
+                        <Show when={isTeacher()}>
+                            <Link
+                                to="/dashboard/drive"
+                                class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 hover:text-slate-900"
+                            >
+                                Drive
+                            </Link>
+                        </Show>
                         <Link
                             to="/user"
                             class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 hover:text-slate-900"

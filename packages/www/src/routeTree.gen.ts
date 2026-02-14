@@ -16,7 +16,6 @@ import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as PostsRouteImport } from './routes/posts'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as DeferredRouteImport } from './routes/deferred'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomScriptDotjsRouteImport } from './routes/customScript[.]js'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
@@ -24,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users.index'
 import { Route as RoomIndexRouteImport } from './routes/room/index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
 import { Route as ShareShareIdRouteImport } from './routes/share/$shareId'
 import { Route as QuizzesNewRouteImport } from './routes/quizzes/new'
@@ -31,6 +31,7 @@ import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
 import { Route as RoomRoomIdIndexRouteImport } from './routes/room/$roomId/index'
+import { Route as DashboardDriveIndexRouteImport } from './routes/dashboard/drive/index'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
 import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
 import { Route as ApiRoomRoomIdRouteImport } from './routes/api/room/$roomId'
@@ -44,6 +45,8 @@ import { Route as ApiAdminStatsRouteImport } from './routes/api/admin/stats'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
 import { Route as ApiShareShareIdQrRouteImport } from './routes/api/share/$shareId/qr'
+import { Route as ApiDriveMediaIdRouteImport } from './routes/api/drive/media/$id'
+import { Route as ApiDriveFoldersIdRouteImport } from './routes/api/drive/folders/$id'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
@@ -80,11 +83,6 @@ const DeferredRoute = DeferredRouteImport.update({
   path: '/deferred',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CustomScriptDotjsRoute = CustomScriptDotjsRouteImport.update({
   id: '/customScript.js',
   path: '/customScript.js',
@@ -119,6 +117,11 @@ const PostsIndexRoute = PostsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PostsRoute,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -152,6 +155,11 @@ const PathlessLayoutNestedLayoutRoute =
 const RoomRoomIdIndexRoute = RoomRoomIdIndexRouteImport.update({
   id: '/room/$roomId/',
   path: '/room/$roomId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardDriveIndexRoute = DashboardDriveIndexRouteImport.update({
+  id: '/dashboard/drive/',
+  path: '/dashboard/drive/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
@@ -221,12 +229,21 @@ const ApiShareShareIdQrRoute = ApiShareShareIdQrRouteImport.update({
   path: '/api/share/$shareId/qr',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDriveMediaIdRoute = ApiDriveMediaIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiDriveMediaRoute,
+} as any)
+const ApiDriveFoldersIdRoute = ApiDriveFoldersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiDriveFoldersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/customScript.js': typeof CustomScriptDotjsRoute
-  '/dashboard': typeof DashboardRoute
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
@@ -239,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/quizzes/new': typeof QuizzesNewRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/room': typeof RoomIndexRoute
   '/users/': typeof UsersIndexRoute
@@ -248,20 +266,22 @@ export interface FileRoutesByFullPath {
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/api/auth/sign-out': typeof ApiAuthSignOutRoute
-  '/api/drive/folders': typeof ApiDriveFoldersRoute
-  '/api/drive/media': typeof ApiDriveMediaRoute
+  '/api/drive/folders': typeof ApiDriveFoldersRouteWithChildren
+  '/api/drive/media': typeof ApiDriveMediaRouteWithChildren
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
+  '/dashboard/drive': typeof DashboardDriveIndexRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
+  '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
   '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/customScript.js': typeof CustomScriptDotjsRoute
-  '/dashboard': typeof DashboardRoute
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/redirect': typeof RedirectRoute
@@ -272,6 +292,7 @@ export interface FileRoutesByTo {
   '/quizzes/new': typeof QuizzesNewRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/posts': typeof PostsIndexRoute
   '/room': typeof RoomIndexRoute
   '/users': typeof UsersIndexRoute
@@ -281,13 +302,16 @@ export interface FileRoutesByTo {
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/api/auth/sign-out': typeof ApiAuthSignOutRoute
-  '/api/drive/folders': typeof ApiDriveFoldersRoute
-  '/api/drive/media': typeof ApiDriveMediaRoute
+  '/api/drive/folders': typeof ApiDriveFoldersRouteWithChildren
+  '/api/drive/media': typeof ApiDriveMediaRouteWithChildren
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
+  '/dashboard/drive': typeof DashboardDriveIndexRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
+  '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
   '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
 }
 export interface FileRoutesById {
@@ -296,7 +320,6 @@ export interface FileRoutesById {
   '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
   '/admin': typeof AdminRoute
   '/customScript.js': typeof CustomScriptDotjsRoute
-  '/dashboard': typeof DashboardRoute
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
@@ -310,6 +333,7 @@ export interface FileRoutesById {
   '/quizzes/new': typeof QuizzesNewRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/room/': typeof RoomIndexRoute
   '/users/': typeof UsersIndexRoute
@@ -319,13 +343,16 @@ export interface FileRoutesById {
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/api/auth/sign-out': typeof ApiAuthSignOutRoute
-  '/api/drive/folders': typeof ApiDriveFoldersRoute
-  '/api/drive/media': typeof ApiDriveMediaRoute
+  '/api/drive/folders': typeof ApiDriveFoldersRouteWithChildren
+  '/api/drive/media': typeof ApiDriveMediaRouteWithChildren
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
+  '/dashboard/drive/': typeof DashboardDriveIndexRoute
   '/room/$roomId/': typeof RoomRoomIdIndexRoute
+  '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
+  '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
   '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
 }
 export interface FileRouteTypes {
@@ -334,7 +361,6 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/customScript.js'
-    | '/dashboard'
     | '/deferred'
     | '/home'
     | '/posts'
@@ -347,6 +373,7 @@ export interface FileRouteTypes {
     | '/quizzes/new'
     | '/share/$shareId'
     | '/users/$userId'
+    | '/dashboard'
     | '/posts/'
     | '/room'
     | '/users/'
@@ -362,14 +389,16 @@ export interface FileRouteTypes {
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts/$postId/deep'
+    | '/dashboard/drive'
     | '/room/$roomId'
+    | '/api/drive/folders/$id'
+    | '/api/drive/media/$id'
     | '/api/share/$shareId/qr'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/customScript.js'
-    | '/dashboard'
     | '/deferred'
     | '/home'
     | '/redirect'
@@ -380,6 +409,7 @@ export interface FileRouteTypes {
     | '/quizzes/new'
     | '/share/$shareId'
     | '/users/$userId'
+    | '/dashboard'
     | '/posts'
     | '/room'
     | '/users'
@@ -395,7 +425,10 @@ export interface FileRouteTypes {
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts/$postId/deep'
+    | '/dashboard/drive'
     | '/room/$roomId'
+    | '/api/drive/folders/$id'
+    | '/api/drive/media/$id'
     | '/api/share/$shareId/qr'
   id:
     | '__root__'
@@ -403,7 +436,6 @@ export interface FileRouteTypes {
     | '/_pathlessLayout'
     | '/admin'
     | '/customScript.js'
-    | '/dashboard'
     | '/deferred'
     | '/home'
     | '/posts'
@@ -417,6 +449,7 @@ export interface FileRouteTypes {
     | '/quizzes/new'
     | '/share/$shareId'
     | '/users/$userId'
+    | '/dashboard/'
     | '/posts/'
     | '/room/'
     | '/users/'
@@ -432,7 +465,10 @@ export interface FileRouteTypes {
     | '/api/room/$roomId'
     | '/api/users/$userId'
     | '/posts_/$postId/deep'
+    | '/dashboard/drive/'
     | '/room/$roomId/'
+    | '/api/drive/folders/$id'
+    | '/api/drive/media/$id'
     | '/api/share/$shareId/qr'
   fileRoutesById: FileRoutesById
 }
@@ -441,7 +477,6 @@ export interface RootRouteChildren {
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
   AdminRoute: typeof AdminRoute
   CustomScriptDotjsRoute: typeof CustomScriptDotjsRoute
-  DashboardRoute: typeof DashboardRoute
   DeferredRoute: typeof DeferredRoute
   HomeRoute: typeof HomeRoute
   PostsRoute: typeof PostsRouteWithChildren
@@ -452,16 +487,18 @@ export interface RootRouteChildren {
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
   QuizzesNewRoute: typeof QuizzesNewRoute
   ShareShareIdRoute: typeof ShareShareIdRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
   RoomIndexRoute: typeof RoomIndexRoute
   ApiAdminStatsRoute: typeof ApiAdminStatsRoute
   ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
   ApiAuthSignInRoute: typeof ApiAuthSignInRoute
   ApiAuthSignOutRoute: typeof ApiAuthSignOutRoute
-  ApiDriveFoldersRoute: typeof ApiDriveFoldersRoute
-  ApiDriveMediaRoute: typeof ApiDriveMediaRoute
+  ApiDriveFoldersRoute: typeof ApiDriveFoldersRouteWithChildren
+  ApiDriveMediaRoute: typeof ApiDriveMediaRouteWithChildren
   ApiQuizzesMediaRoute: typeof ApiQuizzesMediaRoute
   ApiRoomRoomIdRoute: typeof ApiRoomRoomIdRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
+  DashboardDriveIndexRoute: typeof DashboardDriveIndexRoute
   RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute
   ApiShareShareIdQrRoute: typeof ApiShareShareIdQrRoute
 }
@@ -517,13 +554,6 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof DeferredRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/customScript.js': {
       id: '/customScript.js'
       path: '/customScript.js'
@@ -573,6 +603,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof PostsIndexRouteImport
       parentRoute: typeof PostsRoute
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users/$userId': {
       id: '/users/$userId'
       path: '/$userId'
@@ -620,6 +657,13 @@ declare module '@tanstack/solid-router' {
       path: '/room/$roomId'
       fullPath: '/room/$roomId'
       preLoaderRoute: typeof RoomRoomIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/drive/': {
+      id: '/dashboard/drive/'
+      path: '/dashboard/drive'
+      fullPath: '/dashboard/drive'
+      preLoaderRoute: typeof DashboardDriveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/posts_/$postId/deep': {
@@ -713,6 +757,20 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ApiShareShareIdQrRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/drive/media/$id': {
+      id: '/api/drive/media/$id'
+      path: '/$id'
+      fullPath: '/api/drive/media/$id'
+      preLoaderRoute: typeof ApiDriveMediaIdRouteImport
+      parentRoute: typeof ApiDriveMediaRoute
+    }
+    '/api/drive/folders/$id': {
+      id: '/api/drive/folders/$id'
+      path: '/$id'
+      fullPath: '/api/drive/folders/$id'
+      preLoaderRoute: typeof ApiDriveFoldersIdRouteImport
+      parentRoute: typeof ApiDriveFoldersRoute
+    }
   }
 }
 
@@ -782,12 +840,35 @@ const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
   ApiUsersRouteChildren,
 )
 
+interface ApiDriveFoldersRouteChildren {
+  ApiDriveFoldersIdRoute: typeof ApiDriveFoldersIdRoute
+}
+
+const ApiDriveFoldersRouteChildren: ApiDriveFoldersRouteChildren = {
+  ApiDriveFoldersIdRoute: ApiDriveFoldersIdRoute,
+}
+
+const ApiDriveFoldersRouteWithChildren = ApiDriveFoldersRoute._addFileChildren(
+  ApiDriveFoldersRouteChildren,
+)
+
+interface ApiDriveMediaRouteChildren {
+  ApiDriveMediaIdRoute: typeof ApiDriveMediaIdRoute
+}
+
+const ApiDriveMediaRouteChildren: ApiDriveMediaRouteChildren = {
+  ApiDriveMediaIdRoute: ApiDriveMediaIdRoute,
+}
+
+const ApiDriveMediaRouteWithChildren = ApiDriveMediaRoute._addFileChildren(
+  ApiDriveMediaRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
   AdminRoute: AdminRoute,
   CustomScriptDotjsRoute: CustomScriptDotjsRoute,
-  DashboardRoute: DashboardRoute,
   DeferredRoute: DeferredRoute,
   HomeRoute: HomeRoute,
   PostsRoute: PostsRouteWithChildren,
@@ -798,16 +879,18 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUsersRoute: ApiUsersRouteWithChildren,
   QuizzesNewRoute: QuizzesNewRoute,
   ShareShareIdRoute: ShareShareIdRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
   RoomIndexRoute: RoomIndexRoute,
   ApiAdminStatsRoute: ApiAdminStatsRoute,
   ApiAuthCallbackRoute: ApiAuthCallbackRoute,
   ApiAuthSignInRoute: ApiAuthSignInRoute,
   ApiAuthSignOutRoute: ApiAuthSignOutRoute,
-  ApiDriveFoldersRoute: ApiDriveFoldersRoute,
-  ApiDriveMediaRoute: ApiDriveMediaRoute,
+  ApiDriveFoldersRoute: ApiDriveFoldersRouteWithChildren,
+  ApiDriveMediaRoute: ApiDriveMediaRouteWithChildren,
   ApiQuizzesMediaRoute: ApiQuizzesMediaRoute,
   ApiRoomRoomIdRoute: ApiRoomRoomIdRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
+  DashboardDriveIndexRoute: DashboardDriveIndexRoute,
   RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,
   ApiShareShareIdQrRoute: ApiShareShareIdQrRoute,
 }

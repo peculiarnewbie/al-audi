@@ -2,11 +2,14 @@ import { createFileRoute } from "@tanstack/solid-router";
 import { json } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { createDb, driveAssets, driveFolders } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
+import {
+    getAuthenticatedUser,
+    getAuthenticatedDbUser,
+} from "~/utils/workos-auth.server";
 
 const uploadSchema = z.object({
     folderId: z.string().min(1).optional(),
@@ -36,13 +39,67 @@ const isAllowedContentType = (contentType: string) =>
 export const Route = createFileRoute("/api/drive/media")({
     server: {
         handlers: {
-            POST: async ({ request }) => {
+            GET: async ({ request }) => {
                 const user = await getAuthenticatedUser(getRequestHeaders());
 
                 if (!user) {
                     return json(
                         { error: "You must be signed in." },
                         { status: 401 },
+                    );
+                }
+
+                const url = new URL(request.url);
+                const folderIdParam = url.searchParams.get("folderId");
+                const db = createDb(env.DB);
+
+                const conditions = [eq(driveAssets.teacherId, user.id)];
+
+                if (folderIdParam !== null) {
+                    const trimmedFolderId = folderIdParam.trim();
+
+                    if (trimmedFolderId) {
+                        conditions.push(
+                            eq(driveAssets.folderId, trimmedFolderId),
+                        );
+                    } else {
+                        conditions.push(isNull(driveAssets.folderId));
+                    }
+                }
+
+                const assets = await db
+                    .select()
+                    .from(driveAssets)
+                    .where(and(...conditions))
+                    .orderBy(driveAssets.createdAt);
+
+                return json({
+                    assets: assets.map((asset) => ({
+                        id: asset.id,
+                        folderId: asset.folderId,
+                        fileName: asset.fileName,
+                        contentType: asset.contentType,
+                        fileSize: asset.fileSize,
+                        createdAt: asset.createdAt,
+                    })),
+                });
+            },
+            POST: async ({ request }) => {
+                const user = await getAuthenticatedUser(getRequestHeaders());
+                const dbUser =
+                    await getAuthenticatedDbUser(getRequestHeaders());
+
+                if (!user || !dbUser) {
+                    return json(
+                        { error: "You must be signed in." },
+                        { status: 401 },
+                    );
+                }
+
+                if (dbUser.role !== "teacher" && dbUser.role !== "admin") {
+                    return json(
+                        { error: "Only teachers can upload files." },
+                        { status: 403 },
                     );
                 }
 
