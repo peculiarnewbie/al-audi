@@ -13,11 +13,14 @@ const shareSearchSchema = z
 
 export const Route = createFileRoute("/share/$shareId")({
     validateSearch: (search) => shareSearchSchema.parse(search),
-    loader: ({ params, search }) =>
+    loaderDeps: ({ search }) => ({
+        token: search.token,
+    }),
+    loader: ({ params, deps }) =>
         getSharedQuiz({
             data: {
                 shareId: params.shareId,
-                token: search.token,
+                token: deps.token,
             },
         }),
     component: SharedQuizPage,
@@ -227,7 +230,7 @@ function SharedQuizPage() {
                                 <div class="rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-sm text-slate-600">
                                     Sign in to submit answers.{" "}
                                     <a
-                                        href="/api/auth/sign-in"
+                                        href="/sign-in"
                                         class="text-slate-900 underline"
                                     >
                                         Sign in

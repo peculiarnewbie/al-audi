@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as UserRouteImport } from './routes/user'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as PostsRouteImport } from './routes/posts'
@@ -38,9 +40,8 @@ import { Route as ApiRoomRoomIdRouteImport } from './routes/api/room/$roomId'
 import { Route as ApiQuizzesMediaRouteImport } from './routes/api/quizzes/media'
 import { Route as ApiDriveMediaRouteImport } from './routes/api/drive/media'
 import { Route as ApiDriveFoldersRouteImport } from './routes/api/drive/folders'
-import { Route as ApiAuthSignOutRouteImport } from './routes/api/auth/sign-out'
 import { Route as ApiAuthSignInRouteImport } from './routes/api/auth/sign-in'
-import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminStatsRouteImport } from './routes/api/admin/stats'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
@@ -56,6 +57,16 @@ const UsersRoute = UsersRouteImport.update({
 const UserRoute = UserRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsRoute = ReportsRouteImport.update({
@@ -192,19 +203,14 @@ const ApiDriveFoldersRoute = ApiDriveFoldersRouteImport.update({
   path: '/api/drive/folders',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSignOutRoute = ApiAuthSignOutRouteImport.update({
-  id: '/api/auth/sign-out',
-  path: '/api/auth/sign-out',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAuthSignInRoute = ApiAuthSignInRouteImport.update({
   id: '/api/auth/sign-in',
   path: '/api/auth/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
-  id: '/api/auth/callback',
-  path: '/api/auth/callback',
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminStatsRoute = ApiAdminStatsRouteImport.update({
@@ -249,6 +255,8 @@ export interface FileRoutesByFullPath {
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
   '/reports': typeof ReportsRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
@@ -263,9 +271,8 @@ export interface FileRoutesByFullPath {
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/admin/stats': typeof ApiAdminStatsRoute
-  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
-  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
   '/api/drive/folders': typeof ApiDriveFoldersRouteWithChildren
   '/api/drive/media': typeof ApiDriveMediaRouteWithChildren
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
@@ -286,6 +293,8 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/redirect': typeof RedirectRoute
   '/reports': typeof ReportsRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
@@ -299,9 +308,8 @@ export interface FileRoutesByTo {
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/admin/stats': typeof ApiAdminStatsRoute
-  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
-  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
   '/api/drive/folders': typeof ApiDriveFoldersRouteWithChildren
   '/api/drive/media': typeof ApiDriveMediaRouteWithChildren
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
@@ -325,6 +333,8 @@ export interface FileRoutesById {
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
   '/reports': typeof ReportsRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
@@ -340,9 +350,8 @@ export interface FileRoutesById {
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/admin/stats': typeof ApiAdminStatsRoute
-  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/sign-in': typeof ApiAuthSignInRoute
-  '/api/auth/sign-out': typeof ApiAuthSignOutRoute
   '/api/drive/folders': typeof ApiDriveFoldersRouteWithChildren
   '/api/drive/media': typeof ApiDriveMediaRouteWithChildren
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
@@ -366,6 +375,8 @@ export interface FileRouteTypes {
     | '/posts'
     | '/redirect'
     | '/reports'
+    | '/sign-in'
+    | '/sign-up'
     | '/user'
     | '/users'
     | '/api/users'
@@ -380,9 +391,8 @@ export interface FileRouteTypes {
     | '/route-a'
     | '/route-b'
     | '/api/admin/stats'
-    | '/api/auth/callback'
+    | '/api/auth/$'
     | '/api/auth/sign-in'
-    | '/api/auth/sign-out'
     | '/api/drive/folders'
     | '/api/drive/media'
     | '/api/quizzes/media'
@@ -403,6 +413,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/redirect'
     | '/reports'
+    | '/sign-in'
+    | '/sign-up'
     | '/user'
     | '/api/users'
     | '/posts/$postId'
@@ -416,9 +428,8 @@ export interface FileRouteTypes {
     | '/route-a'
     | '/route-b'
     | '/api/admin/stats'
-    | '/api/auth/callback'
+    | '/api/auth/$'
     | '/api/auth/sign-in'
-    | '/api/auth/sign-out'
     | '/api/drive/folders'
     | '/api/drive/media'
     | '/api/quizzes/media'
@@ -441,6 +452,8 @@ export interface FileRouteTypes {
     | '/posts'
     | '/redirect'
     | '/reports'
+    | '/sign-in'
+    | '/sign-up'
     | '/user'
     | '/users'
     | '/_pathlessLayout/_nested-layout'
@@ -456,9 +469,8 @@ export interface FileRouteTypes {
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
     | '/api/admin/stats'
-    | '/api/auth/callback'
+    | '/api/auth/$'
     | '/api/auth/sign-in'
-    | '/api/auth/sign-out'
     | '/api/drive/folders'
     | '/api/drive/media'
     | '/api/quizzes/media'
@@ -482,6 +494,8 @@ export interface RootRouteChildren {
   PostsRoute: typeof PostsRouteWithChildren
   RedirectRoute: typeof RedirectRoute
   ReportsRoute: typeof ReportsRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   UserRoute: typeof UserRoute
   UsersRoute: typeof UsersRouteWithChildren
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
@@ -490,9 +504,8 @@ export interface RootRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   RoomIndexRoute: typeof RoomIndexRoute
   ApiAdminStatsRoute: typeof ApiAdminStatsRoute
-  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthSignInRoute: typeof ApiAuthSignInRoute
-  ApiAuthSignOutRoute: typeof ApiAuthSignOutRoute
   ApiDriveFoldersRoute: typeof ApiDriveFoldersRouteWithChildren
   ApiDriveMediaRoute: typeof ApiDriveMediaRouteWithChildren
   ApiQuizzesMediaRoute: typeof ApiQuizzesMediaRoute
@@ -517,6 +530,20 @@ declare module '@tanstack/solid-router' {
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof UserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reports': {
@@ -708,13 +735,6 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ApiDriveFoldersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/sign-out': {
-      id: '/api/auth/sign-out'
-      path: '/api/auth/sign-out'
-      fullPath: '/api/auth/sign-out'
-      preLoaderRoute: typeof ApiAuthSignOutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/sign-in': {
       id: '/api/auth/sign-in'
       path: '/api/auth/sign-in'
@@ -722,11 +742,11 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ApiAuthSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/callback': {
-      id: '/api/auth/callback'
-      path: '/api/auth/callback'
-      fullPath: '/api/auth/callback'
-      preLoaderRoute: typeof ApiAuthCallbackRouteImport
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/stats': {
@@ -874,6 +894,8 @@ const rootRouteChildren: RootRouteChildren = {
   PostsRoute: PostsRouteWithChildren,
   RedirectRoute: RedirectRoute,
   ReportsRoute: ReportsRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   UserRoute: UserRoute,
   UsersRoute: UsersRouteWithChildren,
   ApiUsersRoute: ApiUsersRouteWithChildren,
@@ -882,9 +904,8 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   RoomIndexRoute: RoomIndexRoute,
   ApiAdminStatsRoute: ApiAdminStatsRoute,
-  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthSignInRoute: ApiAuthSignInRoute,
-  ApiAuthSignOutRoute: ApiAuthSignOutRoute,
   ApiDriveFoldersRoute: ApiDriveFoldersRouteWithChildren,
   ApiDriveMediaRoute: ApiDriveMediaRouteWithChildren,
   ApiQuizzesMediaRoute: ApiQuizzesMediaRoute,

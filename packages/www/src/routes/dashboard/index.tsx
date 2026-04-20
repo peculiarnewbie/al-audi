@@ -2,13 +2,14 @@ import { Link, createFileRoute, redirect } from "@tanstack/solid-router";
 import { For, Show, createSignal } from "solid-js";
 import { getDashboardData } from "~/server/dashboard";
 import type { DashboardClassroom, DashboardResource } from "~/server/dashboard";
+import { authClient } from "~/utils/auth-client";
 
 export const Route = createFileRoute("/dashboard/")({
     loader: async () => {
         const data = await getDashboardData();
 
         if (!data) {
-            throw redirect({ href: "/api/auth/sign-in" });
+            throw redirect({ href: "/sign-in?next=/dashboard" });
         }
 
         return data;
@@ -158,6 +159,10 @@ function DashboardPage() {
     const resources = () => data().resources;
     const isTeacher = () => user().role === "teacher";
     const isAdmin = () => user().role === "admin";
+    const signOut = async () => {
+        await authClient.signOut();
+        window.location.assign("/");
+    };
 
     const closeSidebar = () => setSidebarOpen(false);
 
@@ -286,12 +291,13 @@ function DashboardPage() {
                     </div>
 
                     <div class="mt-auto">
-                        <a
-                            href="/api/auth/sign-out"
+                        <button
+                            type="button"
+                            onClick={() => void signOut()}
                             class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-white/70 hover:text-slate-700"
                         >
                             Sign out
-                        </a>
+                        </button>
                     </div>
                 </div>
             </aside>

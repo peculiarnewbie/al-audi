@@ -10,7 +10,7 @@ import {
     driveFolderPermissions,
     driveFolders,
 } from "core";
-import { getAuthenticatedDbUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedDbUser } from "~/utils/auth.server";
 import type { UserRole } from "~/utils/users";
 
 type ClassroomRow = typeof classes.$inferSelect;

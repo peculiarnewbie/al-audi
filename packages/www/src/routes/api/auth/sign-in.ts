@@ -1,22 +1,19 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { env } from "cloudflare:workers";
-import { getAuthorizationUrl } from "~/utils/workos-auth.server";
 
 export const Route = createFileRoute("/api/auth/sign-in")({
     server: {
         handlers: {
             GET: ({ request }) => {
-                const authorizationUrl = getAuthorizationUrl(request);
-                console.log("authorization url", authorizationUrl);
-                console.log(
-                    "WorkOS key prefix",
-                    env.WORKOS_API_KEY?.slice(0, 8),
-                );
+                const url = new URL(request.url);
+                const next = url.searchParams.get("next");
+                const location = next
+                    ? `/sign-in?next=${encodeURIComponent(next)}`
+                    : "/sign-in";
 
                 return new Response(null, {
                     status: 302,
                     headers: {
-                        Location: authorizationUrl,
+                        Location: location,
                     },
                 });
             },

@@ -93,7 +93,7 @@ export const Route = createFileRoute("/admin")({
         const result = await getAdminDashboardStats();
 
         if (result.status === "unauthenticated") {
-            throw redirect({ href: "/api/auth/sign-in" });
+            throw redirect({ href: "/sign-in?next=/admin" });
         }
 
         return result;
@@ -107,6 +107,7 @@ type StatItem = {
 };
 
 const buildStatItems = (stats: AdminStats): StatItem[] => [
+    { label: "Pending", value: stats.pending },
     { label: "Teachers", value: stats.teachers },
     { label: "Students", value: stats.students },
     { label: "Classes", value: stats.classes },
@@ -155,6 +156,7 @@ function AdminDashboard() {
     };
     const [searchInput, setSearchInput] = createSignal("");
     const [searchTerm, setSearchTerm] = createSignal("");
+    const [selectedRole, setSelectedRole] = createSignal<UserRole | undefined>();
     const [userError, setUserError] = createSignal<string | null>(null);
     const [updatingUserId, setUpdatingUserId] = createSignal<string | null>(
         null,
@@ -169,16 +171,23 @@ function AdminDashboard() {
     >(null);
 
     const [users, { mutate, refetch }] = createResource(
-        () => (stats() ? searchTerm().trim() : null),
-        async (search): Promise<User[]> => {
-            if (search === null) {
+        () =>
+            stats()
+                ? {
+                      role: selectedRole(),
+                      search: searchTerm().trim(),
+                  }
+                : null,
+        async (query): Promise<User[]> => {
+            if (query === null) {
                 return [];
             }
 
             setUserError(null);
             const result = await fetchAdminUsers({
                 data: {
-                    search: search || undefined,
+                    role: query.role,
+                    search: query.search || undefined,
                 },
             });
 
@@ -355,6 +364,9 @@ function AdminDashboard() {
 
     const assignmentTeachers = () => assignmentData()?.teachers ?? [];
     const assignmentStudents = () => assignmentData()?.students ?? [];
+    const pendingUsersCount = () => stats()?.pending ?? 0;
+    const unassignedStudentsCount = () =>
+        assignmentStudents().filter((student) => !student.teacherId).length;
     const hasAssignmentStudents = () => assignmentStudents().length > 0;
     const hasUsers = () => (users() ?? []).length > 0;
 
@@ -368,7 +380,7 @@ function AdminDashboard() {
                     Admin dashboard
                 </h1>
                 <p class="text-slate-600">
-                    Monitor overall usage for the school program.
+                    Manage school access, clear pending accounts, and keep assignments in sync.
                 </p>
                 <Show when={stats()}>
                     <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
@@ -400,6 +412,31 @@ function AdminDashboard() {
                                 />
                             )}
                         </For>
+                    </div>
+
+                    <div class="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                        <div class="glass-card p-6 space-y-3">
+                            <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                                Access queue
+                            </div>
+                            <div class="text-2xl font-semibold text-[color:var(--dashboard-ink)]">
+                                {formatNumber(pendingUsersCount())} accounts need a role
+                            </div>
+                            <p class="text-sm text-slate-600">
+                                New sign-ups stay pending until an admin assigns student, teacher, or admin access.
+                            </p>
+                        </div>
+                        <div class="glass-card p-6 space-y-3">
+                            <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                                Assignment health
+                            </div>
+                            <div class="text-2xl font-semibold text-[color:var(--dashboard-ink)]">
+                                {formatNumber(unassignedStudentsCount())} students unassigned
+                            </div>
+                            <p class="text-sm text-slate-600">
+                                Students without a teacher miss reporting context and shared-drive targeting.
+                            </p>
+                        </div>
                     </div>
 
                     <div class="glass-panel p-6 space-y-4">
@@ -445,6 +482,35 @@ function AdminDashboard() {
                             </button>
                         </form>
 
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                class={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
+                                    !selectedRole()
+                                        ? "bg-[color:var(--dashboard-accent)] text-white shadow-sm"
+                                        : "border border-white/70 bg-white/80 text-slate-600 hover:bg-white"
+                                }`}
+                                onClick={() => setSelectedRole(undefined)}
+                            >
+                                All roles
+                            </button>
+                            <For each={roleOptions}>
+                                {(role) => (
+                                    <button
+                                        type="button"
+                                        class={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
+                                            selectedRole() === role
+                                                ? "bg-[color:var(--dashboard-accent)] text-white shadow-sm"
+                                                : "border border-white/70 bg-white/80 text-slate-600 hover:bg-white"
+                                        }`}
+                                        onClick={() => setSelectedRole(role)}
+                                    >
+                                        {role}
+                                    </button>
+                                )}
+                            </For>
+                        </div>
+
                         <Show when={userError()}>
                             <div class="text-sm text-red-600">
                                 {userError()}
@@ -472,8 +538,26 @@ function AdminDashboard() {
                                         {(user) => (
                                             <div class="flex flex-wrap items-center justify-between gap-4 py-4">
                                                 <div class="space-y-1">
-                                                    <div class="text-sm font-medium text-[color:var(--dashboard-ink)]">
-                                                        {user.name}
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <div class="text-sm font-medium text-[color:var(--dashboard-ink)]">
+                                                            {user.name}
+                                                        </div>
+                                                        <span
+                                                            class={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
+                                                                user.role ===
+                                                                "admin"
+                                                                    ? "bg-amber-100 text-amber-800"
+                                                                    : user.role ===
+                                                                        "teacher"
+                                                                      ? "bg-teal-100 text-teal-800"
+                                                                      : user.role ===
+                                                                          "student"
+                                                                        ? "bg-sky-100 text-sky-800"
+                                                                        : "bg-stone-200 text-stone-700"
+                                                            }`}
+                                                        >
+                                                            {user.role}
+                                                        </span>
                                                     </div>
                                                     <div class="text-xs text-slate-500">
                                                         {user.email ??
@@ -595,6 +679,12 @@ function AdminDashboard() {
                             </button>
                         </form>
 
+                        <Show when={unassignedStudentsCount() > 0}>
+                            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                                {formatNumber(unassignedStudentsCount())} students still need a teacher assignment.
+                            </div>
+                        </Show>
+
                         <Show when={assignmentError()}>
                             <div class="text-sm text-red-600">
                                 {assignmentError()}
@@ -622,8 +712,19 @@ function AdminDashboard() {
                                         {(student) => (
                                             <div class="flex flex-wrap items-center justify-between gap-4 py-4">
                                                 <div class="space-y-1">
-                                                    <div class="text-sm font-medium text-[color:var(--dashboard-ink)]">
-                                                        {student.name}
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <div class="text-sm font-medium text-[color:var(--dashboard-ink)]">
+                                                            {student.name}
+                                                        </div>
+                                                        <Show
+                                                            when={
+                                                                !student.teacherId
+                                                            }
+                                                        >
+                                                            <span class="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-800">
+                                                                Needs assignment
+                                                            </span>
+                                                        </Show>
                                                     </div>
                                                     <div class="text-xs text-slate-500">
                                                         {student.email ??

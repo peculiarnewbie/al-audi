@@ -18,8 +18,8 @@ import {
     quizzes,
 } from "core";
 import type { DbClient, QuizCategories, QuizPayload, QuizQuestion } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
-import type { AuthUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedUser } from "~/utils/auth.server";
+import type { AuthUser } from "~/utils/auth.server";
 
 const multipleChoiceSchema = z.object({
     id: z.string(),

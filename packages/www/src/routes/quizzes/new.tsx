@@ -6,12 +6,12 @@ import { createStore, produce, unwrap } from "solid-js/store";
 import type { MultipleChoiceQuestion, QuizQuestion, TextQuestion } from "core";
 import { QuizPreview } from "~/components/quiz-preview";
 import { createQuizShareLink, saveQuiz } from "~/server/quiz";
-import type { AuthUser } from "~/utils/workos-auth.server";
+import type { AuthUser } from "~/utils/auth.server";
 
 const getUser = createServerFn({ method: "GET" }).handler(
     async (): Promise<AuthUser | null> => {
         const { getAuthenticatedUser } =
-            await import("~/utils/workos-auth.server");
+            await import("~/utils/auth.server");
         const { getRequestHeaders } =
             await import("@tanstack/solid-start/server");
         return getAuthenticatedUser(getRequestHeaders());
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/quizzes/new")({
         const user = await getUser();
 
         if (!user) {
-            throw redirect({ href: "/api/auth/sign-in" });
+            throw redirect({ href: "/sign-in?next=/quizzes/new" });
         }
 
         return user;

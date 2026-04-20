@@ -7,7 +7,7 @@ export const Route = createFileRoute("/reports")({
         const report = await getTeacherReport();
 
         if (!report) {
-            throw redirect({ href: "/api/auth/sign-in" });
+            throw redirect({ href: "/sign-in?next=/reports" });
         }
 
         return report;

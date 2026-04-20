@@ -10,7 +10,7 @@ import {
     quizAttempts,
     users,
 } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedUser } from "~/utils/auth.server";
 
 type AttemptRow = typeof quizAttempts.$inferSelect;
 type AssignmentRow = typeof quizAssignments.$inferSelect;

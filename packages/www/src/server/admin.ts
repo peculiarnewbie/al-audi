@@ -8,11 +8,12 @@ import {
     quizzes,
     users,
 } from "core";
-import { getAuthenticatedDbUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedDbUser } from "~/utils/auth.server";
 
 export type AdminStats = {
     teachers: number;
     students: number;
+    pending: number;
     classes: number;
     assignments: number;
     quizzes: number;
@@ -73,6 +74,7 @@ export async function getAdminStats(
     const [
         teacherRows,
         studentRows,
+        pendingRows,
         classRows,
         assignmentRows,
         quizRows,
@@ -86,6 +88,10 @@ export async function getAdminStats(
             .select({ count: sql<number>`count(*)` })
             .from(users)
             .where(eq(users.role, "student")),
+        db
+            .select({ count: sql<number>`count(*)` })
+            .from(users)
+            .where(eq(users.role, "none")),
         db.select({ count: sql<number>`count(*)` }).from(classes),
         db.select({ count: sql<number>`count(*)` }).from(quizAssignments),
         db.select({ count: sql<number>`count(*)` }).from(quizzes),
@@ -97,6 +103,7 @@ export async function getAdminStats(
         stats: {
             teachers: teacherRows[0]?.count ?? 0,
             students: studentRows[0]?.count ?? 0,
+            pending: pendingRows[0]?.count ?? 0,
             classes: classRows[0]?.count ?? 0,
             assignments: assignmentRows[0]?.count ?? 0,
             quizzes: quizRows[0]?.count ?? 0,

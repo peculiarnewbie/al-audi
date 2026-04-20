@@ -5,7 +5,7 @@ import { env } from "cloudflare:workers";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { createDb, quizQuestionAssets } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedUser } from "~/utils/auth.server";
 
 const uploadSchema = z.object({
     quizId: z.string().min(1),

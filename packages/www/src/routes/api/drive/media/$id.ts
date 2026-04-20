@@ -4,7 +4,7 @@ import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
 import { and, eq } from "drizzle-orm";
 import { createDb, driveAssets } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedUser } from "~/utils/auth.server";
 
 export const Route = createFileRoute("/api/drive/media/$id")({
     server: {

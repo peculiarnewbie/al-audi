@@ -1,15 +1,25 @@
 import { createFileRoute, redirect } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
-import type { AuthUser } from "~/utils/workos-auth.server";
+import { Show } from "solid-js";
+import type { AuthUser, DbUser } from "~/utils/auth.server";
 
 const getUser = createServerFn({ method: "GET" }).handler(
-    async (): Promise<AuthUser | null> => {
-        const { getAuthenticatedUser } =
-            await import("~/utils/workos-auth.server");
+    async (): Promise<{ authUser: AuthUser; dbUser: DbUser | null } | null> => {
+        const { getAuthenticatedDbUser, getAuthenticatedUser } =
+            await import("~/utils/auth.server");
         const { getRequestHeaders } =
             await import("@tanstack/solid-start/server");
         const headers = getRequestHeaders();
-        return getAuthenticatedUser(headers);
+        const authUser = await getAuthenticatedUser(headers);
+
+        if (!authUser) {
+            return null;
+        }
+
+        return {
+            authUser,
+            dbUser: await getAuthenticatedDbUser(headers),
+        };
     },
 );
 
@@ -18,7 +28,7 @@ export const Route = createFileRoute("/user")({
         const user = await getUser();
 
         if (!user) {
-            throw redirect({ href: "/api/auth/sign-in" });
+            throw redirect({ href: "/sign-in?next=/user" });
         }
 
         return user;
@@ -28,8 +38,8 @@ export const Route = createFileRoute("/user")({
 
 function UserPage() {
     const user = Route.useLoaderData();
-    const fullName = () =>
-        [user().firstName, user().lastName].filter(Boolean).join(" ");
+    const authUser = () => user().authUser;
+    const dbUser = () => user().dbUser;
 
     return (
         <div class="mx-auto max-w-3xl px-6 py-12">
@@ -42,7 +52,7 @@ function UserPage() {
                         Name
                     </div>
                     <div class="text-lg text-[color:var(--dashboard-ink)]">
-                        {fullName() || "WorkOS User"}
+                        {authUser().name}
                     </div>
                 </div>
                 <div>
@@ -50,7 +60,25 @@ function UserPage() {
                         Email
                     </div>
                     <div class="text-lg text-[color:var(--dashboard-ink)]">
-                        {user().email}
+                        {authUser().email}
+                    </div>
+                </div>
+                <Show when={dbUser()}>
+                    <div>
+                        <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                            Access role
+                        </div>
+                        <div class="text-lg text-[color:var(--dashboard-ink)]">
+                            {dbUser()!.role}
+                        </div>
+                    </div>
+                </Show>
+                <div>
+                    <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                        Email status
+                    </div>
+                    <div class="text-lg text-[color:var(--dashboard-ink)]">
+                        {authUser().emailVerified ? "Verified" : "Unverified"}
                     </div>
                 </div>
             </div>

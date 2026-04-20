@@ -9,7 +9,7 @@ import {
     driveFolderPermissions,
     driveFolders,
 } from "core";
-import { getAuthenticatedUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedUser } from "~/utils/auth.server";
 
 export const Route = createFileRoute("/api/drive/folders/$id")({
     server: {

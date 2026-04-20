@@ -9,7 +9,7 @@ import { createDb, driveAssets, driveFolders } from "core";
 import {
     getAuthenticatedUser,
     getAuthenticatedDbUser,
-} from "~/utils/workos-auth.server";
+} from "~/utils/auth.server";
 
 const uploadSchema = z.object({
     folderId: z.string().min(1).optional(),

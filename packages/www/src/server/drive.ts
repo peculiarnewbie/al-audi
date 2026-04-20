@@ -3,7 +3,7 @@ import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
 import { and, eq, isNull } from "drizzle-orm";
 import { createDb, driveAssets, driveFolders } from "core";
-import { getAuthenticatedDbUser } from "~/utils/workos-auth.server";
+import { getAuthenticatedDbUser } from "~/utils/auth.server";
 
 export type DriveFolder = {
     id: string;

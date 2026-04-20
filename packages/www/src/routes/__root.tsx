@@ -13,13 +13,14 @@ import type * as Solid from "solid-js";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
 import appCss from "~/styles/app.css?url";
+import { authClient } from "~/utils/auth-client";
 import { seo } from "~/utils/seo";
 
 const getUser = createServerFn({ method: "GET" }).handler(async () => {
-    const { getAuthenticatedUser } = await import("~/utils/workos-auth.server");
+    const { getAuthenticatedDbUser } = await import("~/utils/auth.server");
     const { getRequestHeaders } = await import("@tanstack/solid-start/server");
 
-    return getAuthenticatedUser(getRequestHeaders());
+    return getAuthenticatedDbUser(getRequestHeaders());
 });
 
 export const Route = createRootRoute({
@@ -82,6 +83,10 @@ export const Route = createRootRoute({
 function RootDocument({ children }: { children: Solid.JSX.Element }) {
     const auth = Route.useLoaderData();
     const user = () => auth()?.user;
+    const signOut = async () => {
+        await authClient.signOut();
+        window.location.assign("/");
+    };
 
     return (
         <html>
@@ -136,13 +141,27 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
                             >
                                 Reports
                             </Link>
+                            <Show when={user()?.role === "admin"}>
+                                <>
+                                    <span class="text-slate-300">•</span>
+                                    <Link
+                                        to="/admin"
+                                        activeProps={{
+                                            class: "text-slate-900",
+                                        }}
+                                        class="transition hover:text-slate-900"
+                                    >
+                                        Admin
+                                    </Link>
+                                </>
+                            </Show>
                         </div>
                         <div class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                             <Show
                                 when={user()}
                                 fallback={
                                     <a
-                                        href="/api/auth/sign-in"
+                                        href="/sign-in"
                                         class="rounded-full border border-white/70 bg-white/80 px-4 py-2 shadow-sm transition hover:bg-white"
                                     >
                                         Sign in
@@ -155,12 +174,13 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
                                 >
                                     Account
                                 </Link>
-                                <a
-                                    href="/api/auth/sign-out"
+                                <button
+                                    type="button"
+                                    onClick={() => void signOut()}
                                     class="rounded-full border border-white/70 bg-white/80 px-4 py-2 shadow-sm transition hover:bg-white"
                                 >
                                     Sign out
-                                </a>
+                                </button>
                             </Show>
                         </div>
                     </header>

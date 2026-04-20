@@ -15,7 +15,7 @@ import {
 import {
     getAuthenticatedUser,
     getAuthenticatedDbUser,
-} from "~/utils/workos-auth.server";
+} from "~/utils/auth.server";
 
 const createFolderSchema = z.object({
     name: z.string().trim().min(1),
