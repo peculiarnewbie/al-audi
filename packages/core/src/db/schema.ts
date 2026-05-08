@@ -1,3 +1,4 @@
+import { createInsertSchema, createSelectSchema } from "drizzle-orm/effect-schema";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const quizzes = sqliteTable("quizzes", {
@@ -208,3 +209,48 @@ export const liveQuizResults = sqliteTable("live_quiz_results", {
     endedAt: integer("ended_at").notNull(),
     createdAt: integer("created_at").notNull(),
 });
+
+// ── Effect Schemas (generated from Drizzle tables) ──────────────
+// Use these for type-safe validation with Effect's Schema module.
+//
+//   import { QuizSelect } from "core";
+//   const parsed = yield* Schema.decode(QuizSelect)(raw);
+//
+export const QuizSelect = createSelectSchema(quizzes);
+export const QuizInsert = createInsertSchema(quizzes);
+export const UserSelect = createSelectSchema(users);
+export const UserInsert = createInsertSchema(users);
+export const AuthUserSelect = createSelectSchema(authUsers);
+export const AuthSessionSelect = createSelectSchema(authSessions);
+export const AuthAccountSelect = createSelectSchema(authAccounts);
+export const AuthVerificationSelect = createSelectSchema(authVerifications);
+export const ClassSelect = createSelectSchema(classes);
+export const ClassInsert = createInsertSchema(classes);
+export const ClassStudentSelect = createSelectSchema(classStudents);
+export const ClassStudentInsert = createInsertSchema(classStudents);
+export const QuizQuestionSelect = createSelectSchema(quizQuestions);
+export const QuizQuestionInsert = createInsertSchema(quizQuestions);
+export const QuizQuestionOptionSelect = createSelectSchema(quizQuestionOptions);
+export const QuizQuestionOptionInsert = createInsertSchema(quizQuestionOptions);
+export const QuizAssignmentSelect = createSelectSchema(quizAssignments);
+export const QuizAssignmentInsert = createInsertSchema(quizAssignments);
+export const QuizShareLinkSelect = createSelectSchema(quizShareLinks);
+export const QuizShareLinkInsert = createInsertSchema(quizShareLinks);
+export const QuizCategorySelect = createSelectSchema(quizCategories);
+export const QuizCategoryInsert = createInsertSchema(quizCategories);
+export const QuizCategoryLinkSelect = createSelectSchema(quizCategoryLinks);
+export const QuizCategoryLinkInsert = createInsertSchema(quizCategoryLinks);
+export const QuizQuestionAssetSelect = createSelectSchema(quizQuestionAssets);
+export const QuizQuestionAssetInsert = createInsertSchema(quizQuestionAssets);
+export const DriveAssetSelect = createSelectSchema(driveAssets);
+export const DriveAssetInsert = createInsertSchema(driveAssets);
+export const DriveFolderSelect = createSelectSchema(driveFolders);
+export const DriveFolderInsert = createInsertSchema(driveFolders);
+export const DriveFolderPermissionSelect = createSelectSchema(driveFolderPermissions);
+export const DriveFolderPermissionInsert = createInsertSchema(driveFolderPermissions);
+export const QuizAttemptSelect = createSelectSchema(quizAttempts);
+export const QuizAttemptInsert = createInsertSchema(quizAttempts);
+export const QuizResponseSelect = createSelectSchema(quizResponses);
+export const QuizResponseInsert = createInsertSchema(quizResponses);
+export const LiveQuizResultSelect = createSelectSchema(liveQuizResults);
+export const LiveQuizResultInsert = createInsertSchema(liveQuizResults);

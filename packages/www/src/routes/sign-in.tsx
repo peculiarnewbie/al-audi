@@ -94,8 +94,8 @@ function SignInPage() {
                             Existing users
                         </div>
                         <p class="mt-3 text-sm leading-6 text-slate-600">
-                            If you used WorkOS before, sign up once with the
-                            same email to claim the same role and school data.
+                            Sign up with your school email to claim your
+                            existing role and data.
                         </p>
                     </div>
                     <div class="rounded-3xl border border-white/70 bg-white/70 p-5">

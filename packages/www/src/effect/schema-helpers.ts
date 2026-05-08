@@ -55,19 +55,22 @@ export function extractMessageType(raw: unknown): string | undefined {
     return undefined;
 }
 
-export function decodeWithSchema<A, I, E>(
-    schema: Schema.Schema<A, I>,
+export function decodeWithSchema<A, E>(
+    schema: Schema.Schema<A>,
     raw: unknown,
     mapError: (issue: string, raw: unknown) => E,
 ): Effect.Effect<A, E> {
-    return Schema.decodeUnknown(schema)(raw).pipe(
+    return (Schema.decodeUnknownEffect(schema)(raw) as Effect.Effect<
+        A,
+        Schema.SchemaError
+    >).pipe(
         Effect.mapError((error) => mapError(formatUnknownError(error), raw)),
     );
 }
 
-export function encodeWithSchema<A, I>(
-    schema: Schema.Schema<A, I>,
+export function encodeWithSchema<A>(
+    schema: Schema.Schema<A>,
     value: A,
-): I {
-    return Schema.encodeSync(schema)(value);
+): unknown {
+    return Schema.encodeUnknownSync(schema as any)(value);
 }

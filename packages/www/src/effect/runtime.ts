@@ -1,4 +1,4 @@
-import { Cause, Effect, LogLevel, Logger } from "effect";
+import { Cause, Effect, Logger } from "effect";
 
 import type { EffectLogContext } from "./logger";
 import { compactLogContext } from "./logger";
@@ -16,7 +16,7 @@ export function runObservedPromiseExit<A, E>(
     const observed = program.pipe(
         Effect.annotateLogs(annotations),
         Effect.withLogSpan(operation),
-        Effect.catchAllCause((cause: Cause.Cause<unknown>) =>
+        Effect.catchCause((cause: Cause.Cause<unknown>) =>
             Effect.logError(Cause.pretty(cause)).pipe(
                 Effect.annotateLogs(
                     compactLogContext({
@@ -29,7 +29,7 @@ export function runObservedPromiseExit<A, E>(
                 Effect.flatMap(() => Effect.failCause(cause)),
             ),
         ),
-        Logger.withMinimumLogLevel(LogLevel.Warning),
+        Effect.withLogger(Logger.defaultLogger),
     );
 
     return Effect.runPromiseExit(observed);
@@ -49,7 +49,7 @@ export function runObservedSync<A, E>(
         program.pipe(
             Effect.annotateLogs(annotations),
             Effect.withLogSpan(operation),
-            Logger.withMinimumLogLevel(LogLevel.Warning),
+            Effect.withLogger(Logger.defaultLogger),
         ),
     );
 }

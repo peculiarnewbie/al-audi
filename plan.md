@@ -8,7 +8,7 @@ English Learning add-on app for an in-person school with teacher-managed workflo
 
 ### Completed
 
-- WorkOS authentication
+- Better Auth authentication
 - Admin dashboard with user role management
 - Quiz authoring and live sessions
 - Assignments system

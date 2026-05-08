@@ -4,7 +4,7 @@ This document provides guidelines for agentic coding agents operating in this re
 
 ## Product Overview
 
-This is the English Learning add-on app for an in-person school. It focuses on teacher-managed workflows, async homework, and real-time live quizzes. The stack is Cloudflare-first (Workers, D1, R2, Durable Objects) with a TanStack Solid Start frontend and WorkOS authentication.
+This is the English Learning add-on app for an in-person school. It focuses on teacher-managed workflows, async homework, and real-time live quizzes. The stack is Cloudflare-first (Workers, D1, R2, Durable Objects) with a TanStack Solid Start frontend and Better Auth authentication.
 
 ## Repository Layout (Monorepo)
 
@@ -68,7 +68,7 @@ Media storage conventions:
 
 ## Authentication
 
-- Auth uses WorkOS (see `packages/www/src/utils/workos-auth.server.ts`).
+- Auth uses Better Auth (see `packages/www/src/utils/auth.server.ts`).
 - Protect server handlers with `getAuthenticatedUser`.
 - Required env vars are listed in `packages/www/.env.example`.
 
