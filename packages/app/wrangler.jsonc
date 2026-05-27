@@ -1,0 +1,40 @@
+{
+    "$schema": "../node_modules/wrangler/config-schema.json",
+    "name": "al-audi",
+    "compatibility_date": "2026-01-01",
+    "compatibility_flags": ["nodejs_compat"],
+    "main": "src/worker/index.ts",
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "al-audi",
+            "database_id": "1b662294-b75b-43fc-b276-4ae5c79135ed",
+            "remote": true,
+        },
+    ],
+    "r2_buckets": [
+        {
+            "binding": "BUCKET",
+            "bucket_name": "al-audi",
+            "preview_bucket_name": "al-audi-preview",
+            "remote": true,
+        },
+    ],
+    "durable_objects": {
+        "bindings": [
+            {
+                "name": "WS",
+                "class_name": "GameRoom",
+            },
+        ],
+    },
+    "migrations": [
+        {
+            "tag": "v1",
+            "new_sqlite_classes": ["GameRoom"],
+        },
+    ],
+    "vars": {
+        "MY_VAR": "Hello from Cloudflare",
+    },
+}

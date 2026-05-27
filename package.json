@@ -5,6 +5,12 @@
     "workspaces": [
         "packages/*"
     ],
+    "scripts": {
+        "dev": "cd packages/app && bun run dev",
+        "build": "cd packages/app && bun run build",
+        "preview": "cd packages/app && bun run preview",
+        "deploy": "cd packages/app && bun run deploy"
+    },
     "devDependencies": {
         "@types/bun": "latest",
         "prettier": "^3.7.4"

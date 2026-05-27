@@ -1,93 +1,220 @@
-# Project Roadmap
+# al-audi Rewrite Plan
 
-## Overview
+Full rewrite from imperative TanStack server functions + Zod + scattered DO storage into an Effect-first, Alchemy-managed architecture.
 
-English Learning add-on app for an in-person school with teacher-managed workflows, async homework, and real-time live quizzes. Cloudflare-first stack with TanStack Solid Start frontend.
+## References
 
-## Current State
+Before implementing any part of this plan, read the two reference repos for patterns:
 
-### Completed
+- **`/home/bolt/git/web/party`** — Game room infrastructure, Effect Schema at boundaries, `GameAdapter` strategy pattern, DO SQLite persistence, Effect-wrapped runtime, `runObservedPromiseExit`/`runObservedSync` wrappers, structured logging with `Effect.annotateLogs`, tagger error types via `Data.TaggedError`
+- **`/home/bolt/git/web/shedflare/apps/drive`** — `Alchemy.Stack` + `Effect.gen` for infra, `effect/unstable/httpapi` for API definitions (`HttpApi`, `HttpApiGroup`, `HttpApiEndpoint`) + handlers (`HttpApiBuilder.group`), `createProtectedHandler` auth middleware, Effect Schema for request/response schemas
 
-- Better Auth authentication
-- Admin dashboard with user role management
-- Quiz authoring and live sessions
-- Assignments system
-- Reporting dashboard
-- Drive backend API (folders, media upload)
-
-### Missing
-
-- Teacher Drive UI for resource management
-- Role-based access control enforcement in APIs
-
----
-
-# Phase 1: Drive UI for Teachers
-
-## Goal
-
-Enable teachers to upload, organize, and manage resources (files, audio, images) through a dedicated Drive interface.
-
-## Tasks
-
-### Backend API Tasks
-
-- [x]   1. Add `GET /api/drive/media` endpoint - list all assets (not just 8)
-- [x]   2. Add `DELETE /api/drive/media/[id]` endpoint - delete files
-- [x]   3. Add `DELETE /api/drive/folders/[id]` endpoint - delete folders
-- [x]   4. Add role check to `POST /api/drive/media` - require teacher role
-
-### Frontend Tasks
-
-- [x]   5. Add "Drive" nav item to dashboard sidebar
-- [x]   6. Create Drive page route at `/dashboard/drive`
-- [ ]   7. Build `FileUploader` component with drag-and-drop
-- [x]   8. Build `FileList` component - display files with icons, name, size, date
-- [x]   9. Build `FolderModal` component - create new folder dialog
-- [x]   10. Build `DriveBrowser` component - main container with breadcrumb, folder/file view
-- [x]   11. Wire up folder navigation (click folder to enter)
-- [x]   12. Wire up file upload to POST /api/drive/media
-- [x]   13. Wire up folder creation to POST /api/drive/folders
-- [x]   14. Wire up file deletion to DELETE /api/drive/media
-- [x]   15. Wire up folder deletion to DELETE /api/drive/folders
-
-## Technical Details
-
-### Backend (Existing)
-
-- `POST /api/drive/media` - Upload files to R2 (`drive-media/`)
-- `POST /api/drive/folders` - Create folders
-- `GET /api/drive/folders` - List folders with permissions
-
-### Schema (Existing)
-
-- `driveAssets` table: id, teacherId, folderId, fileName, r2Key, contentType, fileSize, createdAt
-- `driveFolders` table: id, teacherId, name, createdAt, permissions (classIds, studentIds)
-
-### File Structure
+## Architecture
 
 ```
-packages/www/src/
-├── routes/dashboard/drive/
-│   └── index.tsx       # Drive page
-├── components/
-│   └── drive/
-│       ├── FileUploader.tsx
-│       ├── FileList.tsx
-│       ├── FolderModal.tsx
-│       └── DriveBrowser.tsx
+al-audi/
+├── alchemy.run.ts          # Alchemy.Stack with Effect.gen (like shedflare)
+├── packages/
+│   └── app/                 # Single package (not core + www)
+│       ├── alchemy.run.ts   # (or keep at root, one or the other)
+│       ├── src/
+│       │   ├── worker.ts    # Worker entry
+│       │   ├── effect/      # Effect utilities (port from party)
+│       │   │   ├── runtime.ts
+│       │   │   ├── schema-helpers.ts
+│       │   │   └── logger.ts
+│       │   ├── db/
+│       │   │   ├── schema.ts       # Drizzle tables + Effect schemas
+│       │   │   └── client.ts       # createDb wrapper
+│       │   ├── auth/
+│       │   │   └── server.ts       # Better Auth setup (no change needed)
+│       │   ├── game/               # Game room
+│       │   │   ├── adapter.ts      # GameAdapter interface (see party)
+│       │   │   ├── schemas.ts      # Shared wire schemas (Effect Schema)
+│       │   │   ├── engine.ts       # Pure quiz logic (no I/O, testable)
+│       │   │   ├── server.ts       # Message dispatch + broadcast
+│       │   │   └── connection.ts   # Client-side WS wrapper
+│       │   ├── quiz/               # Quiz CRUD (not game room)
+│       │   │   ├── schemas.ts      # Effect Schema for quiz payloads
+│       │   │   ├── api.ts          # HttpApi group (see shedflare drive)
+│       │   │   └── handlers.ts     # HttpApiBuilder handlers
+│       │   ├── drive/              # Resource drive
+│       │   │   ├── schemas.ts
+│       │   │   ├── api.ts
+│       │   │   └── handlers.ts
+│       │   ├── assignments/        # Quiz assignments
+│       │   │   ├── schemas.ts
+│       │   │   ├── api.ts
+│       │   │   └── handlers.ts
+│       │   ├── reporting/          # Teacher reports
+│       │   │   ├── schemas.ts
+│       │   │   └── api.ts
+│       │   ├── admin/              # Admin dashboard
+│       │   │   ├── schemas.ts
+│       │   │   └── api.ts
+│       │   ├── components/         # UI components
+│       │   ├── routes/             # TanStack file-based routes
+│       │   ├── worker/             # Durable Object
+│       │   │   └── game-room.ts    # GameRoom DO (see party/worker/ws.ts)
+│       │   └── styles/
+│       └── migrations/              # Squashed single migration
 ```
 
----
+## Data Model
 
-# Phase 2: Role-Based Access Control
+Current 19 tables → consolidate to final form. Squash all 10 migrations into 1.
 
-## Goal
+Key tables (Drizzle + Effect Schema from day one):
+- `users` (app users, already better-auth + custom role)
+- `user`, `session`, `account`, `verification` (better-auth tables)
+- `quizzes` + `quiz_questions` + `quiz_question_options` + `quiz_question_assets`
+- `quiz_categories` + `quiz_category_links`
+- `quiz_assignments`
+- `quiz_attempts` + `quiz_responses`
+- `live_quiz_results`
+- `classes` + `class_students`
+- `drive_assets` + `drive_folders` + `drive_folder_permissions`
+- `quiz_share_links`
 
-Enforce role-based permissions throughout the application.
+Consider adding tags support to drive_assets (like shedflare's many-to-many tags).
 
-## Tasks
+## Module Design
 
-1. Add role checks to all API endpoints
-2. Migrate teachers/students tables to unified users table
-3. Add role enum: none, student, teacher, admin
+Every domain module follows the same pattern (modeled after shedflare drive):
+
+```
+domain/
+├── schemas.ts    # Effect Schema: request params, request body, response
+├── api.ts        # HttpApi definitions (endpoints + groups)
+└── handlers.ts   # HttpApiBuilder.group with createProtectedHandler
+```
+
+Each server function is an Effect, not an async function. Handlers use `Effect.gen` with typed errors via `Data.TaggedError`.
+
+## Game Room Architecture
+
+Follow the party repo's pattern rather than the current imperative DO:
+
+```
+game/
+├── adapter.ts           # GameAdapter interface (see party/worker/game-adapter.ts)
+├── schemas.ts           # clientMessageSchema, serverMessageSchema (Effect Schema)
+├── engine.ts            # Pure functions, no I/O. Scoring, question validation.
+├── server.ts            # Wraps engine, handles message → response mapping
+└── connection.ts        # Client-side GameConnection (Solid signals + WS)
+```
+
+GameRoom DO (`worker/game-room.ts`) delegates to `GameAdapter.processMessage`. Use DO SQLite for persistence (not key-value API), with hibernation + alarms.
+
+## Domain Modules
+
+### Quiz CRUD (`quiz/`)
+- Save/load quizzes (R2 for JSON payload, D1 for metadata)
+- Share links (create, lookup with token)
+- Categories (level, topic, skill)
+- See shedflare drive for HttpApi pattern
+
+### Drive (`drive/`)
+- File upload (FormData → R2 + D1 metadata)
+- Folders (create, list, delete)
+- Download + preview (inline vs attachment)
+- Search, filter, pagination
+- See shedflare drive `server/impl/files.ts` for reference
+
+### Assignments (`assignments/`)
+- Create assignment (quiz → class or student)
+- List (teacher view, student view)
+- Status updates
+- Access control (teacher owns, student matches)
+
+### Reporting (`reporting/`)
+- Per-quiz attempt summaries
+- Per-student history
+- Class overview
+- Live session results
+
+### Auth (`auth/`)
+- Keep Better Auth setup (it works)
+- Wrap auth calls in `Effect.tryPromise`
+- `createProtectedHandler` middleware (like shedflare)
+
+## Implementation Order
+
+### 1. Scaffold
+- Squash 10 migrations → 1 fresh migration
+- Single `packages/app` package
+- Port `effect/runtime.ts`, `effect/schema-helpers.ts`, `effect/logger.ts` from party
+- Update `alchemy.run.ts` to use `Alchemy.Stack` + `Effect.gen` pattern (see shedflare)
+- Remove `zod`, `remeda` from deps
+
+### 2. Auth layer
+- Port `auth/server.ts` as-is (it works)
+- Add `createProtectedHandler` middleware (see shedflare `@shedflare/auth-client/http-api`)
+- Add `getAuthenticatedDbUser` as an Effect
+
+### 3. Quiz API
+- Define Effect schemas for quiz payloads
+- Implement quiz CRUD handlers (save, load, share)
+- Wire HttpApi endpoints
+- Test with bun test
+
+### 4. Drive API
+- Implement file upload/download/preview
+- Folders CRUD
+- Tags (optional, but useful)
+- Search + pagination
+
+### 5. Assignments + Reporting
+- Quiz assignment CRUD
+- Attempt submission + scoring
+- Reporting queries
+
+### 6. Game Room
+- Port `game/schemas.ts` to Effect Schema
+- Extract pure `engine.ts` (scoring, validation)
+- Implement `server.ts` (message dispatch)
+- Implement `GameAdapter` interface
+- Rewrite `GameRoom` DO with SQLite persistence
+- Wire `GameConnection` client wrapper
+
+### 7. Frontend
+- Port SolidJS routes (keep TanStack router)
+- Convert components to use new API shapes
+- Drive UI overhaul (refer to shedflare drive `plan.md` for layout)
+
+### 8. Cleanup
+- Remove `packages/core`
+- Remove `zod`, `remeda` dependencies
+- Delete old API routes and server functions
+- Typecheck + lint pass
+
+## Dependencies
+
+Keep:
+- `solid-js`, `@tanstack/solid-router`, `@tanstack/solid-start`
+- `better-auth`
+- `tailwindcss`, `wrangler`, `vite`
+- `nanoid`, `animejs`, `luxon`, `qrcode`
+
+Bump to newest beta:
+- `alchemy` — latest `2.0.0-beta.*` (use `Alchemy.Stack` + `Effect.gen` pattern from shedflare infra)
+- `effect` — latest `4.0.0-beta.*` (Effect Schema, Data.TaggedError, `effect/unstable/httpapi`)
+- `drizzle-orm` — latest `1.0.0-rc.*` (effect-schema integration, D1 driver stability)
+- `drizzle-kit` — latest to match `drizzle-orm`
+
+Remove:
+- `zod` — replaced by Effect Schema
+- `remeda` — `Effect` + native `Array` methods suffice
+
+Add:
+- `@effect/schema` (part of `effect` package already)
+- `effect/unstable/httpapi` 
+
+## Key Principles
+
+1. **Effect Schema at every boundary** — HTTP requests, WebSocket messages, DB queries. Never parse with Zod.
+2. **Tagged errors everywhere** — `Data.TaggedError` for every failure mode. No `{ success: false, error: string }`.
+3. **Pure engines** — Game logic and quiz scoring are pure functions. No I/O. Testable with `bun test`.
+4. **Alchemy for infra** — `Alchemy.Stack` + `Effect.gen` for all Cloudflare resources. No manual wrangler config drift.
+5. **One package** — No `core`/`www` split. Shared types live in `packages/app/src/db/schema.ts` and are imported directly.
+6. **HttpApi pattern** — All server endpoints defined as `HttpApi` groups with Schema-typed responses, not `createServerFn`.
