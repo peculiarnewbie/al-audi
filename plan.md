@@ -153,16 +153,26 @@ GameRoom DO (`worker/game-room.ts`) delegates to `GameAdapter.processMessage`. U
 - Add `getAuthenticatedDbUser` as an Effect
 
 ### 3. Quiz API
-- Define Effect schemas for quiz payloads
-- Implement quiz CRUD handlers (save, load, share)
-- Wire HttpApi endpoints
-- Test with bun test
+- [x] Define Effect schemas for quiz payloads (`quiz/schemas.ts`)
+- [x] Implement quiz CRUD handlers with tagged errors (`quiz/handlers.ts`)
+- [x] Rewrite `server/quiz.ts` to use Effect handlers via `Effect.runPromiseExit` + `Exit.match`
+- [x] Tests pass (22 tests in `quiz/quiz.test.ts`), build clean
 
-### 4. Drive API
-- Implement file upload/download/preview
-- Folders CRUD
-- Tags (optional, but useful)
-- Search + pagination
+### 4. Drive API (in progress)
+- `drive/schemas.ts` created — types for folders, files, upload/download, search, tags
+- `drive/handlers.ts` — tagged error classes defined, effect handlers using raw Drizzle tables
+  - Replaced `DriveFolderSelect`/`DriveAssetSelect` with raw `driveFolders`/`driveAsset` table references
+  - Replaced `ISODateTime.now()` with `DateTime.now().valueOf()`
+  - Fixed column names to match schema
+  - R2 bucket accessed via `env.BUCKET` at runtime
+- `server/drive.ts` — Effect-wrapped server functions implemented
+  - All handlers using `Effect.sync()` + `Effect.runPromiseExit`
+  - Auth middleware via `getAuthenticatedDbUser`
+- **Build error**: Duplicate `db` declarations in `server/drive.ts` — need to refactor to use single db instance
+- Still needed:
+  - Fix duplicate `db` declaration in `server/drive.ts`
+  - Write tests
+  - Update drive routes to use new server fns
 
 ### 5. Assignments + Reporting
 - Quiz assignment CRUD
