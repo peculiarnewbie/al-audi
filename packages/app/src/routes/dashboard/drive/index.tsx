@@ -57,7 +57,7 @@ const getFileBadge = (contentType: string) => {
 function DrivePage() {
     const initialData = Route.useLoaderData();
     const [folders, setFolders] = createSignal<DriveFolder[]>(
-        initialData().folders,
+        (initialData().folders as any),
     );
     const [assets, setAssets] = createSignal<DriveAsset[]>(
         initialData().assets,
@@ -91,8 +91,8 @@ function DrivePage() {
             getDriveAssets(),
         ]);
 
-        setFolders(nextFolders.folders);
-        setAssets(nextAssets.assets);
+        setFolders(nextFolders.folders as any);
+        setAssets(nextAssets.assets as any);
     };
 
     const navigateToFolder = (folderId: string | null, name: string) => {

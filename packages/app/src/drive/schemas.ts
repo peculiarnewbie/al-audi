@@ -1,6 +1,3 @@
-import { ISODateTime } from "effect";
-import { filetypes } from "~/utils/filetypes";
-
 export type UploadProgress = { bytes: number; total: number; percent: number };
 
 export type DriveFileMetadata = {
@@ -8,7 +5,7 @@ export type DriveFileMetadata = {
     name: string;
     mimeType: string;
     size: number;
-    uploadedAt: ISODateTime;
+    uploadedAt: number;
     shareId?: string;
     quizId?: string;
     tags?: string[];
@@ -18,16 +15,16 @@ export type RootFolder = {
     id: string;
     name: string;
     parentFolderId?: string | null;
-    createdAt: ISODateTime;
-    updatedAt: ISODateTime;
+    createdAt: number;
+    updatedAt: number;
 };
 
 export type Folder = {
     id: string;
     name: string;
     parentId: string;
-    createdAt: ISODateTime;
-    updatedAt: ISODateTime;
+    createdAt: number;
+    updatedAt: number;
     fileCount: number;
     tagCount: number;
 };
@@ -67,7 +64,7 @@ export type FileUploadResult = {
     name: string;
     mimeType: string;
     size: number;
-    uploadedAt: ISODateTime;
+    uploadedAt: number;
     progress?: FileUploadProgress;
 };
 
@@ -75,7 +72,7 @@ export type Tag = {
     id: string;
     name: string;
     color: string;
-    createdAt: ISODateTime;
+    createdAt: number;
 };
 
 export type FolderCreateInput = {

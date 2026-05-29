@@ -3,15 +3,9 @@ import { json } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
 import { nanoid } from "nanoid";
-import { z } from "zod";
 import { createDb } from "~/db/client";
 import { quizQuestionAssets } from "~/db/schema";
 import { getAuthenticatedUser } from "~/utils/auth.server";
-
-const uploadSchema = z.object({
-    quizId: z.string().min(1),
-    questionId: z.string().min(1),
-});
 
 const getFileExtension = (fileName: string) => {
     const trimmed = fileName.trim();
@@ -58,9 +52,7 @@ export const Route = createFileRoute("/api/quizzes/media")({
                     );
                 }
 
-                const parsed = uploadSchema.safeParse({ quizId, questionId });
-
-                if (!parsed.success) {
+                if (!quizId.trim() || !questionId.trim()) {
                     return json(
                         { error: "Invalid upload payload." },
                         { status: 400 },

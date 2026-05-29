@@ -1,183 +1,144 @@
 import { describe, it, expect } from "bun:test";
+import {
+    validateQuestion,
+    calculateScore,
+    getResults,
+    validateAnswer,
+} from "./engine";
 
-describe("Game Logic", () => {
-    describe("Player Management", () => {
-        it("adds a new player to empty room", async () => {
-            const mockStorage = new Map();
-            const mockCtx = {
-                storage: {
-                    get: mockResolvedValue(undefined),
-                    put: mockResolvedValue(undefined),
-                },
-            } as any;
-
-            const { server } = await import("~/game");
-            const result = await server(mockCtx).addPlayer(
-                "player-123",
-                "Alice",
-            );
-
-            expect(result).toHaveLength(1);
-            expect(result[0]).toEqual({
-                id: "player-123",
-                name: "Alice",
-                score: 0,
-            });
-        });
-
-        it("updates existing player name on reconnect", async () => {
-            const existingPlayers = [
-                { id: "player-123", name: "Alice", score: 10 },
-            ];
-            const mockStorage = new Map([["players", existingPlayers]]);
-            const mockCtx = {
-                storage: {
-                    get: (key: string) => mockStorage.get(key),
-                    put: mockResolvedValue(undefined),
-                },
-            } as any;
-
-            const { server } = await import("~/game");
-            const result = await server(mockCtx).addPlayer(
-                "player-123",
-                "Alice Updated",
-            );
-
-            expect(result).toHaveLength(1);
-            expect(result[0].name).toBe("Alice Updated");
-            expect(result[0].score).toBe(10);
-        });
-
-        it("adds new player alongside existing ones", async () => {
-            const existingPlayers = [
-                { id: "player-123", name: "Alice", score: 0 },
-            ];
-            const mockStorage = new Map([["players", existingPlayers]]);
-            const mockCtx = {
-                storage: {
-                    get: (key: string) => mockStorage.get(key),
-                    put: mockResolvedValue(undefined),
-                },
-            } as any;
-
-            const { server } = await import("~/game");
-            const result = await server(mockCtx).addPlayer("player-456", "Bob");
-
-            expect(result).toHaveLength(2);
-            expect(result[0].name).toBe("Alice");
-            expect(result[1].name).toBe("Bob");
-        });
-
-        it("removes player from room", async () => {
-            const existingPlayers = [
-                { id: "player-123", name: "Alice", score: 0 },
-                { id: "player-456", name: "Bob", score: 0 },
-            ];
-            const mockStorage = new Map([["players", existingPlayers]]);
-            const mockCtx = {
-                storage: {
-                    get: (key: string) => mockStorage.get(key),
-                    put: mockResolvedValue(undefined),
-                },
-            } as any;
-
-            const { server } = await import("~/game");
-            const result = await server(mockCtx).removePlayer("player-123");
-
-            expect(result).toHaveLength(1);
-            expect(result[0].id).toBe("player-456");
-        });
-    });
-
-    describe("Host Assignment", () => {
-        it("assigns first player as host", async () => {
-            const mockStorage = new Map();
-            const mockCtx = {
-                storage: {
-                    get: mockResolvedValue(undefined),
-                    put: mockResolvedValue(undefined),
-                },
-            } as any;
-
-            const { server } = await import("~/game");
-            const hostId = await server(mockCtx).getOrSetHost("player-123");
-
-            expect(hostId).toBe("player-123");
-        });
-
-        it("returns existing host on subsequent calls", async () => {
-            const mockStorage = new Map([["hostId", "player-123"]]);
-            const mockCtx = {
-                storage: {
-                    get: (key: string) => mockStorage.get(key),
-                    put: mockResolvedValue(undefined),
-                },
-            } as any;
-
-            const { server } = await import("~/game");
-            const hostId = await server(mockCtx).getOrSetHost("player-456");
-
-            expect(hostId).toBe("player-123");
-        });
-    });
-
-    describe("Message Types", () => {
-        it("contains all expected message types", async () => {
-            const gameModule = await import("~/game");
-            expect(gameModule.messageTypes).toContain("join");
-            expect(gameModule.messageTypes).toContain("leave");
-            expect(gameModule.messageTypes).toContain("start");
-            expect(gameModule.messageTypes).toContain("end");
-            expect(gameModule.messageTypes).toContain("info");
-            expect(gameModule.messageTypes).toContain("answer");
-        });
-    });
-});
-
-describe("Quiz Questions Schema", () => {
-    it("validates correct question structure", async () => {
-        const { z } = await import("zod");
-        const questionSchema = z.object({
-            id: z.number(),
-            text: z.string().min(1),
-            options: z.array(z.string()).length(4),
-            correctIndex: z.number().min(0).max(3),
-            timerSeconds: z.number().min(5).max(60).default(10),
-        });
-
-        const validQuestion = {
-            id: 1,
-            text: "What is 2 + 2?",
-            options: ["3", "4", "5", "6"],
-            correctIndex: 1,
-            timerSeconds: 15,
+describe("Game Engine - Question Validation", () => {
+    it("validates a valid multiple-choice question", async () => {
+        const question = {
+            id: "q1",
+            prompt: "What is 2 + 2?",
+            options: ["1", "2", "3", "4"],
+            correctAnswer: "4",
         };
 
-        const result = questionSchema.parse(validQuestion);
-        expect(result.text).toBe("What is 2 + 2?");
-        expect(result.options).toHaveLength(4);
+        const result = validateQuestion(question);
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.value.id).toBe("q1");
+            expect(result.value.prompt).toBe("What is 2 + 2?");
+            expect(result.value.options.length).toBe(4);
+            expect(result.value.correctAnswer).toBe("4");
+        }
     });
 
-    it("rejects invalid correctIndex", async () => {
-        const { z } = await import("zod");
-        const questionSchema = z.object({
-            id: z.number(),
-            text: z.string(),
-            options: z.array(z.string()).length(4),
-            correctIndex: z.number().min(0).max(3),
-        });
+    it("returns error for missing ID", async () => {
+        const question = {
+            prompt: "What is 2 + 2?",
+            options: ["1", "2", "3", "4"],
+            correctAnswer: "4",
+        };
 
-        expect(() =>
-            questionSchema.parse({
-                id: 1,
-                text: "Test",
-                options: ["a", "b", "c", "d"],
-                correctIndex: 5,
-            }),
-        ).toThrow();
+        const result = validateQuestion(question);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error).toContain("Missing question ID");
+        }
+    });
+
+    it("returns error for not enough options", async () => {
+        const question = {
+            id: "q1",
+            prompt: "What is 2 + 2?",
+            options: ["1"],
+            correctAnswer: "2",
+        };
+
+        const result = validateQuestion(question);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error).toContain("Not enough options");
+        }
     });
 });
 
-function mockResolvedValue(value: unknown) {
-    return () => Promise.resolve(value);
-}
+describe("Game Engine - Answer Validation", () => {
+    it("validates a valid answer", async () => {
+        const answer = {
+            questionId: "q1",
+            answer: "4",
+        };
+
+        const result = validateAnswer(answer);
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.value.questionId).toBe("q1");
+            expect(result.value.answer).toBe("4");
+        }
+    });
+
+    it("returns error for missing questionId", async () => {
+        const answer = {
+            answer: "4",
+        };
+
+        const result = validateAnswer(answer);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error).toContain("Missing question ID");
+        }
+    });
+});
+
+describe("Game Engine - Score Calculation", () => {
+    it("calculates correct score", async () => {
+        const answers = {
+            "q1": "4",
+            "q2": "2",
+            "q3": null,
+        };
+
+        const questions: Record<string, any> = {
+            "q1": { id: "q1", prompt: "What is 2 + 2?", correctAnswer: "4" },
+            "q2": { id: "q2", prompt: "What is 1 + 1?", correctAnswer: "2" },
+            "q3": { id: "q3", prompt: "What is 1 + 1?", correctAnswer: "2" },
+        };
+
+        const score = calculateScore(answers, questions);
+        expect(score).toBe(2);
+    });
+
+    it("handles null answers", async () => {
+        const answers = {
+            "q1": "4",
+            "q2": null,
+        };
+
+        const questions: Record<string, any> = {
+            "q1": { id: "q1", prompt: "What is 2 + 2?", correctAnswer: "4" },
+            "q2": { id: "q2", prompt: "What is 1 + 1?", correctAnswer: "2" },
+        };
+
+        const score = calculateScore(answers, questions);
+        expect(score).toBe(1);
+    });
+});
+
+describe("Game Engine - Results", () => {
+    it("calculates player results", async () => {
+        const players = [
+            { id: "player1", name: "Alice" },
+            { id: "player2", name: "Bob" },
+        ];
+
+        const questions: Record<string, any> = {
+            "q1": { id: "q1", prompt: "What is 2 + 2?", correctAnswer: "4" },
+        };
+
+        const answers = {
+            "q1": {
+                "player1": "4",
+                "player2": "3",
+            },
+        };
+
+        const results = getResults(players, questions, answers);
+        expect(results.length).toBe(2);
+        expect(results[0].playerName).toBe("Alice");
+        expect(results[0].score).toBe(1);
+        expect(results[1].score).toBe(0);
+    });
+});

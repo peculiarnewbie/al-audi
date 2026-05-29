@@ -1,37 +1,44 @@
 import { createFileRoute } from "@tanstack/solid-router";
 import { json } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
-import { z } from "zod";
 import {
     getAdminUser,
     updateAdminStudentTeacher,
     updateAdminUserRole,
 } from "~/server/admin";
 
-const updateUserSchema = z
-    .object({
-        role: z.enum(["none", "student", "teacher", "admin"]).optional(),
-        teacherId: z.string().trim().min(1).nullable().optional(),
-    })
-    .superRefine((data, ctx) => {
-        const hasRole = typeof data.role !== "undefined";
-        const hasTeacher = typeof data.teacherId !== "undefined";
+type UpdateUserPayload = {
+    role?: "none" | "student" | "teacher" | "admin";
+    teacherId?: string | null;
+};
 
-        if (!hasRole && !hasTeacher) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Invalid user payload.",
-            });
-            return;
-        }
+const validRoles = ["none", "student", "teacher", "admin"] as const;
 
-        if (hasRole && hasTeacher) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Invalid user payload.",
-            });
-        }
-    });
+function parseUpdateUserPayload(payload: unknown): UpdateUserPayload | null {
+    if (typeof payload !== "object" || payload === null) return null;
+
+    const obj = payload as Record<string, unknown>;
+    const hasRole = "role" in obj;
+    const hasTeacher = "teacherId" in obj;
+
+    if ((!hasRole && !hasTeacher) || (hasRole && hasTeacher)) return null;
+
+    if (hasRole) {
+        if (!validRoles.includes(obj.role as any)) return null;
+    }
+
+    if (hasTeacher) {
+        if (obj.teacherId !== null && typeof obj.teacherId !== "string") return null;
+        if (typeof obj.teacherId === "string" && !obj.teacherId.trim()) return null;
+    }
+
+    return {
+        ...(hasRole ? { role: obj.role as UpdateUserPayload["role"] } : {}),
+        ...(hasTeacher
+            ? { teacherId: obj.teacherId === null ? null : String(obj.teacherId) }
+            : {}),
+    };
+}
 
 export const Route = createFileRoute("/api/users/$userId")({
     server: {
@@ -74,17 +81,17 @@ export const Route = createFileRoute("/api/users/$userId")({
                     );
                 }
 
-                const parsed = updateUserSchema.safeParse(payload);
+                const parsed = parseUpdateUserPayload(payload);
 
-                if (!parsed.success) {
+                if (!parsed) {
                     return json(
                         { error: "Invalid user payload." },
                         { status: 400 },
                     );
                 }
 
-                const role = parsed.data.role;
-                const teacherId = parsed.data.teacherId;
+                const role = parsed.role;
+                const teacherId = parsed.teacherId;
                 const isTeacherUpdate = typeof teacherId !== "undefined";
                 let result: Awaited<ReturnType<typeof updateAdminUserRole>>;
 

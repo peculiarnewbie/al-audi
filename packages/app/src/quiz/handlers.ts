@@ -1,8 +1,9 @@
 import { Data, Effect } from "effect";
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import {
     quizzes,
+    users,
     quizQuestions,
     quizQuestionOptions,
     quizCategories,
@@ -226,6 +227,7 @@ export function saveQuizEffect(
                 id: quizId,
                 creatorId: userId,
                 createdAt,
+                name: input.name || undefined,
                 questions: input.questions,
                 categories,
             };
@@ -237,7 +239,7 @@ export function saveQuizEffect(
 
             await db
                 .insert(quizzes)
-                .values({ id: quizId, creatorId: userId, createdAt: Date.now(), r2Key })
+                .values({ id: quizId, creatorId: userId, createdAt: Date.now(), r2Key, name: input.name || null })
                 .onConflictDoNothing();
 
             await saveQuizQuestions(db, quizId, input.questions);
@@ -584,6 +586,177 @@ export function submitQuizAttemptEffect(
             }
 
             return { attemptId, score, maxScore };
+        },
+        catch: catchKnown,
+    });
+}
+
+export function getStudentAssignmentsWithDetailsEffect(
+    db: DbClient,
+    userId: string,
+    filters: { status?: string },
+) {
+    return Effect.tryPromise({
+        try: async () => {
+            const classMemberships = await db
+                .select({ classId: classStudents.classId })
+                .from(classStudents)
+                .where(eq(classStudents.studentId, userId));
+            const classIds = classMemberships.map((r) => r.classId);
+
+            const baseCondition = classIds.length
+                ? or(eq(quizAssignments.studentId, userId), inArray(quizAssignments.classId, classIds))
+                : eq(quizAssignments.studentId, userId);
+            const conditions = [baseCondition];
+            if (filters.status) conditions.push(eq(quizAssignments.status, filters.status));
+            const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions);
+
+            const rows = await db
+                .select({
+                    id: quizAssignments.id,
+                    quizId: quizAssignments.quizId,
+                    status: quizAssignments.status,
+                    dueAt: quizAssignments.dueAt,
+                    createdAt: quizAssignments.createdAt,
+                    quizName: quizzes.name,
+                    teacherName: users.name,
+                })
+                .from(quizAssignments)
+                .leftJoin(quizzes, eq(quizAssignments.quizId, quizzes.id))
+                .leftJoin(users, eq(quizAssignments.teacherId, users.id))
+                .where(whereClause)
+                .orderBy(desc(quizAssignments.createdAt));
+
+            const assignmentQuizIds = [...new Set(rows.map((r) => r.quizId))];
+            const attempts = assignmentQuizIds.length
+                ? await db
+                      .select()
+                      .from(quizAttempts)
+                      .where(and(inArray(quizAttempts.quizId, assignmentQuizIds), eq(quizAttempts.studentId, userId), eq(quizAttempts.mode, "homework")))
+                : [];
+
+            const attemptByQuizId = new Map<string, typeof quizAttempts.$inferSelect>();
+            for (const a of attempts) {
+                const existing = attemptByQuizId.get(a.quizId);
+                if (!existing || (a.completedAt ?? 0) > (existing.completedAt ?? 0)) {
+                    attemptByQuizId.set(a.quizId, a);
+                }
+            }
+
+            return rows.map((row) => {
+                const attempt = attemptByQuizId.get(row.quizId) ?? null;
+                return {
+                    id: row.id,
+                    quizId: row.quizId,
+                    quizName: row.quizName ?? "Untitled quiz",
+                    status: row.status,
+                    dueAt: row.dueAt,
+                    createdAt: row.createdAt,
+                    teacherName: row.teacherName ?? "Unknown",
+                    attempt: attempt
+                        ? { id: attempt.id, score: attempt.score, maxScore: attempt.maxScore, completedAt: attempt.completedAt }
+                        : null,
+                };
+            });
+        },
+        catch: catchKnown,
+    });
+}
+
+export function getAssignmentQuizForPlayEffect(
+    db: DbClient,
+    assignmentId: string,
+    userId: string,
+) {
+    return Effect.tryPromise({
+        try: async () => {
+            const [assignment] = await db
+                .select()
+                .from(quizAssignments)
+                .where(eq(quizAssignments.id, assignmentId))
+                .limit(1);
+
+            if (!assignment) throw new AssignmentNotFound({ id: assignmentId });
+
+            const accessResult = await ensureAssignmentAccess(db, assignmentId, assignment.quizId, userId);
+            if (!accessResult.success) throw new AttemptError({ message: accessResult.error });
+
+            const questionRows = await db
+                .select()
+                .from(quizQuestions)
+                .where(eq(quizQuestions.quizId, assignment.quizId));
+
+            if (!questionRows.length) throw new QuizNotFound({ id: assignment.quizId });
+
+            const sortedQuestions = [...questionRows].sort((a, b) => a.position - b.position);
+            const questionIds = sortedQuestions.map((q) => q.id);
+            const optionRows = questionIds.length
+                ? await db
+                      .select()
+                      .from(quizQuestionOptions)
+                      .where(inArray(quizQuestionOptions.questionId, questionIds))
+                : [];
+            const optionsByQuestionId = new Map<string, string[]>();
+
+            for (const opt of [...optionRows].sort((a, b) => a.optionIndex - b.optionIndex)) {
+                const current = optionsByQuestionId.get(opt.questionId) ?? [];
+                current.push(opt.optionText);
+                optionsByQuestionId.set(opt.questionId, current);
+            }
+
+            const questions = sortedQuestions.map((question) => {
+                if (question.questionType === "multiple-choice") {
+                    return {
+                        id: question.id,
+                        type: "multiple-choice" as const,
+                        prompt: question.prompt,
+                        options: optionsByQuestionId.get(question.id) ?? [],
+                        correctOptionIndex: null,
+                    };
+                }
+                return {
+                    id: question.id,
+                    type: "text" as const,
+                    prompt: question.prompt,
+                    answer: "",
+                };
+            });
+
+            const [quiz] = await db
+                .select({ name: quizzes.name })
+                .from(quizzes)
+                .where(eq(quizzes.id, assignment.quizId))
+                .limit(1);
+
+            const [existingAttempt] = await db
+                .select()
+                .from(quizAttempts)
+                .where(and(eq(quizAttempts.quizId, assignment.quizId), eq(quizAttempts.studentId, userId), eq(quizAttempts.mode, "homework")))
+                .orderBy(desc(quizAttempts.completedAt))
+                .limit(1);
+
+            let existingResult = null;
+
+            if (existingAttempt) {
+                const responses = await db
+                    .select()
+                    .from(quizResponses)
+                    .where(eq(quizResponses.attemptId, existingAttempt.id));
+                existingResult = {
+                    attempt: existingAttempt,
+                    responses,
+                };
+            }
+
+            return {
+                assignmentId: assignment.id,
+                quizId: assignment.quizId,
+                quizName: quiz?.name ?? "Untitled quiz",
+                status: assignment.status,
+                dueAt: assignment.dueAt,
+                questions,
+                existingResult,
+            };
         },
         catch: catchKnown,
     });

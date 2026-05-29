@@ -1,18 +1,21 @@
 import { createFileRoute } from "@tanstack/solid-router";
 import { createMemo, createSignal, For, Show, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { z } from "zod";
 import type { MultipleChoiceQuestion } from "~/types/quiz";
 import { getSharedQuiz, submitQuizAttempt } from "~/server/quiz";
 
-const shareSearchSchema = z
-    .object({
-        token: z.string().trim().min(1).optional(),
-    })
-    .default({});
+type ShareSearch = { token?: string };
+
+function parseShareSearch(search: Record<string, unknown>): ShareSearch {
+    const token = search.token;
+    if (typeof token === "string" && token.trim()) {
+        return { token: token.trim() };
+    }
+    return {};
+}
 
 export const Route = createFileRoute("/share/$shareId")({
-    validateSearch: (search) => shareSearchSchema.parse(search),
+    validateSearch: (search) => parseShareSearch(search),
     loaderDeps: ({ search }) => ({
         token: search.token,
     }),

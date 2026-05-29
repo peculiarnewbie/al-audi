@@ -24,17 +24,24 @@ import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users.index'
 import { Route as RoomIndexRouteImport } from './routes/room/index'
+import { Route as QuizzesIndexRouteImport } from './routes/quizzes/index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as AssignmentsIndexRouteImport } from './routes/assignments/index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
 import { Route as ShareShareIdRouteImport } from './routes/share/$shareId'
 import { Route as QuizzesNewRouteImport } from './routes/quizzes/new'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
+import { Route as DashboardDriveRouteImport } from './routes/dashboard/drive'
+import { Route as AssignmentsAssignmentIdRouteImport } from './routes/assignments/$assignmentId'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
+import { Route as ApiAssignmentsRouteImport } from './routes/api/assignments'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
 import { Route as RoomRoomIdIndexRouteImport } from './routes/room/$roomId/index'
 import { Route as DashboardDriveIndexRouteImport } from './routes/dashboard/drive/index'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
+import { Route as DashboardClassroomsNewRouteImport } from './routes/dashboard/classrooms/new'
+import { Route as DashboardClassroomsClassIdRouteImport } from './routes/dashboard/classrooms/$classId'
 import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
 import { Route as ApiRoomRoomIdRouteImport } from './routes/api/room/$roomId'
 import { Route as ApiQuizzesMediaRouteImport } from './routes/api/quizzes/media'
@@ -123,6 +130,11 @@ const RoomIndexRoute = RoomIndexRouteImport.update({
   path: '/room/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizzesIndexRoute = QuizzesIndexRouteImport.update({
+  id: '/quizzes/',
+  path: '/quizzes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostsIndexRoute = PostsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -131,6 +143,11 @@ const PostsIndexRoute = PostsIndexRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssignmentsIndexRoute = AssignmentsIndexRouteImport.update({
+  id: '/assignments/',
+  path: '/assignments/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
@@ -153,9 +170,24 @@ const PostsPostIdRoute = PostsPostIdRouteImport.update({
   path: '/$postId',
   getParentRoute: () => PostsRoute,
 } as any)
+const DashboardDriveRoute = DashboardDriveRouteImport.update({
+  id: '/dashboard/drive',
+  path: '/dashboard/drive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssignmentsAssignmentIdRoute = AssignmentsAssignmentIdRouteImport.update({
+  id: '/assignments/$assignmentId',
+  path: '/assignments/$assignmentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUsersRoute = ApiUsersRouteImport.update({
   id: '/api/users',
   path: '/api/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAssignmentsRoute = ApiAssignmentsRouteImport.update({
+  id: '/api/assignments',
+  path: '/api/assignments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PathlessLayoutNestedLayoutRoute =
@@ -169,15 +201,26 @@ const RoomRoomIdIndexRoute = RoomRoomIdIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardDriveIndexRoute = DashboardDriveIndexRouteImport.update({
-  id: '/dashboard/drive/',
-  path: '/dashboard/drive/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardDriveRoute,
 } as any)
 const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
   id: '/posts_/$postId/deep',
   path: '/posts/$postId/deep',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardClassroomsNewRoute = DashboardClassroomsNewRouteImport.update({
+  id: '/dashboard/classrooms/new',
+  path: '/dashboard/classrooms/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardClassroomsClassIdRoute =
+  DashboardClassroomsClassIdRouteImport.update({
+    id: '/dashboard/classrooms/$classId',
+    path: '/dashboard/classrooms/$classId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiUsersUserIdRoute = ApiUsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -259,13 +302,18 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
+  '/api/assignments': typeof ApiAssignmentsRoute
   '/api/users': typeof ApiUsersRouteWithChildren
+  '/assignments/$assignmentId': typeof AssignmentsAssignmentIdRoute
+  '/dashboard/drive': typeof DashboardDriveRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/assignments': typeof AssignmentsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/posts/': typeof PostsIndexRoute
+  '/quizzes': typeof QuizzesIndexRoute
   '/room': typeof RoomIndexRoute
   '/users/': typeof UsersIndexRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
@@ -278,8 +326,10 @@ export interface FileRoutesByFullPath {
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/dashboard/classrooms/$classId': typeof DashboardClassroomsClassIdRoute
+  '/dashboard/classrooms/new': typeof DashboardClassroomsNewRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
-  '/dashboard/drive': typeof DashboardDriveIndexRoute
+  '/dashboard/drive/': typeof DashboardDriveIndexRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
   '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
   '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
@@ -296,13 +346,17 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
+  '/api/assignments': typeof ApiAssignmentsRoute
   '/api/users': typeof ApiUsersRouteWithChildren
+  '/assignments/$assignmentId': typeof AssignmentsAssignmentIdRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/assignments': typeof AssignmentsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/posts': typeof PostsIndexRoute
+  '/quizzes': typeof QuizzesIndexRoute
   '/room': typeof RoomIndexRoute
   '/users': typeof UsersIndexRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
@@ -315,6 +369,8 @@ export interface FileRoutesByTo {
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/dashboard/classrooms/$classId': typeof DashboardClassroomsClassIdRoute
+  '/dashboard/classrooms/new': typeof DashboardClassroomsNewRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
   '/dashboard/drive': typeof DashboardDriveIndexRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
@@ -338,13 +394,18 @@ export interface FileRoutesById {
   '/user': typeof UserRoute
   '/users': typeof UsersRouteWithChildren
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
+  '/api/assignments': typeof ApiAssignmentsRoute
   '/api/users': typeof ApiUsersRouteWithChildren
+  '/assignments/$assignmentId': typeof AssignmentsAssignmentIdRoute
+  '/dashboard/drive': typeof DashboardDriveRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/assignments/': typeof AssignmentsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/posts/': typeof PostsIndexRoute
+  '/quizzes/': typeof QuizzesIndexRoute
   '/room/': typeof RoomIndexRoute
   '/users/': typeof UsersIndexRoute
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
@@ -357,6 +418,8 @@ export interface FileRoutesById {
   '/api/quizzes/media': typeof ApiQuizzesMediaRoute
   '/api/room/$roomId': typeof ApiRoomRoomIdRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/dashboard/classrooms/$classId': typeof DashboardClassroomsClassIdRoute
+  '/dashboard/classrooms/new': typeof DashboardClassroomsNewRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
   '/dashboard/drive/': typeof DashboardDriveIndexRoute
   '/room/$roomId/': typeof RoomRoomIdIndexRoute
@@ -379,13 +442,18 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/user'
     | '/users'
+    | '/api/assignments'
     | '/api/users'
+    | '/assignments/$assignmentId'
+    | '/dashboard/drive'
     | '/posts/$postId'
     | '/quizzes/new'
     | '/share/$shareId'
     | '/users/$userId'
+    | '/assignments'
     | '/dashboard'
     | '/posts/'
+    | '/quizzes'
     | '/room'
     | '/users/'
     | '/route-a'
@@ -398,8 +466,10 @@ export interface FileRouteTypes {
     | '/api/quizzes/media'
     | '/api/room/$roomId'
     | '/api/users/$userId'
+    | '/dashboard/classrooms/$classId'
+    | '/dashboard/classrooms/new'
     | '/posts/$postId/deep'
-    | '/dashboard/drive'
+    | '/dashboard/drive/'
     | '/room/$roomId'
     | '/api/drive/folders/$id'
     | '/api/drive/media/$id'
@@ -416,13 +486,17 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/user'
+    | '/api/assignments'
     | '/api/users'
+    | '/assignments/$assignmentId'
     | '/posts/$postId'
     | '/quizzes/new'
     | '/share/$shareId'
     | '/users/$userId'
+    | '/assignments'
     | '/dashboard'
     | '/posts'
+    | '/quizzes'
     | '/room'
     | '/users'
     | '/route-a'
@@ -435,6 +509,8 @@ export interface FileRouteTypes {
     | '/api/quizzes/media'
     | '/api/room/$roomId'
     | '/api/users/$userId'
+    | '/dashboard/classrooms/$classId'
+    | '/dashboard/classrooms/new'
     | '/posts/$postId/deep'
     | '/dashboard/drive'
     | '/room/$roomId'
@@ -457,13 +533,18 @@ export interface FileRouteTypes {
     | '/user'
     | '/users'
     | '/_pathlessLayout/_nested-layout'
+    | '/api/assignments'
     | '/api/users'
+    | '/assignments/$assignmentId'
+    | '/dashboard/drive'
     | '/posts/$postId'
     | '/quizzes/new'
     | '/share/$shareId'
     | '/users/$userId'
+    | '/assignments/'
     | '/dashboard/'
     | '/posts/'
+    | '/quizzes/'
     | '/room/'
     | '/users/'
     | '/_pathlessLayout/_nested-layout/route-a'
@@ -476,6 +557,8 @@ export interface FileRouteTypes {
     | '/api/quizzes/media'
     | '/api/room/$roomId'
     | '/api/users/$userId'
+    | '/dashboard/classrooms/$classId'
+    | '/dashboard/classrooms/new'
     | '/posts_/$postId/deep'
     | '/dashboard/drive/'
     | '/room/$roomId/'
@@ -498,10 +581,15 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   UserRoute: typeof UserRoute
   UsersRoute: typeof UsersRouteWithChildren
+  ApiAssignmentsRoute: typeof ApiAssignmentsRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
+  AssignmentsAssignmentIdRoute: typeof AssignmentsAssignmentIdRoute
+  DashboardDriveRoute: typeof DashboardDriveRouteWithChildren
   QuizzesNewRoute: typeof QuizzesNewRoute
   ShareShareIdRoute: typeof ShareShareIdRoute
+  AssignmentsIndexRoute: typeof AssignmentsIndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  QuizzesIndexRoute: typeof QuizzesIndexRoute
   RoomIndexRoute: typeof RoomIndexRoute
   ApiAdminStatsRoute: typeof ApiAdminStatsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -510,8 +598,9 @@ export interface RootRouteChildren {
   ApiDriveMediaRoute: typeof ApiDriveMediaRouteWithChildren
   ApiQuizzesMediaRoute: typeof ApiQuizzesMediaRoute
   ApiRoomRoomIdRoute: typeof ApiRoomRoomIdRoute
+  DashboardClassroomsClassIdRoute: typeof DashboardClassroomsClassIdRoute
+  DashboardClassroomsNewRoute: typeof DashboardClassroomsNewRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
-  DashboardDriveIndexRoute: typeof DashboardDriveIndexRoute
   RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute
   ApiShareShareIdQrRoute: typeof ApiShareShareIdQrRoute
 }
@@ -623,6 +712,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof RoomIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quizzes/': {
+      id: '/quizzes/'
+      path: '/quizzes'
+      fullPath: '/quizzes'
+      preLoaderRoute: typeof QuizzesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/posts/': {
       id: '/posts/'
       path: '/'
@@ -635,6 +731,13 @@ declare module '@tanstack/solid-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assignments/': {
+      id: '/assignments/'
+      path: '/assignments'
+      fullPath: '/assignments'
+      preLoaderRoute: typeof AssignmentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/users/$userId': {
@@ -665,11 +768,32 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof PostsPostIdRouteImport
       parentRoute: typeof PostsRoute
     }
+    '/dashboard/drive': {
+      id: '/dashboard/drive'
+      path: '/dashboard/drive'
+      fullPath: '/dashboard/drive'
+      preLoaderRoute: typeof DashboardDriveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assignments/$assignmentId': {
+      id: '/assignments/$assignmentId'
+      path: '/assignments/$assignmentId'
+      fullPath: '/assignments/$assignmentId'
+      preLoaderRoute: typeof AssignmentsAssignmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/users': {
       id: '/api/users'
       path: '/api/users'
       fullPath: '/api/users'
       preLoaderRoute: typeof ApiUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/assignments': {
+      id: '/api/assignments'
+      path: '/api/assignments'
+      fullPath: '/api/assignments'
+      preLoaderRoute: typeof ApiAssignmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_pathlessLayout/_nested-layout': {
@@ -688,16 +812,30 @@ declare module '@tanstack/solid-router' {
     }
     '/dashboard/drive/': {
       id: '/dashboard/drive/'
-      path: '/dashboard/drive'
-      fullPath: '/dashboard/drive'
+      path: '/'
+      fullPath: '/dashboard/drive/'
       preLoaderRoute: typeof DashboardDriveIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardDriveRoute
     }
     '/posts_/$postId/deep': {
       id: '/posts_/$postId/deep'
       path: '/posts/$postId/deep'
       fullPath: '/posts/$postId/deep'
       preLoaderRoute: typeof PostsPostIdDeepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/classrooms/new': {
+      id: '/dashboard/classrooms/new'
+      path: '/dashboard/classrooms/new'
+      fullPath: '/dashboard/classrooms/new'
+      preLoaderRoute: typeof DashboardClassroomsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/classrooms/$classId': {
+      id: '/dashboard/classrooms/$classId'
+      path: '/dashboard/classrooms/$classId'
+      fullPath: '/dashboard/classrooms/$classId'
+      preLoaderRoute: typeof DashboardClassroomsClassIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/users/$userId': {
@@ -860,6 +998,18 @@ const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
   ApiUsersRouteChildren,
 )
 
+interface DashboardDriveRouteChildren {
+  DashboardDriveIndexRoute: typeof DashboardDriveIndexRoute
+}
+
+const DashboardDriveRouteChildren: DashboardDriveRouteChildren = {
+  DashboardDriveIndexRoute: DashboardDriveIndexRoute,
+}
+
+const DashboardDriveRouteWithChildren = DashboardDriveRoute._addFileChildren(
+  DashboardDriveRouteChildren,
+)
+
 interface ApiDriveFoldersRouteChildren {
   ApiDriveFoldersIdRoute: typeof ApiDriveFoldersIdRoute
 }
@@ -898,10 +1048,15 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   UserRoute: UserRoute,
   UsersRoute: UsersRouteWithChildren,
+  ApiAssignmentsRoute: ApiAssignmentsRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
+  AssignmentsAssignmentIdRoute: AssignmentsAssignmentIdRoute,
+  DashboardDriveRoute: DashboardDriveRouteWithChildren,
   QuizzesNewRoute: QuizzesNewRoute,
   ShareShareIdRoute: ShareShareIdRoute,
+  AssignmentsIndexRoute: AssignmentsIndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  QuizzesIndexRoute: QuizzesIndexRoute,
   RoomIndexRoute: RoomIndexRoute,
   ApiAdminStatsRoute: ApiAdminStatsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
@@ -910,8 +1065,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDriveMediaRoute: ApiDriveMediaRouteWithChildren,
   ApiQuizzesMediaRoute: ApiQuizzesMediaRoute,
   ApiRoomRoomIdRoute: ApiRoomRoomIdRoute,
+  DashboardClassroomsClassIdRoute: DashboardClassroomsClassIdRoute,
+  DashboardClassroomsNewRoute: DashboardClassroomsNewRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
-  DashboardDriveIndexRoute: DashboardDriveIndexRoute,
   RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,
   ApiShareShareIdQrRoute: ApiShareShareIdQrRoute,
 }

@@ -1,5 +1,5 @@
 import { Component, createSignal, onMount, For, Show } from "solid-js";
-import type { Player, PublicQuestion } from "~/game";
+import type { Player, PublicQuestion } from "~/game/schemas";
 
 type PlayerAnswer = {
     player: Player;

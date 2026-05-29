@@ -244,6 +244,18 @@ function DashboardPage() {
                             Resources
                         </a>
                         <Link
+                            to="/assignments"
+                            class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 hover:text-slate-900"
+                        >
+                            Assignments
+                        </Link>
+                        <Link
+                            to="/quizzes"
+                            class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 hover:text-slate-900"
+                        >
+                            My quizzes
+                        </Link>
+                        <Link
                             to="/reports"
                             class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 hover:text-slate-900"
                         >
@@ -406,8 +418,18 @@ function DashboardPage() {
                                     : "See the classrooms connected to you."}
                             </p>
                         </div>
-                        <div class="rounded-full bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                            {classrooms().length} total
+                        <div class="flex flex-wrap items-center gap-3">
+                            <Show when={isTeacher()}>
+                                <Link
+                                    to="/dashboard/classrooms/new"
+                                    class="rounded-full bg-[color:var(--dashboard-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)]"
+                                >
+                                    New classroom
+                                </Link>
+                            </Show>
+                            <div class="rounded-full bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                                {classrooms().length} total
+                            </div>
                         </div>
                     </div>
 
@@ -444,8 +466,17 @@ function DashboardPage() {
                                                 students
                                             </div>
                                         </div>
-                                        <div class="mt-4 text-xs uppercase tracking-[0.2em] text-slate-400">
-                                            ID {classroom.id}
+                                        <div class="mt-4 flex items-center justify-between">
+                                            <div class="text-xs uppercase tracking-[0.2em] text-slate-400">
+                                                ID {classroom.id}
+                                            </div>
+                                            <Link
+                                                to="/dashboard/classrooms/$classId"
+                                                params={{ classId: classroom.id }}
+                                                class="rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm transition hover:bg-white"
+                                            >
+                                                Manage
+                                            </Link>
                                         </div>
                                     </div>
                                 )}

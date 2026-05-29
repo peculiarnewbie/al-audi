@@ -2,32 +2,28 @@ import { createFileRoute } from "@tanstack/solid-router";
 import { json } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { z } from "zod";
+import { Effect, Exit } from "effect";
 import { createDb } from "~/db/client";
-import {
-    classes,
-    driveFolderPermissions,
-    driveFolders,
-    users,
-} from "~/db/schema";
-import {
-    getAuthenticatedUser,
-    getAuthenticatedDbUser,
-} from "~/utils/auth.server";
+import { driveFolders, classes, users, driveFolderPermissions } from "~/db/schema";
+import { getAuthenticatedUser, getAuthenticatedDbUser } from "~/utils/auth.server";
 
-const createFolderSchema = z.object({
-    name: z.string().trim().min(1),
-    parentId: z.string().trim().min(1).optional(),
-    classIds: z.array(z.string().trim().min(1)).optional(),
-    studentIds: z.array(z.string().trim().min(1)).optional(),
-});
-
-const normalizeIds = (values?: string[]) =>
-    Array.from(
-        new Set((values ?? []).map((value) => value.trim()).filter(Boolean)),
-    );
+function parseFolderPayload(payload: unknown): {
+    name?: string;
+    parentId?: string | null;
+    classIds?: string[];
+    studentIds?: string[];
+} | null {
+    if (typeof payload !== "object" || payload === null) return null;
+    const obj = payload as Record<string, unknown>;
+    if (typeof obj.name !== "string" || !obj.name.trim()) return null;
+    const result: any = { name: obj.name.trim() };
+    if (typeof obj.parentId === "string" && obj.parentId.trim()) result.parentId = obj.parentId.trim();
+    if (Array.isArray(obj.classIds)) result.classIds = obj.classIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim());
+    if (Array.isArray(obj.studentIds)) result.studentIds = obj.studentIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim());
+    return result;
+}
 
 export const Route = createFileRoute("/api/drive/folders")({
     server: {
@@ -44,84 +40,26 @@ export const Route = createFileRoute("/api/drive/folders")({
 
                 const url = new URL(request.url);
                 const parentIdParam = url.searchParams.get("parentId");
+
                 const db = createDb(env.DB);
-                const conditions = [eq(driveFolders.teacherId, user.id)];
-
-                if (parentIdParam !== null) {
-                    const trimmedParentId = parentIdParam.trim();
-
-                    if (trimmedParentId) {
-                        conditions.push(
-                            eq(driveFolders.parentId, trimmedParentId),
-                        );
-                    } else {
-                        conditions.push(isNull(driveFolders.parentId));
-                    }
-                }
-
-                const folderRows = await db
+                const rows = await db
                     .select()
                     .from(driveFolders)
-                    .where(and(...conditions));
-                const folderIds = folderRows.map((folder) => folder.id);
-                const permissionRows = folderIds.length
-                    ? await db
-                          .select({
-                              folderId: driveFolderPermissions.folderId,
-                              classId: driveFolderPermissions.classId,
-                              studentId: driveFolderPermissions.studentId,
-                          })
-                          .from(driveFolderPermissions)
-                          .where(
-                              inArray(
-                                  driveFolderPermissions.folderId,
-                                  folderIds,
-                              ),
-                          )
-                    : [];
-                const permissionsByFolderId = new Map<
-                    string,
-                    { classIds: string[]; studentIds: string[] }
-                >();
-
-                for (const permission of permissionRows) {
-                    const entry = permissionsByFolderId.get(
-                        permission.folderId,
-                    ) ?? {
-                        classIds: [],
-                        studentIds: [],
-                    };
-
-                    if (permission.classId) {
-                        entry.classIds.push(permission.classId);
-                    }
-
-                    if (permission.studentId) {
-                        entry.studentIds.push(permission.studentId);
-                    }
-
-                    permissionsByFolderId.set(permission.folderId, entry);
-                }
-
-                const folders = folderRows
-                    .map((folder) => ({
-                        id: folder.id,
-                        name: folder.name,
-                        parentId: folder.parentId,
-                        createdAt: folder.createdAt,
-                        permissions: permissionsByFolderId.get(folder.id) ?? {
-                            classIds: [],
-                            studentIds: [],
-                        },
-                    }))
-                    .sort((left, right) => left.name.localeCompare(right.name));
-
-                return json({ folders });
+                    .where(eq(driveFolders.teacherId, user.id))
+                    .orderBy(driveFolders.name);
+                return json({
+                    folders: rows.map((r) => ({
+                        id: r.id,
+                        name: r.name,
+                        parentId: r.parentId,
+                        createdAt: r.createdAt,
+                        permissions: { classIds: [], studentIds: [] },
+                    })),
+                });
             },
             POST: async ({ request }) => {
                 const user = await getAuthenticatedUser(getRequestHeaders());
-                const dbUser =
-                    await getAuthenticatedDbUser(getRequestHeaders());
+                const dbUser = await getAuthenticatedDbUser(getRequestHeaders());
 
                 if (!user || !dbUser) {
                     return json(
@@ -148,19 +86,19 @@ export const Route = createFileRoute("/api/drive/folders")({
                     );
                 }
 
-                const parsed = createFolderSchema.safeParse(payload);
+                const parsed = parseFolderPayload(payload);
 
-                if (!parsed.success) {
+                if (!parsed || !parsed.name) {
                     return json(
                         { error: "Invalid folder payload." },
                         { status: 400 },
                     );
                 }
 
-                const name = parsed.data.name.trim();
-                const parentId = parsed.data.parentId?.trim() || null;
-                const classIds = normalizeIds(parsed.data.classIds);
-                const studentIds = normalizeIds(parsed.data.studentIds);
+                const name = parsed.name;
+                const parentId = parsed.parentId ?? null;
+                const classIds = parsed.classIds ?? [];
+                const studentIds = parsed.studentIds ?? [];
                 const db = createDb(env.DB);
 
                 if (parentId) {

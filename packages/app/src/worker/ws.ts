@@ -1,76 +1,101 @@
 import { DurableObject } from "cloudflare:workers";
+import { sql, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { createDoDb, gameKv } from "./db";
 import { createDb } from "~/db/client";
 import { liveQuizResults } from "~/db/schema";
-import { server } from "~/game";
-import type { LiveSessionSummary } from "~/game";
+import { createQuizGameAdapter } from "~/game/adapter";
+import { createServer } from "~/game/server";
+import type { GameAdapter } from "~/game/adapter";
+import type { LiveSessionSummary } from "~/game/schemas";
+
+const ROOM_STATE_KEY = "room_state";
 
 export class GameRoom extends DurableObject {
     env: Env;
-    roomId?: string;
-    sessions: Map<WebSocket, { [key: string]: string }>;
+    db: ReturnType<typeof createDoDb>;
+    roomId: string;
+    sessions: Map<WebSocket, { id: string }>;
+    gameAdapter: GameAdapter;
+    private stateRef: { current: unknown };
 
     constructor(ctx: DurableObjectState, env: Env) {
         super(ctx, env);
         this.env = env;
+        this.roomId = ctx.id.name ?? "";
         this.sessions = new Map();
-
-        this.ctx.getWebSockets().forEach((ws) => {
-            let attachment = ws.deserializeAttachment();
-            if (attachment) {
-                this.sessions.set(ws, { ...attachment });
-            }
-        });
+        this.stateRef = { current: null };
+        this.db = createDoDb(ctx.storage);
+        this.gameAdapter = createQuizGameAdapter(this.stateRef);
 
         this.ctx.setWebSocketAutoResponse(
             new WebSocketRequestResponsePair("ping", "pong"),
         );
+
+        ctx.blockConcurrencyWhile(async () => {
+            this.ensureSchema();
+            this.loadPersistedState();
+            this.rehydrateSessions();
+        });
+    }
+
+    private ensureSchema() {
+        this.db.run(sql`CREATE TABLE IF NOT EXISTS game_kv (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )`);
+    }
+
+    private loadPersistedState() {
+        try {
+            const row = this.db
+                .select({ value: gameKv.value })
+                .from(gameKv)
+                .where(eq(gameKv.key, ROOM_STATE_KEY))
+                .get();
+            if (row) {
+                const parsed = JSON.parse(row.value);
+                this.stateRef.current = createServer(parsed);
+            }
+        } catch {
+            this.stateRef.current = null;
+        }
+    }
+
+    private persistState() {
+        const server = this.stateRef.current as ReturnType<typeof createServer> | null;
+        if (!server) return;
+        const state = server.getState();
+        this.db
+            .insert(gameKv)
+            .values({ key: ROOM_STATE_KEY, value: JSON.stringify(state) })
+            .onConflictDoUpdate({
+                target: gameKv.key,
+                set: { value: JSON.stringify(state) },
+            })
+            .run();
+    }
+
+    private rehydrateSessions() {
+        this.ctx.getWebSockets().forEach((ws) => {
+            const attachment = ws.deserializeAttachment();
+            if (attachment?.id) {
+                this.sessions.set(ws, { id: attachment.id as string });
+            }
+        });
     }
 
     async fetch(request: Request): Promise<Response> {
-        if (!this.roomId) {
-            const { pathname } = new URL(request.url);
-            const segments = pathname.split("/").filter(Boolean);
-            this.roomId = segments[segments.length - 1];
-        }
-
         const webSocketPair = new WebSocketPair();
         const [client, serverWs] = Object.values(webSocketPair);
 
-        this.ctx.acceptWebSocket(serverWs);
-
-        const id = crypto.randomUUID();
-        serverWs.serializeAttachment({ id });
-        this.sessions.set(serverWs, { id });
+        const playerId = crypto.randomUUID();
+        serverWs.serializeAttachment({ id: playerId });
+        this.ctx.acceptWebSocket(serverWs, [playerId]);
+        this.sessions.set(serverWs, { id: playerId });
 
         const send = (msg: string) => serverWs.send(msg);
-
-        const serverInstance = server(this.ctx);
-
-        const players = await serverInstance.getPlayers();
-        const hostId = await serverInstance.getHostId();
-
-        send(
-            JSON.stringify({
-                type: "room_state",
-                data: {
-                    players: players || [],
-                    hostId: hostId || null,
-                },
-            }),
-        );
-
-        const currentQuestion = await serverInstance.getCurrentQuestion();
-
-        if (currentQuestion) {
-            const { correctAnswer, ...publicQuestion } = currentQuestion;
-            send(
-                JSON.stringify({
-                    type: "question",
-                    data: { question: publicQuestion },
-                }),
-            );
-        }
+        this.gameAdapter.sendStateToPlayer(playerId, send);
 
         return new Response(null, {
             status: 101,
@@ -81,18 +106,58 @@ export class GameRoom extends DurableObject {
     async webSocketMessage(ws: WebSocket, message: string) {
         const broadcast = (msg: string) => {
             this.sessions.forEach((_, connectedWs) => {
-                connectedWs.send(msg);
+                try {
+                    connectedWs.send(msg);
+                } catch {
+                    // Ignore send errors
+                }
             });
         };
 
-        const result = await server(this.ctx).processMessage(
-            message,
-            broadcast,
-        );
+        const sendTo = (playerId: string, msg: string) => {
+            this.sessions.forEach((attachment, connectedWs) => {
+                if (attachment.id === playerId) {
+                    try {
+                        connectedWs.send(msg);
+                    } catch {
+                        // Ignore send errors
+                    }
+                }
+            });
+        };
 
-        if (result && "type" in result && result.type === "persist") {
-            await this.persistSessionResults(result.summary);
+        try {
+            const json = JSON.parse(message);
+            const result = this.gameAdapter.processMessage(json, broadcast, sendTo);
+            this.persistState();
+            if (result) {
+                await this.persistSessionResults(result);
+            }
+        } catch {
+            // Ignore malformed messages
         }
+    }
+
+    async webSocketClose(
+        ws: WebSocket,
+        _code: number,
+        _reason: string,
+        _wasClean: boolean,
+    ) {
+        const attachment = this.sessions.get(ws);
+        this.sessions.delete(ws);
+        if (attachment) {
+            this.gameAdapter.removePlayer(
+                attachment.id,
+                () => {},
+                () => {},
+            );
+            this.persistState();
+        }
+    }
+
+    async webSocketError(ws: WebSocket, _error: unknown) {
+        this.sessions.delete(ws);
     }
 
     async persistSessionResults(summary: LiveSessionSummary) {
@@ -100,13 +165,12 @@ export class GameRoom extends DurableObject {
             return;
         }
 
-        const roomId = this.roomId;
         const db = createDb(this.env.DB);
         const createdAt = Date.now();
         const rows = summary.results.map((result) => ({
             id: nanoid(10),
             sessionId: summary.sessionId,
-            roomId,
+            roomId: this.roomId,
             playerId: result.playerId,
             playerName: result.playerName,
             score: result.score,
@@ -118,15 +182,5 @@ export class GameRoom extends DurableObject {
         }));
 
         await db.insert(liveQuizResults).values(rows);
-    }
-
-    async webSocketClose(
-        ws: WebSocket,
-        code: number,
-        reason: string,
-        wasClean: boolean,
-    ) {
-        this.sessions.delete(ws);
-        ws.close(code, "Durable Object is closing WebSocket");
     }
 }

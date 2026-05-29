@@ -3,14 +3,8 @@ import { json } from "@tanstack/solid-start";
 import { env } from "cloudflare:workers";
 import { eq } from "drizzle-orm";
 import QRCode from "qrcode";
-import { z } from "zod";
 import { createDb } from "~/db/client";
 import { quizShareLinks } from "~/db/schema";
-
-const shareQrSchema = z.object({
-    shareId: z.string().trim().min(1),
-    token: z.string().trim().min(1).optional(),
-});
 
 const buildShareUrl = (requestUrl: URL, shareId: string, token?: string) => {
     const shareUrl = new URL(requestUrl);
@@ -39,20 +33,15 @@ export const Route = createFileRoute("/api/share/$shareId/qr")({
         handlers: {
             GET: async ({ request, params }) => {
                 const url = new URL(request.url);
-                const tokenValue = url.searchParams.get("token")?.trim();
-                const parsed = shareQrSchema.safeParse({
-                    shareId: params.shareId,
-                    token: tokenValue || undefined,
-                });
+                const shareId = params.shareId?.trim();
+                const token = url.searchParams.get("token")?.trim() || undefined;
 
-                if (!parsed.success) {
+                if (!shareId) {
                     return json(
                         { error: "Invalid share link request." },
                         { status: 400 },
                     );
                 }
-
-                const { shareId, token } = parsed.data;
                 const db = createDb(env.DB);
                 const [shareLink] = await db
                     .select({ accessToken: quizShareLinks.accessToken })

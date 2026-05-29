@@ -30,12 +30,14 @@ export const QuizPayloadSchema = Schema.Struct({
     id: Schema.String,
     creatorId: Schema.String,
     createdAt: Schema.String,
+    name: Schema.optional(Schema.String),
     questions: Schema.Array(QuizQuestionSchema),
     categories: Schema.optional(QuizCategoriesSchema),
 });
 
 export const SaveQuizInputSchema = Schema.Struct({
     quizId: Schema.optional(Schema.String),
+    name: Schema.optional(Schema.String),
     questions: Schema.Array(QuizQuestionSchema),
     categories: Schema.optional(QuizCategoriesSchema),
 });
@@ -119,12 +121,14 @@ export type QuizPayload = {
     id: string;
     creatorId: string;
     createdAt: string;
+    name?: string;
     questions: QuizQuestion[];
     categories?: QuizCategories;
 };
 
 export type SaveQuizInput = {
     quizId?: string;
+    name?: string;
     questions: QuizQuestion[];
     categories?: QuizCategories;
 };

@@ -6,6 +6,7 @@ export const quizzes = sqliteTable("quizzes", {
     creatorId: text("creator_id").notNull(),
     createdAt: integer("created_at").notNull(),
     r2Key: text("r2_key").notNull(),
+    name: text("name"),
 });
 
 export const users = sqliteTable("users", {

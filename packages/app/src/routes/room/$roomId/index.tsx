@@ -3,14 +3,13 @@ import { createSignal, onMount, Switch, Match, For, Show } from "solid-js";
 import { nanoid } from "nanoid";
 import { RoomLobby } from "~/components/room-lobby";
 import { SampleQuizRoom } from "~/components/sample-quiz-room";
-import { serverMessageSchema } from "~/game";
 import type {
     LivePlayerResult,
     LiveQuestion,
     MessageType,
     Player,
-} from "~/game";
-import z from "zod";
+    ServerMessage,
+} from "~/game/schemas";
 
 const sampleQuestion: LiveQuestion = {
     id: "sample-question",
@@ -80,24 +79,12 @@ function RouteComponent() {
         ws = new WebSocket(wsUrl);
         ws.onmessage = (e) => {
             const json = JSON.parse(e.data);
-            const parseRes = z.safeParse(serverMessageSchema, json);
-            console.log(parseRes);
+            const msg = json as ServerMessage;
 
-            if (!parseRes.success) {
-                console.log({
-                    message: "failed parsing server message",
-                    parseRes,
-                });
-                return;
-            }
-
-            const parsed = parseRes.data;
-            console.log(parsed);
-
-            if (parsed.type === "room_state") {
-                const players = parsed.data.players as Player[];
+            if (msg.type === "room_state") {
+                const players = msg.data.players as Player[];
                 setPlayers(players);
-                setIsHost(parsed.data.hostId === playerId());
+                setIsHost(msg.data.hostId === playerId());
                 const currentPlayer = players.find(
                     (p: Player) => p.id === playerId(),
                 );
@@ -105,20 +92,19 @@ function RouteComponent() {
                     setName(currentPlayer.name);
                 }
             }
-            if (parsed.type === "player_list") {
-                const players = parsed.data.players as Player[];
+            if (msg.type === "player_list") {
+                const players = msg.data.players as Player[];
                 setPlayers(players);
             }
-            if (parsed.type === "host_assigned") {
-                setIsHost(parsed.data.hostId === playerId());
+            if (msg.type === "host_assigned") {
+                setIsHost(msg.data.hostId === playerId());
             }
-            if (parsed.type === "game_started") {
-                console.log("play");
+            if (msg.type === "game_started") {
                 setFinalResults(null);
                 setGameState("playing");
             }
-            if (parsed.type === "game_ended") {
-                setFinalResults(parsed.data.results as LivePlayerResult[]);
+            if (msg.type === "game_ended") {
+                setFinalResults(msg.data.results as LivePlayerResult[]);
                 setGameState("ended");
             }
         };

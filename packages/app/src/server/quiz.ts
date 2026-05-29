@@ -13,6 +13,8 @@ import {
     getStudentAssignmentsEffect,
     updateQuizAssignmentStatusEffect,
     submitQuizAttemptEffect,
+    getStudentAssignmentsWithDetailsEffect,
+    getAssignmentQuizForPlayEffect,
 } from "~/quiz/handlers";
 import type {
     SaveQuizInput,
@@ -153,5 +155,35 @@ export const submitQuizAttempt = createServerFn({ method: "POST" })
             onSuccess: ({ attemptId, score, maxScore }) =>
                 ({ success: true as const, attemptId, score, maxScore }),
             onFailure: () => ({ success: false as const, error: "Failed to submit quiz attempt." }),
+        });
+    });
+
+export const getStudentAssignmentsWithDetails = createServerFn({ method: "GET" })
+    .inputValidator((data: unknown) => data as { status?: string })
+    .handler(async ({ data }) => {
+        const user = await getAuthenticatedUser(getRequestHeaders());
+        if (!user) return { success: false as const, error: "You must be signed in.", assignments: [] };
+
+        const exit = await Effect.runPromiseExit(
+            getStudentAssignmentsWithDetailsEffect(createDb(env.DB), user.id, data),
+        );
+        return Exit.match(exit, {
+            onSuccess: (assignments) => ({ success: true as const, assignments }),
+            onFailure: () => ({ success: false as const, error: "Failed to load assignments.", assignments: [] }),
+        });
+    });
+
+export const getAssignmentQuizForPlay = createServerFn({ method: "GET" })
+    .inputValidator((data: unknown) => data as { assignmentId: string })
+    .handler(async ({ data }) => {
+        const user = await getAuthenticatedUser(getRequestHeaders());
+        if (!user) return { success: false as const, error: "You must be signed in." };
+
+        const exit = await Effect.runPromiseExit(
+            getAssignmentQuizForPlayEffect(createDb(env.DB), data.assignmentId, user.id),
+        );
+        return Exit.match(exit, {
+            onSuccess: (quiz) => ({ success: true as const, quiz }),
+            onFailure: () => ({ success: false as const, error: "Failed to load quiz." }),
         });
     });

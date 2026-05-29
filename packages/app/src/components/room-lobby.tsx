@@ -6,7 +6,7 @@ import {
     createEffect,
     onMount,
 } from "solid-js";
-import { Player } from "~/game";
+import type { Player } from "~/game/schemas";
 
 export const RoomLobby: Component<{
     roomId: string;

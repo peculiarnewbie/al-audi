@@ -2,19 +2,11 @@ import { createFileRoute } from "@tanstack/solid-router";
 import { json } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
 import { env } from "cloudflare:workers";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { z } from "zod";
 import { createDb } from "~/db/client";
 import { driveAssets, driveFolders } from "~/db/schema";
-import {
-    getAuthenticatedUser,
-    getAuthenticatedDbUser,
-} from "~/utils/auth.server";
-
-const uploadSchema = z.object({
-    folderId: z.string().min(1).optional(),
-});
+import { getAuthenticatedUser, getAuthenticatedDbUser } from "~/utils/auth.server";
 
 const getFileExtension = (fileName: string) => {
     const trimmed = fileName.trim();
@@ -52,43 +44,31 @@ export const Route = createFileRoute("/api/drive/media")({
 
                 const url = new URL(request.url);
                 const folderIdParam = url.searchParams.get("folderId");
+
                 const db = createDb(env.DB);
-
                 const conditions = [eq(driveAssets.teacherId, user.id)];
-
-                if (folderIdParam !== null) {
-                    const trimmedFolderId = folderIdParam.trim();
-
-                    if (trimmedFolderId) {
-                        conditions.push(
-                            eq(driveAssets.folderId, trimmedFolderId),
-                        );
-                    } else {
-                        conditions.push(isNull(driveAssets.folderId));
-                    }
+                if (folderIdParam) {
+                    conditions.push(eq(driveAssets.folderId, folderIdParam));
                 }
-
-                const assets = await db
+                const rows = await db
                     .select()
                     .from(driveAssets)
                     .where(and(...conditions))
                     .orderBy(driveAssets.createdAt);
-
                 return json({
-                    assets: assets.map((asset) => ({
-                        id: asset.id,
-                        folderId: asset.folderId,
-                        fileName: asset.fileName,
-                        contentType: asset.contentType,
-                        fileSize: asset.fileSize,
-                        createdAt: asset.createdAt,
+                    assets: rows.map((a) => ({
+                        id: a.id,
+                        folderId: a.folderId,
+                        fileName: a.fileName,
+                        contentType: a.contentType,
+                        fileSize: a.fileSize,
+                        createdAt: a.createdAt,
                     })),
                 });
             },
             POST: async ({ request }) => {
                 const user = await getAuthenticatedUser(getRequestHeaders());
-                const dbUser =
-                    await getAuthenticatedDbUser(getRequestHeaders());
+                const dbUser = await getAuthenticatedDbUser(getRequestHeaders());
 
                 if (!user || !dbUser) {
                     return json(
@@ -123,9 +103,7 @@ export const Route = createFileRoute("/api/drive/media")({
                     typeof folderIdValue === "string"
                         ? folderIdValue.trim() || undefined
                         : undefined;
-                const parsed = uploadSchema.safeParse({ folderId });
-
-                if (!parsed.success) {
+                if (folderId && !folderId.trim()) {
                     return json(
                         { error: "Invalid upload payload." },
                         { status: 400 },

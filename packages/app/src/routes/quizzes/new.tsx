@@ -78,6 +78,7 @@ function QuizCreatePage() {
         accessToken: string | null;
     } | null>(null);
     const [shareRequiresToken, setShareRequiresToken] = createSignal(false);
+    const [quizTitle, setQuizTitle] = createSignal("");
     const [categoryInputs, setCategoryInputs] = createStore({
         level: "",
         topic: "",
@@ -410,6 +411,7 @@ function QuizCreatePage() {
         const result = await saveQuiz({
             data: {
                 quizId: getQuizId(),
+                name: quizTitle().trim() || undefined,
                 questions: unwrap(questions),
                 categories: buildCategoryPayload(),
             },
@@ -474,6 +476,20 @@ function QuizCreatePage() {
             </header>
 
             <form class="space-y-6" onSubmit={handleSubmit}>
+                <div class="glass-panel p-4 space-y-2">
+                    <label class="text-xs uppercase tracking-[0.2em] text-slate-500" for="quiz-title">
+                        Title
+                    </label>
+                    <input
+                        id="quiz-title"
+                        type="text"
+                        value={quizTitle()}
+                        onInput={(e) => setQuizTitle(e.currentTarget.value)}
+                        placeholder="e.g. Unit 3 Vocabulary Quiz"
+                        class="w-full rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-lg font-semibold text-slate-700"
+                    />
+                </div>
+
                 <Show
                     when={!previewMode()}
                     fallback={
