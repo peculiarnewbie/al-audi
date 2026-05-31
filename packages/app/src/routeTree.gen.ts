@@ -30,6 +30,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AssignmentsIndexRouteImport } from './routes/assignments/index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
 import { Route as ShareShareIdRouteImport } from './routes/share/$shareId'
+import { Route as ReportsLiveRouteImport } from './routes/reports/live'
 import { Route as QuizzesNewRouteImport } from './routes/quizzes/new'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as DashboardDriveRouteImport } from './routes/dashboard/drive'
@@ -39,6 +40,8 @@ import { Route as ApiAssignmentsRouteImport } from './routes/api/assignments'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
 import { Route as RoomRoomIdIndexRouteImport } from './routes/room/$roomId/index'
 import { Route as DashboardDriveIndexRouteImport } from './routes/dashboard/drive/index'
+import { Route as ReportsStudentsStudentIdRouteImport } from './routes/reports/students/$studentId'
+import { Route as ReportsAttemptsAttemptIdRouteImport } from './routes/reports/attempts/$attemptId'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
 import { Route as DashboardClassroomsNewRouteImport } from './routes/dashboard/classrooms/new'
 import { Route as DashboardClassroomsClassIdRouteImport } from './routes/dashboard/classrooms/$classId'
@@ -55,6 +58,7 @@ import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_
 import { Route as ApiShareShareIdQrRouteImport } from './routes/api/share/$shareId/qr'
 import { Route as ApiDriveMediaIdRouteImport } from './routes/api/drive/media/$id'
 import { Route as ApiDriveFoldersIdRouteImport } from './routes/api/drive/folders/$id'
+import { Route as ApiDriveDownloadAssetIdRouteImport } from './routes/api/drive/download/$assetId'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
@@ -160,6 +164,11 @@ const ShareShareIdRoute = ShareShareIdRouteImport.update({
   path: '/share/$shareId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsLiveRoute = ReportsLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => ReportsRoute,
+} as any)
 const QuizzesNewRoute = QuizzesNewRouteImport.update({
   id: '/quizzes/new',
   path: '/quizzes/new',
@@ -205,6 +214,18 @@ const DashboardDriveIndexRoute = DashboardDriveIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardDriveRoute,
 } as any)
+const ReportsStudentsStudentIdRoute =
+  ReportsStudentsStudentIdRouteImport.update({
+    id: '/students/$studentId',
+    path: '/students/$studentId',
+    getParentRoute: () => ReportsRoute,
+  } as any)
+const ReportsAttemptsAttemptIdRoute =
+  ReportsAttemptsAttemptIdRouteImport.update({
+    id: '/attempts/$attemptId',
+    path: '/attempts/$attemptId',
+    getParentRoute: () => ReportsRoute,
+  } as any)
 const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
   id: '/posts_/$postId/deep',
   path: '/posts/$postId/deep',
@@ -288,6 +309,11 @@ const ApiDriveFoldersIdRoute = ApiDriveFoldersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiDriveFoldersRoute,
 } as any)
+const ApiDriveDownloadAssetIdRoute = ApiDriveDownloadAssetIdRouteImport.update({
+  id: '/api/drive/download/$assetId',
+  path: '/api/drive/download/$assetId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -297,7 +323,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
-  '/reports': typeof ReportsRoute
+  '/reports': typeof ReportsRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
@@ -308,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/drive': typeof DashboardDriveRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
+  '/reports/live': typeof ReportsLiveRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/assignments': typeof AssignmentsIndexRoute
@@ -329,8 +356,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/classrooms/$classId': typeof DashboardClassroomsClassIdRoute
   '/dashboard/classrooms/new': typeof DashboardClassroomsNewRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
+  '/reports/attempts/$attemptId': typeof ReportsAttemptsAttemptIdRoute
+  '/reports/students/$studentId': typeof ReportsStudentsStudentIdRoute
   '/dashboard/drive/': typeof DashboardDriveIndexRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/api/drive/download/$assetId': typeof ApiDriveDownloadAssetIdRoute
   '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
   '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
   '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
@@ -342,7 +372,7 @@ export interface FileRoutesByTo {
   '/deferred': typeof DeferredRoute
   '/home': typeof HomeRoute
   '/redirect': typeof RedirectRoute
-  '/reports': typeof ReportsRoute
+  '/reports': typeof ReportsRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
@@ -351,6 +381,7 @@ export interface FileRoutesByTo {
   '/assignments/$assignmentId': typeof AssignmentsAssignmentIdRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
+  '/reports/live': typeof ReportsLiveRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/assignments': typeof AssignmentsIndexRoute
@@ -372,8 +403,11 @@ export interface FileRoutesByTo {
   '/dashboard/classrooms/$classId': typeof DashboardClassroomsClassIdRoute
   '/dashboard/classrooms/new': typeof DashboardClassroomsNewRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
+  '/reports/attempts/$attemptId': typeof ReportsAttemptsAttemptIdRoute
+  '/reports/students/$studentId': typeof ReportsStudentsStudentIdRoute
   '/dashboard/drive': typeof DashboardDriveIndexRoute
   '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/api/drive/download/$assetId': typeof ApiDriveDownloadAssetIdRoute
   '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
   '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
   '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
@@ -388,7 +422,7 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/posts': typeof PostsRouteWithChildren
   '/redirect': typeof RedirectRoute
-  '/reports': typeof ReportsRoute
+  '/reports': typeof ReportsRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/user': typeof UserRoute
@@ -400,6 +434,7 @@ export interface FileRoutesById {
   '/dashboard/drive': typeof DashboardDriveRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/quizzes/new': typeof QuizzesNewRoute
+  '/reports/live': typeof ReportsLiveRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/assignments/': typeof AssignmentsIndexRoute
@@ -421,8 +456,11 @@ export interface FileRoutesById {
   '/dashboard/classrooms/$classId': typeof DashboardClassroomsClassIdRoute
   '/dashboard/classrooms/new': typeof DashboardClassroomsNewRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
+  '/reports/attempts/$attemptId': typeof ReportsAttemptsAttemptIdRoute
+  '/reports/students/$studentId': typeof ReportsStudentsStudentIdRoute
   '/dashboard/drive/': typeof DashboardDriveIndexRoute
   '/room/$roomId/': typeof RoomRoomIdIndexRoute
+  '/api/drive/download/$assetId': typeof ApiDriveDownloadAssetIdRoute
   '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
   '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
   '/api/share/$shareId/qr': typeof ApiShareShareIdQrRoute
@@ -448,6 +486,7 @@ export interface FileRouteTypes {
     | '/dashboard/drive'
     | '/posts/$postId'
     | '/quizzes/new'
+    | '/reports/live'
     | '/share/$shareId'
     | '/users/$userId'
     | '/assignments'
@@ -469,8 +508,11 @@ export interface FileRouteTypes {
     | '/dashboard/classrooms/$classId'
     | '/dashboard/classrooms/new'
     | '/posts/$postId/deep'
+    | '/reports/attempts/$attemptId'
+    | '/reports/students/$studentId'
     | '/dashboard/drive/'
     | '/room/$roomId'
+    | '/api/drive/download/$assetId'
     | '/api/drive/folders/$id'
     | '/api/drive/media/$id'
     | '/api/share/$shareId/qr'
@@ -491,6 +533,7 @@ export interface FileRouteTypes {
     | '/assignments/$assignmentId'
     | '/posts/$postId'
     | '/quizzes/new'
+    | '/reports/live'
     | '/share/$shareId'
     | '/users/$userId'
     | '/assignments'
@@ -512,8 +555,11 @@ export interface FileRouteTypes {
     | '/dashboard/classrooms/$classId'
     | '/dashboard/classrooms/new'
     | '/posts/$postId/deep'
+    | '/reports/attempts/$attemptId'
+    | '/reports/students/$studentId'
     | '/dashboard/drive'
     | '/room/$roomId'
+    | '/api/drive/download/$assetId'
     | '/api/drive/folders/$id'
     | '/api/drive/media/$id'
     | '/api/share/$shareId/qr'
@@ -539,6 +585,7 @@ export interface FileRouteTypes {
     | '/dashboard/drive'
     | '/posts/$postId'
     | '/quizzes/new'
+    | '/reports/live'
     | '/share/$shareId'
     | '/users/$userId'
     | '/assignments/'
@@ -560,8 +607,11 @@ export interface FileRouteTypes {
     | '/dashboard/classrooms/$classId'
     | '/dashboard/classrooms/new'
     | '/posts_/$postId/deep'
+    | '/reports/attempts/$attemptId'
+    | '/reports/students/$studentId'
     | '/dashboard/drive/'
     | '/room/$roomId/'
+    | '/api/drive/download/$assetId'
     | '/api/drive/folders/$id'
     | '/api/drive/media/$id'
     | '/api/share/$shareId/qr'
@@ -576,7 +626,7 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   PostsRoute: typeof PostsRouteWithChildren
   RedirectRoute: typeof RedirectRoute
-  ReportsRoute: typeof ReportsRoute
+  ReportsRoute: typeof ReportsRouteWithChildren
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   UserRoute: typeof UserRoute
@@ -602,6 +652,7 @@ export interface RootRouteChildren {
   DashboardClassroomsNewRoute: typeof DashboardClassroomsNewRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
   RoomRoomIdIndexRoute: typeof RoomRoomIdIndexRoute
+  ApiDriveDownloadAssetIdRoute: typeof ApiDriveDownloadAssetIdRoute
   ApiShareShareIdQrRoute: typeof ApiShareShareIdQrRoute
 }
 
@@ -754,6 +805,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ShareShareIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reports/live': {
+      id: '/reports/live'
+      path: '/live'
+      fullPath: '/reports/live'
+      preLoaderRoute: typeof ReportsLiveRouteImport
+      parentRoute: typeof ReportsRoute
+    }
     '/quizzes/new': {
       id: '/quizzes/new'
       path: '/quizzes/new'
@@ -816,6 +874,20 @@ declare module '@tanstack/solid-router' {
       fullPath: '/dashboard/drive/'
       preLoaderRoute: typeof DashboardDriveIndexRouteImport
       parentRoute: typeof DashboardDriveRoute
+    }
+    '/reports/students/$studentId': {
+      id: '/reports/students/$studentId'
+      path: '/students/$studentId'
+      fullPath: '/reports/students/$studentId'
+      preLoaderRoute: typeof ReportsStudentsStudentIdRouteImport
+      parentRoute: typeof ReportsRoute
+    }
+    '/reports/attempts/$attemptId': {
+      id: '/reports/attempts/$attemptId'
+      path: '/attempts/$attemptId'
+      fullPath: '/reports/attempts/$attemptId'
+      preLoaderRoute: typeof ReportsAttemptsAttemptIdRouteImport
+      parentRoute: typeof ReportsRoute
     }
     '/posts_/$postId/deep': {
       id: '/posts_/$postId/deep'
@@ -929,6 +1001,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ApiDriveFoldersIdRouteImport
       parentRoute: typeof ApiDriveFoldersRoute
     }
+    '/api/drive/download/$assetId': {
+      id: '/api/drive/download/$assetId'
+      path: '/api/drive/download/$assetId'
+      fullPath: '/api/drive/download/$assetId'
+      preLoaderRoute: typeof ApiDriveDownloadAssetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -973,6 +1052,21 @@ const PostsRouteChildren: PostsRouteChildren = {
 }
 
 const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren)
+
+interface ReportsRouteChildren {
+  ReportsLiveRoute: typeof ReportsLiveRoute
+  ReportsAttemptsAttemptIdRoute: typeof ReportsAttemptsAttemptIdRoute
+  ReportsStudentsStudentIdRoute: typeof ReportsStudentsStudentIdRoute
+}
+
+const ReportsRouteChildren: ReportsRouteChildren = {
+  ReportsLiveRoute: ReportsLiveRoute,
+  ReportsAttemptsAttemptIdRoute: ReportsAttemptsAttemptIdRoute,
+  ReportsStudentsStudentIdRoute: ReportsStudentsStudentIdRoute,
+}
+
+const ReportsRouteWithChildren =
+  ReportsRoute._addFileChildren(ReportsRouteChildren)
 
 interface UsersRouteChildren {
   UsersUserIdRoute: typeof UsersUserIdRoute
@@ -1043,7 +1137,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   PostsRoute: PostsRouteWithChildren,
   RedirectRoute: RedirectRoute,
-  ReportsRoute: ReportsRoute,
+  ReportsRoute: ReportsRouteWithChildren,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   UserRoute: UserRoute,
@@ -1069,6 +1163,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardClassroomsNewRoute: DashboardClassroomsNewRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
   RoomRoomIdIndexRoute: RoomRoomIdIndexRoute,
+  ApiDriveDownloadAssetIdRoute: ApiDriveDownloadAssetIdRoute,
   ApiShareShareIdQrRoute: ApiShareShareIdQrRoute,
 }
 export const routeTree = rootRouteImport

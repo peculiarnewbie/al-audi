@@ -111,16 +111,20 @@ Consider: tags on drive_assets (many-to-many).
 - [x] Save replaces all permissions atomically
 
 ### 6. Reporting Drill-Down
-- Per-quiz attempt detail view
-- Per-student full history
-- Live session results review
+- [x] Schemas: `AttemptDetail`, `StudentHistory`, `LiveSession` with full response/question details
+- [x] Handlers: `getAttemptDetailEffect` (attempt + responses + questions + options), `getStudentHistoryEffect` (all attempts for a student with quiz names), `getLiveSessionsEffect` (grouped by roomId/sessionId)
+- [x] Server functions: `getAttemptDetail`, `getStudentHistory`, `getLiveSessions` (createServerFn)
+- [x] Route: `/reports/students/$studentId` — full student history with per-attempt scores, clickable into attempt detail
+- [x] Route: `/reports/attempts/$attemptId` — question-by-question review (MCQ with option highlighting, text answer display), score summary card
+- [x] Route: `/reports/live` — live session results table with per-player scores
+- [x] Updated `/reports` page: student cards link to history, "Live sessions" link in header
 
 ### 7. Polish
-- File download/preview from drive detail panel
-- Drive search + filter + pagination
-- Live quiz game UI polish
-- Quiz listing page empty state
-- Drive tags (optional)
+- [x] File download/preview: download endpoint at `api/drive/media/$id` returns file from R2; drive page shows assets per folder with Download button
+- [x] Drive search: search input on drive page filters both folders and assets by name
+- [x] Live quiz game UI polish: timer bar with color change at 5s, spinner while loading, answer button states (selected/hover/disabled), progress bar for answer completion (host), ranked results with medals, "New game" button on end screen, loading spinner for waiting state
+- [x] Quiz listing page empty state: was already implemented (shows message + CTA)
+- Drive tags (skipped — types exist but no DB table, handlers, or UI)
 
 ### 8. Deploy
 - Provision with Alchemy: `bun run alchemy deploy`

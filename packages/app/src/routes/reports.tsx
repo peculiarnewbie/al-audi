@@ -22,18 +22,20 @@ type StatItemProps = {
     value: string;
 };
 
-const formatDate = (value: number | null) =>
-    value ? new Date(value).toISOString().slice(0, 10) : "—";
+function formatDate(value: number | null) {
+    return value ? new Date(value).toISOString().slice(0, 10) : "-";
+}
 
-const formatPercent = (value: number | null) =>
-    value === null ? "—" : `${value}%`;
+function formatPercent(value: number | null) {
+    return value === null ? "-" : String(value) + "%";
+}
 
-const tabClass = (isActive: boolean) =>
-    `px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-[0.2em] transition-colors ${
-        isActive
-            ? "bg-[color:var(--dashboard-accent)] text-white"
-            : "border border-white/70 bg-white/80 text-slate-600 hover:text-slate-900"
-    }`;
+function tabClass(isActive: boolean) {
+    if (isActive) {
+        return "px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-[0.2em] transition-colors bg-[color:var(--dashboard-accent)] text-white";
+    }
+    return "px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-[0.2em] transition-colors border border-white/70 bg-white/80 text-slate-600 hover:text-slate-900";
+}
 
 function StatItem(props: StatItemProps) {
     return (
@@ -64,8 +66,16 @@ function ReportsPage() {
                 <p class="text-slate-600">
                     Track class progress, assignments, and quiz performance.
                 </p>
-                <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
-                    Updated {formatDate(report().generatedAt)}
+                <div class="flex items-center gap-4">
+                    <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
+                        Updated {formatDate(report().generatedAt)}
+                    </div>
+                    <a
+                        href="/reports/live"
+                        class="text-xs uppercase tracking-[0.2em] text-[color:var(--dashboard-accent)] hover:underline"
+                    >
+                        Live sessions &rarr;
+                    </a>
                 </div>
             </header>
 
@@ -102,7 +112,10 @@ function ReportsPage() {
                         <div class="grid gap-4">
                             <For each={report().students}>
                                 {(student) => (
-                                    <div class="glass-card p-6 space-y-4">
+                                    <a
+                                        href={"/reports/students/" + student.id}
+                                        class="glass-card p-6 space-y-4 block hover:opacity-80 transition-opacity"
+                                    >
                                         <div>
                                             <div class="text-xs uppercase tracking-[0.3em] text-slate-500">
                                                 Student
@@ -119,15 +132,15 @@ function ReportsPage() {
                                         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                             <StatItem
                                                 label="Classes"
-                                                value={student.classCount.toString()}
+                                                value={String(student.classCount)}
                                             />
                                             <StatItem
                                                 label="Assignments"
-                                                value={student.assignmentCount.toString()}
+                                                value={String(student.assignmentCount)}
                                             />
                                             <StatItem
                                                 label="Attempts"
-                                                value={student.attemptCount.toString()}
+                                                value={String(student.attemptCount)}
                                             />
                                             <StatItem
                                                 label="Avg score"
@@ -142,7 +155,7 @@ function ReportsPage() {
                                                 )}
                                             />
                                         </div>
-                                    </div>
+                                    </a>
                                 )}
                             </For>
                         </div>
@@ -179,15 +192,15 @@ function ReportsPage() {
                                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                         <StatItem
                                             label="Students"
-                                            value={classReport.studentCount.toString()}
+                                            value={String(classReport.studentCount)}
                                         />
                                         <StatItem
                                             label="Assignments"
-                                            value={classReport.assignmentCount.toString()}
+                                            value={String(classReport.assignmentCount)}
                                         />
                                         <StatItem
                                             label="Attempts"
-                                            value={classReport.attemptCount.toString()}
+                                            value={String(classReport.attemptCount)}
                                         />
                                         <StatItem
                                             label="Avg score"

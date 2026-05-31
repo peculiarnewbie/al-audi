@@ -135,32 +135,61 @@ function RouteComponent() {
             </Match>
             <Match when={gameState() === "ended"}>
                 <div class="mx-auto max-w-3xl px-6 py-12">
-                    <div class="glass-panel p-6 space-y-4">
-                        <h2 class="font-display text-2xl font-semibold text-[color:var(--dashboard-ink)]">
-                            Session results
-                        </h2>
+                    <div class="glass-panel p-6 space-y-6">
+                        <div class="text-center space-y-2">
+                            <div class="inline-block text-xs uppercase tracking-[0.3em] bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+                                Game Over
+                            </div>
+                            <h2 class="font-display text-3xl font-semibold text-[color:var(--dashboard-ink)]">
+                                Session results
+                            </h2>
+                        </div>
                         <Show
                             when={finalResults() && finalResults()!.length}
                             fallback={
-                                <div class="text-sm text-slate-500">
-                                    Game ended.
+                                <div class="text-sm text-slate-500 text-center py-8">
+                                    Game ended. No results recorded.
                                 </div>
                             }
                         >
-                            <ul class="space-y-2 text-sm text-slate-600">
-                                <For each={finalResults() ?? []}>
-                                    {(result) => (
-                                        <li class="flex items-center justify-between border-b border-white/70 pb-2">
-                                            <span>{result.playerName}</span>
-                                            <span>
-                                                {result.score} /{" "}
-                                                {result.maxScore}
-                                            </span>
-                                        </li>
-                                    )}
+                            <div class="space-y-2">
+                                <For each={
+                                    (finalResults() ?? []).slice().sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+                                }>
+                                    {(result, idx) => {
+                                        const rank = idx() + 1;
+                                        const medal = rank === 1 ? "bg-yellow-100 text-yellow-700" :
+                                            rank === 2 ? "bg-slate-200 text-slate-600" :
+                                            rank === 3 ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-500";
+                                        const pct = result.maxScore > 0 ? Math.round((result.score / result.maxScore) * 100) : 0;
+                                        return (
+                                            <div class={"flex items-center justify-between rounded-2xl px-4 py-3 " + (rank <= 3 ? "bg-white/90 shadow-sm" : "bg-white/60")}>
+                                                <div class="flex items-center gap-3">
+                                                    <span class={"flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold " + medal}>
+                                                        {rank <= 3 ? ["1st", "2nd", "3rd"][rank - 1] : String(rank) + "th"}
+                                                    </span>
+                                                    <span class="font-medium text-[color:var(--dashboard-ink)]">{result.playerName}</span>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <div class="text-right">
+                                                        <div class="text-lg font-bold text-[color:var(--dashboard-ink)]">{String(pct) + "%"}</div>
+                                                        <div class="text-xs text-slate-500">{result.score} / {result.maxScore}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }}
                                 </For>
-                            </ul>
+                            </div>
                         </Show>
+                        <div class="flex justify-center pt-2">
+                            <a
+                                href="/room"
+                                class="rounded-full bg-[color:var(--dashboard-accent)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-[color:var(--dashboard-accent-strong)]"
+                            >
+                                New game
+                            </a>
+                        </div>
                     </div>
                 </div>
             </Match>

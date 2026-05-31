@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
+import { Effect } from "effect";
 import { env } from "cloudflare:workers";
 import { and, eq, inArray } from "drizzle-orm";
 import { createDb } from "~/db/client";
@@ -11,6 +12,8 @@ import {
     users,
 } from "~/db/schema";
 import { getAuthenticatedUser } from "~/utils/auth.server";
+import { getAttemptDetailEffect, getStudentHistoryEffect, getLiveSessionsEffect } from "~/reporting/handlers";
+import type { AttemptDetail, StudentHistory, LiveSession } from "~/reporting/schemas";
 
 type AttemptRow = typeof quizAttempts.$inferSelect;
 type AssignmentRow = typeof quizAssignments.$inferSelect;
@@ -225,3 +228,44 @@ export const getTeacherReport = createServerFn({ method: "GET" }).handler(
         };
     },
 );
+
+export const getAttemptDetail = createServerFn({ method: "GET" })
+    .inputValidator((data: unknown) => data as { attemptId: string })
+    .handler(async ({ data }): Promise<AttemptDetail | null> => {
+        const user = await getAuthenticatedUser(getRequestHeaders());
+        if (!user) return null;
+        const db = createDb(env.DB);
+        const result = await Effect.runPromiseExit(
+            getAttemptDetailEffect(db, data.attemptId, user.id),
+        );
+        if (result._tag === "Success") return result.value;
+        return null;
+    });
+
+export const getStudentHistory = createServerFn({ method: "GET" })
+    .inputValidator((data: unknown) => data as { studentId: string })
+    .handler(async ({ data }): Promise<StudentHistory | null> => {
+        const user = await getAuthenticatedUser(getRequestHeaders());
+        if (!user) return null;
+        const db = createDb(env.DB);
+        const result = await Effect.runPromiseExit(
+            getStudentHistoryEffect(db, data.studentId, user.id),
+        );
+        if (result._tag === "Success") return result.value;
+        return null;
+    });
+
+export const getLiveSessions = createServerFn({ method: "GET" }).handler(
+    async (): Promise<LiveSession[]> => {
+        const user = await getAuthenticatedUser(getRequestHeaders());
+        if (!user) return [];
+        const db = createDb(env.DB);
+        const result = await Effect.runPromiseExit(
+            getLiveSessionsEffect(db, user.id),
+        );
+        if (result._tag === "Success") return result.value;
+        return [];
+    },
+);
+
+export type { AttemptDetail, AttemptResponse, StudentHistory, LiveSession } from "~/reporting/schemas";
