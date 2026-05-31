@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/solid-router";
+import { createFileRoute } from "@tanstack/solid-router";
 import { For, Show, createResource } from "solid-js";
 import { getLiveSessions } from "~/server/reporting";
 

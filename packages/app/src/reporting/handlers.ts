@@ -149,7 +149,8 @@ export function getStudentHistoryEffect(
             const classRowsForStudent = await db
                 .select({ classId: classStudents.classId })
                 .from(classStudents)
-                .where(eq(classStudents.studentId, studentId));
+                .innerJoin(classes, eq(classes.id, classStudents.classId))
+                .where(and(eq(classStudents.studentId, studentId), eq(classes.teacherId, teacherId)));
 
             const classIds = classRowsForStudent.map((c) => c.classId);
             const classCount = classIds.length;
@@ -203,6 +204,7 @@ export function getLiveSessionsEffect(
             const results = await db
                 .select()
                 .from(liveQuizResults)
+                .where(eq(liveQuizResults.teacherId, teacherId))
                 .orderBy(desc(liveQuizResults.endedAt));
 
             const grouped = new Map<string, typeof results>();

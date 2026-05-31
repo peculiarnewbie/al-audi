@@ -34,6 +34,14 @@ export const TeacherReportSchema = Schema.Struct({
     generatedAt: Schema.Number,
 });
 
+export const AttemptDetailInputSchema = Schema.Struct({
+    attemptId: Schema.NonEmptyString,
+});
+
+export const StudentHistoryInputSchema = Schema.Struct({
+    studentId: Schema.NonEmptyString,
+});
+
 export const AttemptResponseSchema = Schema.Struct({
     id: Schema.String,
     questionId: Schema.String,

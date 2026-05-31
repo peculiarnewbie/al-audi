@@ -10,6 +10,7 @@ import type { GameAdapter } from "~/game/adapter";
 import type { LiveSessionSummary } from "~/game/schemas";
 
 const ROOM_STATE_KEY = "room_state";
+const TEACHER_ID_KEY = "teacher_id";
 
 export class GameRoom extends DurableObject {
     env: Env;
@@ -18,6 +19,7 @@ export class GameRoom extends DurableObject {
     sessions: Map<WebSocket, { id: string }>;
     gameAdapter: GameAdapter;
     private stateRef: { current: unknown };
+    private teacherId: string | null;
 
     constructor(ctx: DurableObjectState, env: Env) {
         super(ctx, env);
@@ -25,6 +27,7 @@ export class GameRoom extends DurableObject {
         this.roomId = ctx.id.name ?? "";
         this.sessions = new Map();
         this.stateRef = { current: null };
+        this.teacherId = null;
         this.db = createDoDb(ctx.storage);
         this.gameAdapter = createQuizGameAdapter(this.stateRef);
 
@@ -34,6 +37,7 @@ export class GameRoom extends DurableObject {
 
         ctx.blockConcurrencyWhile(async () => {
             this.ensureSchema();
+            this.loadTeacherId();
             this.loadPersistedState();
             this.rehydrateSessions();
         });
@@ -62,6 +66,31 @@ export class GameRoom extends DurableObject {
         }
     }
 
+    private loadTeacherId() {
+        try {
+            const row = this.db
+                .select({ value: gameKv.value })
+                .from(gameKv)
+                .where(eq(gameKv.key, TEACHER_ID_KEY))
+                .get();
+            this.teacherId = row?.value ?? null;
+        } catch {
+            this.teacherId = null;
+        }
+    }
+
+    private persistTeacherId() {
+        if (!this.teacherId) return;
+        this.db
+            .insert(gameKv)
+            .values({ key: TEACHER_ID_KEY, value: this.teacherId })
+            .onConflictDoUpdate({
+                target: gameKv.key,
+                set: { value: this.teacherId },
+            })
+            .run();
+    }
+
     private persistState() {
         const server = this.stateRef.current as ReturnType<typeof createServer> | null;
         if (!server) return;
@@ -88,6 +117,11 @@ export class GameRoom extends DurableObject {
     async fetch(request: Request): Promise<Response> {
         const webSocketPair = new WebSocketPair();
         const [client, serverWs] = Object.values(webSocketPair);
+        const teacherId = request.headers.get("x-teacher-id");
+        if (teacherId && !this.teacherId) {
+            this.teacherId = teacherId;
+            this.persistTeacherId();
+        }
 
         const playerId = crypto.randomUUID();
         serverWs.serializeAttachment({ id: playerId });
@@ -161,7 +195,7 @@ export class GameRoom extends DurableObject {
     }
 
     async persistSessionResults(summary: LiveSessionSummary) {
-        if (!this.roomId || !summary.results.length) {
+        if (!this.roomId || !this.teacherId || !summary.results.length) {
             return;
         }
 
@@ -169,6 +203,7 @@ export class GameRoom extends DurableObject {
         const createdAt = Date.now();
         const rows = summary.results.map((result) => ({
             id: nanoid(10),
+            teacherId: this.teacherId!,
             sessionId: summary.sessionId,
             roomId: this.roomId,
             playerId: result.playerId,

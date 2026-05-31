@@ -199,6 +199,7 @@ export const quizResponses = sqliteTable("quiz_responses", {
 
 export const liveQuizResults = sqliteTable("live_quiz_results", {
     id: text("id").primaryKey(),
+    teacherId: text("teacher_id").notNull(),
     sessionId: text("session_id").notNull(),
     roomId: text("room_id").notNull(),
     playerId: text("player_id").notNull(),

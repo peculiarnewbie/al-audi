@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/solid-start";
 import { getRequestHeaders } from "@tanstack/solid-start/server";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { env } from "cloudflare:workers";
 import { and, eq, inArray } from "drizzle-orm";
 import { createDb } from "~/db/client";
@@ -13,6 +13,7 @@ import {
 } from "~/db/schema";
 import { getAuthenticatedUser } from "~/utils/auth.server";
 import { getAttemptDetailEffect, getStudentHistoryEffect, getLiveSessionsEffect } from "~/reporting/handlers";
+import { AttemptDetailInputSchema, StudentHistoryInputSchema } from "~/reporting/schemas";
 import type { AttemptDetail, StudentHistory, LiveSession } from "~/reporting/schemas";
 
 type AttemptRow = typeof quizAttempts.$inferSelect;
@@ -230,7 +231,7 @@ export const getTeacherReport = createServerFn({ method: "GET" }).handler(
 );
 
 export const getAttemptDetail = createServerFn({ method: "GET" })
-    .inputValidator((data: unknown) => data as { attemptId: string })
+    .inputValidator(Schema.decodeUnknownSync(AttemptDetailInputSchema))
     .handler(async ({ data }): Promise<AttemptDetail | null> => {
         const user = await getAuthenticatedUser(getRequestHeaders());
         if (!user) return null;
@@ -243,7 +244,7 @@ export const getAttemptDetail = createServerFn({ method: "GET" })
     });
 
 export const getStudentHistory = createServerFn({ method: "GET" })
-    .inputValidator((data: unknown) => data as { studentId: string })
+    .inputValidator(Schema.decodeUnknownSync(StudentHistoryInputSchema))
     .handler(async ({ data }): Promise<StudentHistory | null> => {
         const user = await getAuthenticatedUser(getRequestHeaders());
         if (!user) return null;

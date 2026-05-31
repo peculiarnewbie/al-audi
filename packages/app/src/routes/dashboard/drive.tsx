@@ -249,7 +249,7 @@ function DrivePage() {
                                             </div>
                                             <div class="flex items-center gap-2 shrink-0">
                                                 <a
-                                                    href={"/api/drive/media/" + asset.id}
+                                                    href={"/api/drive/download/" + asset.id}
                                                     target="_blank"
                                                     download={asset.fileName}
                                                     class="rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm transition hover:bg-white"
