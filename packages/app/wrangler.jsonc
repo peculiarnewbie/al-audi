@@ -37,4 +37,32 @@
     "vars": {
         "MY_VAR": "Hello from Cloudflare",
     },
+    "env": {
+        "test": {
+            "d1_databases": [
+                {
+                    "binding": "DB",
+                    "database_name": "al-audi-test",
+                    "database_id": "00000000-0000-0000-0000-000000000000",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "BUCKET",
+                    "bucket_name": "al-audi-test",
+                },
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "WS",
+                        "class_name": "GameRoom",
+                    },
+                ],
+            },
+            "vars": {
+                "MY_VAR": "Hello from Cloudflare",
+            },
+        },
+    },
 }

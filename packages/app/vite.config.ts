@@ -1,5 +1,5 @@
+import path from "node:path";
 import { defineConfig } from 'vite'
-import tsConfigPaths from 'vite-tsconfig-paths'
 import { cloudflare } from '@cloudflare/vite-plugin'
 import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
 import viteSolid from 'vite-plugin-solid'
@@ -9,11 +9,14 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  resolve: {
+    alias: {
+      kysely: path.resolve(import.meta.dirname, "src/stubs/kysely.ts"),
+    },
+    tsconfigPaths: true,
+  },
   plugins: [
     tailwindcss(),
-    tsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tanstackStart(),
     viteSolid({ ssr: true }),

@@ -1,5 +1,6 @@
 {
     "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["vitest.workers.config.ts", "src/**/*.integration.test.ts"],
     "compilerOptions": {
         "strict": true,
         "esModuleInterop": true,
@@ -18,6 +19,7 @@
         "paths": {
             "~/*": ["./src/*"]
         },
-        "noEmit": true
+        "noEmit": true,
+        "ignoreDeprecations": "6.0"
     }
 }

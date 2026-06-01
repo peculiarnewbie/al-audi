@@ -1,27 +1,28 @@
 {
-    "name": "al-audi",
-    "type": "module",
-    "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
-    "scripts": {
-        "dev": "cd packages/app && bun run dev",
-        "build": "cd packages/app && bun run build",
-        "preview": "cd packages/app && bun run preview",
-        "deploy": "cd packages/app && bun run deploy",
-        "test": "cd packages/app && bun run test",
-        "test:workers": "cd packages/app && bun run test:workers",
-        "test:e2e": "cd packages/app && bun run test:e2e",
-        "test:all": "cd packages/app && bun run test:all"
-    },
-    "devDependencies": {
-        "prettier": "^3.7.4"
-    },
-    "peerDependencies": {
-        "typescript": "^5"
-    },
-    "dependencies": {
-        "alchemy": "2.0.0-beta.32"
-    }
+  "name": "al-audi",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "cd packages/app && pnpm dev",
+    "build": "cd packages/app && pnpm build",
+    "preview": "cd packages/app && pnpm preview",
+    "deploy": "cd packages/app && pnpm deploy",
+    "test": "cd packages/app && pnpm test",
+    "test:workers": "cd packages/app && pnpm test:workers",
+    "test:e2e": "cd packages/app && pnpm test:e2e",
+    "test:all": "cd packages/app && pnpm test:all"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "alchemy": "2.0.0-beta.48"
+  },
+  "packageManager": "pnpm@11.5.0"
 }

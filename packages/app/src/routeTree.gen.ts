@@ -337,11 +337,11 @@ export interface FileRoutesByFullPath {
   '/reports/live': typeof ReportsLiveRoute
   '/share/$shareId': typeof ShareShareIdRoute
   '/users/$userId': typeof UsersUserIdRoute
-  '/assignments': typeof AssignmentsIndexRoute
-  '/dashboard': typeof DashboardIndexRoute
+  '/assignments/': typeof AssignmentsIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/posts/': typeof PostsIndexRoute
-  '/quizzes': typeof QuizzesIndexRoute
-  '/room': typeof RoomIndexRoute
+  '/quizzes/': typeof QuizzesIndexRoute
+  '/room/': typeof RoomIndexRoute
   '/users/': typeof UsersIndexRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
@@ -359,7 +359,7 @@ export interface FileRoutesByFullPath {
   '/reports/attempts/$attemptId': typeof ReportsAttemptsAttemptIdRoute
   '/reports/students/$studentId': typeof ReportsStudentsStudentIdRoute
   '/dashboard/drive/': typeof DashboardDriveIndexRoute
-  '/room/$roomId': typeof RoomRoomIdIndexRoute
+  '/room/$roomId/': typeof RoomRoomIdIndexRoute
   '/api/drive/download/$assetId': typeof ApiDriveDownloadAssetIdRoute
   '/api/drive/folders/$id': typeof ApiDriveFoldersIdRoute
   '/api/drive/media/$id': typeof ApiDriveMediaIdRoute
@@ -489,11 +489,11 @@ export interface FileRouteTypes {
     | '/reports/live'
     | '/share/$shareId'
     | '/users/$userId'
-    | '/assignments'
-    | '/dashboard'
+    | '/assignments/'
+    | '/dashboard/'
     | '/posts/'
-    | '/quizzes'
-    | '/room'
+    | '/quizzes/'
+    | '/room/'
     | '/users/'
     | '/route-a'
     | '/route-b'
@@ -511,7 +511,7 @@ export interface FileRouteTypes {
     | '/reports/attempts/$attemptId'
     | '/reports/students/$studentId'
     | '/dashboard/drive/'
-    | '/room/$roomId'
+    | '/room/$roomId/'
     | '/api/drive/download/$assetId'
     | '/api/drive/folders/$id'
     | '/api/drive/media/$id'
@@ -738,7 +738,7 @@ declare module '@tanstack/solid-router' {
     '/_pathlessLayout': {
       id: '/_pathlessLayout'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof PathlessLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -759,14 +759,14 @@ declare module '@tanstack/solid-router' {
     '/room/': {
       id: '/room/'
       path: '/room'
-      fullPath: '/room'
+      fullPath: '/room/'
       preLoaderRoute: typeof RoomIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quizzes/': {
       id: '/quizzes/'
       path: '/quizzes'
-      fullPath: '/quizzes'
+      fullPath: '/quizzes/'
       preLoaderRoute: typeof QuizzesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -780,14 +780,14 @@ declare module '@tanstack/solid-router' {
     '/dashboard/': {
       id: '/dashboard/'
       path: '/dashboard'
-      fullPath: '/dashboard'
+      fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/assignments/': {
       id: '/assignments/'
       path: '/assignments'
-      fullPath: '/assignments'
+      fullPath: '/assignments/'
       preLoaderRoute: typeof AssignmentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -857,14 +857,14 @@ declare module '@tanstack/solid-router' {
     '/_pathlessLayout/_nested-layout': {
       id: '/_pathlessLayout/_nested-layout'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteImport
       parentRoute: typeof PathlessLayoutRoute
     }
     '/room/$roomId/': {
       id: '/room/$roomId/'
       path: '/room/$roomId'
-      fullPath: '/room/$roomId'
+      fullPath: '/room/$roomId/'
       preLoaderRoute: typeof RoomRoomIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

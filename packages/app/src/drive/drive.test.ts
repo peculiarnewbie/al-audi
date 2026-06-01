@@ -178,7 +178,7 @@ describe("Drive Effect Handlers", () => {
                     name: "huge.bin",
                     mimeType: "application/octet-stream",
                     size: 200 * 1024 * 1024,
-                    fileData: new Uint8Array(0),
+                    fileData: new Blob([]),
                 }),
             );
 
@@ -208,7 +208,7 @@ describe("Drive Effect Handlers", () => {
                     name: "test.txt",
                     mimeType: "text/plain",
                     size: 100,
-                    fileData: new TextEncoder().encode("hello"),
+                    fileData: new Blob(["hello"]),
                 }),
             );
 
