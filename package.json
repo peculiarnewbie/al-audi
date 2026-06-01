@@ -9,10 +9,13 @@
         "dev": "cd packages/app && bun run dev",
         "build": "cd packages/app && bun run build",
         "preview": "cd packages/app && bun run preview",
-        "deploy": "cd packages/app && bun run deploy"
+        "deploy": "cd packages/app && bun run deploy",
+        "test": "cd packages/app && bun run test",
+        "test:workers": "cd packages/app && bun run test:workers",
+        "test:e2e": "cd packages/app && bun run test:e2e",
+        "test:all": "cd packages/app && bun run test:all"
     },
     "devDependencies": {
-        "@types/bun": "latest",
         "prettier": "^3.7.4"
     },
     "peerDependencies": {

@@ -8,7 +8,12 @@
         "build": "vite build && tsc --noEmit",
         "preview": "vite preview",
         "deploy": "npm run build && wrangler deploy",
-        "cf-typegen": "wrangler types"
+        "cf-typegen": "wrangler types",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:workers": "vitest run --config vitest.workers.config.ts",
+        "test:e2e": "vitest run --config vitest.e2e.config.ts",
+        "test:all": "vitest run && vitest run --config vitest.workers.config.ts && vitest run --config vitest.e2e.config.ts"
     },
     "dependencies": {
         "@solid-primitives/i18n": "^2.2.1",
@@ -28,6 +33,7 @@
     },
     "devDependencies": {
         "@cloudflare/vite-plugin": "^1.13.7",
+        "@cloudflare/vitest-pool-workers": "^0.16.10",
         "@tailwindcss/vite": "^4.1.18",
         "@types/luxon": "^3.7.1",
         "@types/node": "^22.5.4",
@@ -37,6 +43,7 @@
         "vite": "npm:rolldown-vite@latest",
         "vite-plugin-solid": "^2.11.10",
         "vite-tsconfig-paths": "^5.1.4",
+        "vitest": "^4.1.8",
         "wrangler": "^4.49.1"
     }
 }

@@ -1,5 +1,14 @@
-import { describe, it, expect } from "bun:test";
-import { Schema } from "effect";
+import { describe, it, expect } from "vitest";
+import { Schema, Effect, Exit, Cause, Option } from "effect";
+
+function expectFailure(exit: Exit.Exit<unknown, unknown>): unknown {
+    expect(Exit.isFailure(exit)).toBe(true);
+    if (Exit.isFailure(exit)) {
+        const err = Cause.squash(exit.cause);
+        return err;
+    }
+    throw new Error("Expected failure");
+}
 import {
     MultipleChoiceQuestionSchema,
     TextQuestionSchema,
@@ -246,6 +255,279 @@ describe("Quiz Handlers (unit)", () => {
         it("buildCategoryPayload returns undefined for empty input", async () => {
             const { saveQuizEffect } = await import("~/quiz/handlers");
             expect(saveQuizEffect).toBeDefined();
+        });
+    });
+
+    describe("createQuizShareLinkEffect", () => {
+        it("creates share link for owned quiz", async () => {
+            const { createQuizShareLinkEffect, QuizNotFound, QuizAccessDenied } = await import(
+                "~/quiz/handlers"
+            );
+            const { Effect, Exit } = await import("effect");
+
+            const mockDb = {
+                select: () => ({
+                    from: () => ({
+                        where: () => ({
+                            limit: () =>
+                                Promise.resolve([
+                                    { id: "quiz-1", creatorId: "user-1" },
+                                ]),
+                        }),
+                    }),
+                }),
+                insert: () => ({
+                    values: () => Promise.resolve(),
+                }),
+            };
+
+            const exit = await Effect.runPromiseExit(
+                createQuizShareLinkEffect(mockDb as any, "quiz-1", "user-1", true),
+            );
+
+            Exit.match(exit, {
+                onSuccess: (result) => {
+                    expect(result.shareId).toBeDefined();
+                    expect(result.accessToken).toBeDefined();
+                },
+                onFailure: (err) => {
+                    throw new Error(`Expected success, got ${err}`);
+                },
+            });
+        });
+
+        it("fails with QuizNotFound for missing quiz", async () => {
+            const { createQuizShareLinkEffect, QuizNotFound } = await import(
+                "~/quiz/handlers"
+            );
+
+            const mockDb = {
+                select: () => ({
+                    from: () => ({
+                        where: () => ({
+                            limit: () => Promise.resolve([]),
+                        }),
+                    }),
+                }),
+            };
+
+            const exit = await Effect.runPromiseExit(
+                createQuizShareLinkEffect(mockDb as any, "missing-quiz", "user-1", false),
+            );
+            const err = expectFailure(exit);
+            expect(err).toBeInstanceOf(QuizNotFound);
+        });
+
+        it("fails with QuizAccessDenied when user is not creator", async () => {
+            const { createQuizShareLinkEffect, QuizAccessDenied } = await import(
+                "~/quiz/handlers"
+            );
+
+            const mockDb = {
+                select: () => ({
+                    from: () => ({
+                        where: () => ({
+                            limit: () =>
+                                Promise.resolve([
+                                    { id: "quiz-1", creatorId: "other-user" },
+                                ]),
+                        }),
+                    }),
+                }),
+            };
+
+            const exit = await Effect.runPromiseExit(
+                createQuizShareLinkEffect(mockDb as any, "quiz-1", "user-1", false),
+            );
+            const err = expectFailure(exit);
+            expect(err).toBeInstanceOf(QuizAccessDenied);
+        });
+    });
+
+    describe("createQuizAssignmentEffect", () => {
+        it("creates assignment targeting a class", async () => {
+            const { createQuizAssignmentEffect } = await import("~/quiz/handlers");
+            const { Effect, Exit } = await import("effect");
+
+            const inserted: any[] = [];
+            const mockDb = {
+                insert: () => ({
+                    values: (row: any) => {
+                        inserted.push(row);
+                        return Promise.resolve();
+                    },
+                }),
+            };
+
+            const exit = await Effect.runPromiseExit(
+                createQuizAssignmentEffect(mockDb as any, "teacher-1", {
+                    quizId: "quiz-1",
+                    classId: "class-1",
+                }),
+            );
+
+            Exit.match(exit, {
+                onSuccess: (result) => {
+                    expect(result.id).toBeDefined();
+                    expect(inserted[0].classId).toBe("class-1");
+                    expect(inserted[0].studentId).toBeNull();
+                },
+                onFailure: (err) => {
+                    throw new Error(`Expected success, got ${err}`);
+                },
+            });
+        });
+
+        it("fails when both classId and studentId are set", async () => {
+            const { createQuizAssignmentEffect, AssignmentTargetError } = await import(
+                "~/quiz/handlers"
+            );
+
+            const mockDb = {};
+
+            const exit = await Effect.runPromiseExit(
+                createQuizAssignmentEffect(mockDb as any, "teacher-1", {
+                    quizId: "quiz-1",
+                    classId: "class-1",
+                    studentId: "student-1",
+                }),
+            );
+            const err = expectFailure(exit);
+            expect(err).toBeInstanceOf(AssignmentTargetError);
+        });
+
+        it("fails when neither classId nor studentId is set", async () => {
+            const { createQuizAssignmentEffect, AssignmentTargetError } = await import(
+                "~/quiz/handlers"
+            );
+
+            const mockDb = {};
+
+            const exit = await Effect.runPromiseExit(
+                createQuizAssignmentEffect(mockDb as any, "teacher-1", {
+                    quizId: "quiz-1",
+                }),
+            );
+            const err = expectFailure(exit);
+            expect(err).toBeInstanceOf(AssignmentTargetError);
+        });
+    });
+
+    describe("getSharedQuizEffect", () => {
+        it("returns quiz questions for valid share link", async () => {
+            const { getSharedQuizEffect } = await import("~/quiz/handlers");
+            const { Effect, Exit } = await import("effect");
+
+            const mockDb = {
+                select: () => ({
+                    from: (table: any) => ({
+                        where: () => ({
+                            limit: () => {
+                                if (table === undefined) {
+                                    return Promise.resolve([
+                                        {
+                                            id: "share-1",
+                                            quizId: "quiz-1",
+                                            accessToken: null,
+                                        },
+                                    ]);
+                                }
+                                return Promise.resolve([]);
+                            },
+                        }),
+                    }),
+                }),
+            };
+
+            const selectCallCount = { count: 0 };
+            const db = {
+                select: () => {
+                    selectCallCount.count++;
+                    const callIndex = selectCallCount.count;
+                    return {
+                        from: () => ({
+                            where: () => ({
+                                limit: () => {
+                                    if (callIndex === 1) {
+                                        return Promise.resolve([
+                                            {
+                                                id: "share-1",
+                                                quizId: "quiz-1",
+                                                accessToken: null,
+                                            },
+                                        ]);
+                                    }
+                                    return Promise.resolve([]);
+                                },
+                            }),
+                        }),
+                    };
+                },
+            };
+
+            const exit = await Effect.runPromiseExit(
+                getSharedQuizEffect(db as any, "share-1"),
+            );
+
+            Exit.match(exit, {
+                onSuccess: () => {
+                    throw new Error("Expected failure due to no questions");
+                },
+                onFailure: (err) => {
+                    expect(err).toBeDefined();
+                },
+            });
+        });
+
+        it("fails with ShareLinkNotFound for missing share link", async () => {
+            const { getSharedQuizEffect, ShareLinkNotFound } = await import(
+                "~/quiz/handlers"
+            );
+
+            const mockDb = {
+                select: () => ({
+                    from: () => ({
+                        where: () => ({
+                            limit: () => Promise.resolve([]),
+                        }),
+                    }),
+                }),
+            };
+
+            const exit = await Effect.runPromiseExit(
+                getSharedQuizEffect(mockDb as any, "missing-share"),
+            );
+            const err = expectFailure(exit);
+            expect(err).toBeInstanceOf(ShareLinkNotFound);
+        });
+
+        it("fails with ShareLinkTokenRequired when token mismatch", async () => {
+            const { getSharedQuizEffect, ShareLinkTokenRequired } = await import(
+                "~/quiz/handlers"
+            );
+
+            const mockDb = {
+                select: () => ({
+                    from: () => ({
+                        where: () => ({
+                            limit: () =>
+                                Promise.resolve([
+                                    {
+                                        id: "share-1",
+                                        quizId: "quiz-1",
+                                        accessToken: "correct-token",
+                                    },
+                                ]),
+                        }),
+                    }),
+                }),
+            };
+
+            const exit = await Effect.runPromiseExit(
+                getSharedQuizEffect(mockDb as any, "share-1", "wrong-token"),
+            );
+            const err = expectFailure(exit);
+            expect(err).toBeInstanceOf(ShareLinkTokenRequired);
         });
     });
 });
