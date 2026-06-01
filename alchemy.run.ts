@@ -11,13 +11,15 @@ export const AppStack = Alchemy.Stack(
     Effect.gen(function* () {
         const stage = yield* Alchemy.Stage;
 
+        const suffix = stage === "production" ? "" : `-${stage}`;
+
         const db = yield* Cloudflare.D1Database("DB", {
-            name: `al-audi-${stage}-db`,
+            name: `al-audi${suffix}`,
             migrationsTable: "d1_migrations",
         });
 
         const bucket = yield* Cloudflare.R2Bucket("BUCKET", {
-            name: `al-audi-${stage}-bucket`,
+            name: `al-audi${suffix}`,
         });
 
         const ws = yield* Cloudflare.DurableObjectNamespace("WS", {
@@ -25,7 +27,7 @@ export const AppStack = Alchemy.Stack(
         });
 
         const worker = yield* Cloudflare.Worker("App", {
-            name: `al-audi-${stage}`,
+            name: `al-audi${suffix}`,
             main: "packages/app/src/worker/index.ts",
             assets: {
                 path: "packages/app/dist/client",
@@ -35,7 +37,6 @@ export const AppStack = Alchemy.Stack(
                 date: "2026-01-01",
                 flags: ["nodejs_compat"],
             },
-            adopt: true,
             bindings: {
                 DB: db,
                 BUCKET: bucket,

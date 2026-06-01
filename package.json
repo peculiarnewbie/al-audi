@@ -8,8 +8,11 @@
   "scripts": {
     "dev": "cd packages/app && pnpm dev",
     "build": "cd packages/app && pnpm build",
-    "preview": "cd packages/app && pnpm preview",
     "deploy": "cd packages/app && pnpm deploy",
+    "deploy:dev": "cd packages/app && pnpm deploy:dev",
+    "alchemy:plan": "alchemy plan",
+    "alchemy:bootstrap": "alchemy cloudflare bootstrap",
+    "preview": "cd packages/app && pnpm preview",
     "test": "cd packages/app && pnpm test",
     "test:workers": "cd packages/app && pnpm test:workers",
     "test:e2e": "cd packages/app && pnpm test:e2e",
@@ -22,6 +25,8 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@effect/platform-node": "4.0.0-beta.74",
+    "@effect/platform-node-shared": "4.0.0-beta.74",
     "alchemy": "2.0.0-beta.48"
   },
   "packageManager": "pnpm@11.5.0"

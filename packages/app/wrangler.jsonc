@@ -9,15 +9,12 @@
             "binding": "DB",
             "database_name": "al-audi",
             "database_id": "1b662294-b75b-43fc-b276-4ae5c79135ed",
-            "remote": true,
         },
     ],
     "r2_buckets": [
         {
             "binding": "BUCKET",
             "bucket_name": "al-audi",
-            "preview_bucket_name": "al-audi-preview",
-            "remote": true,
         },
     ],
     "durable_objects": {
@@ -34,9 +31,6 @@
             "new_sqlite_classes": ["GameRoom"],
         },
     ],
-    "vars": {
-        "MY_VAR": "Hello from Cloudflare",
-    },
     "env": {
         "test": {
             "d1_databases": [
@@ -59,9 +53,6 @@
                         "class_name": "GameRoom",
                     },
                 ],
-            },
-            "vars": {
-                "MY_VAR": "Hello from Cloudflare",
             },
         },
     },
